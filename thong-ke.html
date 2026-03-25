@@ -179,12 +179,14 @@ window.addEventListener('unhandledrejection', function(e) {
                             class="bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-500 dark:text-zinc-400 font-bold">BE
                             0-10</span>
                         <a href="./index.html"
-                            class="inline-block px-6 py-2.5 bg-green-100 text-green-700 font-semibold rounded-md hover:bg-green-200 hover:text-green-800 transition duration-300 border border-green-200">
+                            class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 text-zinc-500 dark:text-zinc-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400">
+                            <i class="fa-solid fa-pen-to-square text-[10px]"></i>
                             Nhập liệu
                         </a>
-                        <a href="./mau-hinh.html"
-                            class="inline-block px-8 py-3 bg-gradient-to-r from-green-400 to-emerald-600 text-white font-bold rounded-full shadow-lg shadow-green-500/50 hover:from-green-500 hover:to-emerald-700 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/40">
-                            Mẫu hình
+                        <a href="./phan-ung.html"
+                            class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 text-zinc-500 dark:text-zinc-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-600 dark:hover:text-violet-400">
+                            <i class="fa-solid fa-diagram-project text-[10px]"></i>
+                            Mẫu hình PƯ
                         </a>
                     </div>
                 </div>
@@ -830,6 +832,14 @@ window.addEventListener('unhandledrejection', function(e) {
             </span>
             <i class="fa-solid fa-rotate loading-icon text-blue-500 text-lg min-w-[20px] text-center"></i>
         </button>
+        <button onclick="document.getElementById('report-section').scrollIntoView({behavior: 'smooth'})"
+            class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-indigo-600 dark:text-indigo-400 mr-3 hidden group-hover:block">
+                Bao cao
+            </span>
+            <i class="fa-solid fa-file-invoice text-indigo-500 text-lg min-w-[20px] text-center"></i>
+        </button>
+
         <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap mt-4">
             <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-zinc-500 dark:text-zinc-400 mr-3 hidden group-hover:block">
@@ -948,7 +958,7 @@ window.addEventListener('unhandledrejection', function(e) {
                     setTimeout(function() {
                         try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch(e) { console.error("[Hours]", e); }
                         try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch(e) { console.error("[AI]", e); }
-                        fetch(API_PRIMARY_URL + "?mode=history").then(r=>r.json()).then(d=>{ block10Data=d; try{renderBlock10Chart(d);}catch(e2){console.error("[Block10]",e2);} }).catch(()=>{ try{renderBlock10Chart(globalData);}catch(e3){} });
+                        fetch(API_PRIMARY_URL + "?mode=history").then(r=>r.json()).then(d=>{ block10Data=d; try{updatePrimaryReport();}catch(e_rep){} try{renderBlock10Chart(d);}catch(e2){console.error("[Block10]",e2);} }).catch(()=>{ try{renderBlock10Chart(globalData);}catch(e3){} });
                     }, 800);
 
 
@@ -2701,6 +2711,270 @@ window.addEventListener('unhandledrejection', function(e) {
             }
         }
 </script>
+
+
+    <!-- BÁO CÁO AUTOMATION -->
+    <div id="report-section" class="scroll-mt-24 mt-12 mb-20 max-w-7xl mx-auto">
+        <div class="flex flex-col items-center justify-center gap-5 mb-10 w-full">
+            <!-- 1. Báo cáo (Header) -->
+            <h2 class="text-3xl font-black text-zinc-900 dark:text-white flex items-center gap-3 text-center">
+                <i class="fa-solid fa-file-invoice text-indigo-500"></i> Báo Cáo Hiệu Suất
+            </h2>
+            
+            <!-- 2. Lọc (Bộ lọc và Nút Tải) -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md">
+                <select id="primary-date-filter" onchange="updatePrimaryReport()" class="w-full sm:flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl px-4 py-3 font-bold cursor-pointer focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition hover:bg-zinc-50 dark:hover:bg-zinc-700/80 shadow-sm text-center appearance-none">
+                    <option value="all">🗓️ Toàn thời gian</option>
+                    <option value="today">🔥 Hôm nay</option>
+                    <option value="yesterday">↩️ Hôm qua</option>
+                    <option value="this-week">📅 Tuần này</option>
+                    <option value="this-month">📊 Tháng này</option>
+                    <option value="last-month">⏪ Tháng trước</option>
+                </select>
+                <button onclick="downloadReport()" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-download"></i> Tải Ảnh Báo Cáo
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. Kết quả (Thống kê Card) -->
+        <div id="report-card" class="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
+            <!-- Decorative Blur -->
+            <div class="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+            <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+
+            <div class="relative z-10">
+                <div class="text-center mb-10 pb-6 border-b border-zinc-100 dark:border-zinc-800">
+                    <h3 class="text-3xl font-black text-zinc-900 dark:text-white mb-2 tracking-tight">SMC TRADING JOURNAL PRO</h3>
+                    <p class="text-zinc-500 dark:text-zinc-400 font-medium" id="rep-period">Kỳ báo cáo: Toàn thời gian</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <!-- Stat 1 -->
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
+                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Tổng Số Lệnh</div>
+                        <div class="text-5xl font-black text-zinc-900 dark:text-white" id="rep-total-trades">0</div>
+                    </div>
+                    <!-- Stat 2 -->
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
+                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Lợi Nhuận Ròng</div>
+                        <div class="text-5xl font-black text-green-500" id="rep-net-r">+0 Pip</div>
+                    </div>
+                    <!-- Stat 3 -->
+                    <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center relative overflow-hidden">
+                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2 relative z-10">Tỷ Lệ Thắng</div>
+                        <div class="text-5xl font-black text-blue-500 relative z-10" id="rep-wr">0%</div>
+                        <div class="absolute bottom-0 left-0 h-1 w-full bg-zinc-200 dark:bg-zinc-700">
+                            <div id="rep-wr-bar" class="h-full bg-blue-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                    <!-- Best Trade -->
+                    <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-6 border border-emerald-100 dark:border-emerald-900/30 flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex flex-shrink-0 items-center justify-center text-emerald-600 dark:text-emerald-400 text-xl shadow-inner">
+                            <i class="fa-solid fa-crown"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-widest mb-1.5 opacity-80">Lệnh Tốt Nhất</div>
+                            <div id="rep-best-trade" class="text-zinc-700 dark:text-zinc-300">
+                                <span class="text-sm italic opacity-60">Chưa có dữ liệu</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Worst Trade -->
+                    <div class="bg-rose-50 dark:bg-rose-900/10 rounded-2xl p-6 border border-rose-100 dark:border-rose-900/30 flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-800/50 flex flex-shrink-0 items-center justify-center text-rose-600 dark:text-rose-400 text-xl shadow-inner">
+                            <i class="fa-solid fa-skull"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-rose-800 dark:text-rose-300 text-xs font-black uppercase tracking-widest mb-1.5 opacity-80">Lệnh Tệ Nhất</div>
+                            <div id="rep-worst-trade" class="text-zinc-700 dark:text-zinc-300">
+                                <span class="text-sm italic opacity-60">Chưa có dữ liệu</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 dark:bg-black rounded-2xl p-6 sm:p-8 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition duration-500">
+                        <i class="fa-solid fa-robot text-8xl text-indigo-500"></i>
+                    </div>
+                    <div class="flex items-start gap-5 relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex-shrink-0 flex items-center justify-center shadow-lg shadow-indigo-600/20 transform -rotate-3">
+                            <i class="fa-solid fa-robot text-2xl text-white"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-2">
+                                <h4 class="font-black text-white text-sm tracking-widest uppercase">AI Advisor</h4>
+                                <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold rounded-full border border-indigo-500/20">BETA</span>
+                            </div>
+                            <p class="text-zinc-300 text-sm leading-relaxed" id="rep-ai-comment">Đang phân tích...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================== REPORT AUTOMATION ==================
+        function updatePrimaryReport() {
+            if (!block10Data || block10Data.length === 0) return;
+            const fDate = document.getElementById('primary-date-filter').value || 'all';
+            const now = new Date();
+            
+            let filtered = block10Data.filter(d => {
+                if (fDate === 'all') return true;
+                
+                let dDate = new Date(d.time || d.thoigian);
+                if (isNaN(dDate.getTime())) {
+                    const s = String(d.time || d.thoigian || '');
+                    const parts = s.split(' ')[0].split('/');
+                    if(parts.length===3) dDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+                }
+                if (isNaN(dDate.getTime())) return true;
+                
+                const startOf = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                const dStart = startOf(dDate);
+                const todayStart = startOf(now);
+                
+                if (fDate === 'today' && dStart.getTime() !== todayStart.getTime()) return false;
+                if (fDate === 'yesterday') {
+                    const yest = new Date(todayStart); yest.setDate(yest.getDate() - 1);
+                    if (dStart.getTime() !== yest.getTime()) return false;
+                }
+                if (fDate === 'this-week') {
+                    const weekStart = new Date(todayStart); weekStart.setDate(todayStart.getDate() - todayStart.getDay() + (todayStart.getDay()===0?-6:1));
+                    if (dStart < weekStart) return false;
+                }
+                if (fDate === 'this-month' && (dDate.getMonth() !== now.getMonth() || dDate.getFullYear() !== now.getFullYear())) return false;
+                if (fDate === 'last-month') {
+                    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    if (dDate.getMonth() !== lastMonth.getMonth() || dDate.getFullYear() !== lastMonth.getFullYear()) return false;
+                }
+                return true;
+            });
+            
+            const periodEl = document.getElementById('rep-period');
+            if (periodEl) {
+                const pText = { 'all': 'Toàn thời gian (30 lệnh gần nhất)', 'today': 'Hôm nay', 'yesterday': 'Hôm qua', 'this-week': 'Tuần này', 'this-month': 'Tháng này', 'last-month': 'Tháng trước' };
+                periodEl.innerText = 'Kỳ báo cáo: ' + (pText[fDate] || 'Tuỳ chỉnh');
+            }
+            
+            renderReport(filtered);
+        }
+
+        function renderReport(data) {
+            if (!data || data.length === 0) {
+                document.getElementById('rep-total-trades').innerText = '0';
+                document.getElementById('rep-wr').innerText = '0%';
+                document.getElementById('rep-wr-bar').style.width = '0%';
+                const netEl = document.getElementById('rep-net-r');
+                netEl.innerText = '0 Pip';
+                netEl.className = 'text-5xl font-black text-zinc-400';
+                document.getElementById('rep-best-trade').innerHTML = '<span class="text-sm italic opacity-60">Chưa có dữ liệu giao dịch</span>';
+                document.getElementById('rep-worst-trade').innerHTML = '<span class="text-sm italic opacity-60">Chưa có dữ liệu giao dịch</span>';
+                document.getElementById('rep-ai-comment').innerHTML = 'Không mượn được dữ liệu trong kỳ này, hãy tích cực quan sát và vào lệnh theo Setup chuẩn bạn nhé!';
+                return;
+            }
+
+
+            document.getElementById('rep-total-trades').innerText = data.length;
+
+            let wins = 0, losses = 0, netPips = 0;
+            let bestTrade = null, worstTrade = null;
+            let maxPip = -9999, minPip = 9999;
+
+            data.forEach(t => {
+                const pip = parseFloat(t.pips || t.pip || 0);
+                netPips += pip;
+
+                const rs = (t.ket_qua_primary || t.ketqua || t.ket_qua || t.ket_qua_secondary || '').toLowerCase();
+
+                if (pip > 10 || (pip > 0 && rs.includes('win') && pip > 10)) {
+                    wins++;
+                } else if (pip < 0 || rs.includes('loss')) {
+                    losses++;
+                }
+
+                if (pip > maxPip) { maxPip = pip; bestTrade = t; }
+                if (pip < minPip) { minPip = pip; worstTrade = t; }
+            });
+
+            const wr = data.length > 0 ? Math.round((wins / data.length) * 100) : 0;
+            document.getElementById('rep-wr').innerText = wr + '%';
+            document.getElementById('rep-wr-bar').style.width = wr + '%';
+
+            const netEl = document.getElementById('rep-net-r');
+            netEl.innerText = (netPips > 0 ? '+' : '') + netPips.toFixed(0) + ' Pip';
+            netEl.className = `text-5xl font-black ${netPips >= 0 ? 'text-green-500' : 'text-rose-500'}`;
+
+            if(bestTrade && maxPip >= 0) {
+                document.getElementById('rep-best-trade').innerHTML = `
+                    <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2 leading-none">+${maxPip} <span class="text-lg font-bold">Pip</span></div>
+                    <div class="text-sm font-medium opacity-80 mb-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${bestTrade.time || bestTrade.thoigian || ''}</div>
+                    <div class="text-sm font-bold opacity-90"><i class="fa-solid fa-tag mr-1"></i> ${bestTrade.pair||bestTrade.trade||''} &bull; ${bestTrade.pattern||bestTrade.setup||''}</div>
+                `;
+            }
+            if(worstTrade && minPip < 0) {
+                document.getElementById('rep-worst-trade').innerHTML = `
+                    <div class="text-3xl font-black text-rose-600 dark:text-rose-400 mb-2 leading-none">${minPip} <span class="text-lg font-bold">Pip</span></div>
+                    <div class="text-sm font-medium opacity-80 mb-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${worstTrade.time || worstTrade.thoigian || ''}</div>
+                    <div class="text-sm font-bold opacity-90"><i class="fa-solid fa-tag mr-1"></i> ${worstTrade.pair||worstTrade.trade||''} &bull; ${worstTrade.pattern||worstTrade.setup||''}</div>
+                `;
+            } else if (!worstTrade || minPip >= 0) {
+                document.getElementById('rep-worst-trade').innerHTML = `<span class="text-sm italic opacity-60">Không có lệnh thua lỗ trong kỳ này! Tuyệt vời!</span>`;
+            }
+
+            let comment = "";
+            let p_total = data.length;
+
+            if (netPips < 0) {
+                comment = `Hệ thống ghi nhận khoản sụt giảm <span class="text-rose-400 font-bold">${netPips.toFixed(0)} Pip</span> trong ${p_total} lệnh qua. Hãy rà soát lại kỷ luật: "Lệnh Tệ Nhất" (-${Math.abs(minPip)} Pip) có bám đúng quy tắc SMC không, hay rủi ro trượt giá đang vượt mức cho phép?`;
+            } else if (wr < 40 && netPips > 0) {
+                comment = `Win Rate của bạn dù khiêm tốn <span class="text-yellow-400 font-bold">${wr}%</span> nhưng bắt sóng siêu dài nên chốt lãi <span class="text-green-400 font-bold">+${netPips.toFixed(0)} Pip</span>. Hãy cẩn thận vì rủi ro chuỗi thua (drawdown) sẽ rất cao. Bám chặt vào Setup chuẩn.`;
+            } else if (wr >= 50 && netPips > 0) {
+                comment = `Tuyệt vời! Win Rate <span class="text-blue-400 font-bold">${wr}%</span> quá xịn và lợi nhuận <span class="text-green-400 font-bold">+${netPips.toFixed(0)} Pip</span>. Đừng ảo tưởng sức mạnh, cứ kiên định vào Setup và kỷ luật.`;
+            } else {
+                comment = `Kết quả khả quan (+<span class="text-green-400 font-bold">${netPips.toFixed(0)} Pip</span>). Bạn có thể thử dời Stop Loss (Trailing SL) khéo léo để gồng lãi xa hơn chút nữa.`;
+            }
+            document.getElementById('rep-ai-comment').innerHTML = comment;
+        }
+
+        function downloadReport() {
+            if (typeof html2canvas === 'undefined') {
+                alert("Đang tải module chụp ảnh báo cáo... Bạn hãy đợi 2 giây nữa rồi bấm.");
+                return;
+            }
+            const btn = event.currentTarget || document.activeElement;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Xử lý ảnh...';
+
+            const card = document.getElementById('report-card');
+            const isDark = document.documentElement.classList.contains('dark');
+            const oldBg = card.style.background;
+            if (isDark) card.style.background = '#09090b';
+
+            setTimeout(() => {
+                html2canvas(card, {
+                    scale: 2, 
+                    backgroundColor: isDark ? '#09090b' : '#ffffff',
+                    logging: false,
+                    useCORS: true
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `SMC_Journal_Report_${new Date().getTime()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    card.style.background = oldBg;
+                    btn.innerHTML = originalHtml;
+                });
+            }, 300);
+        }
+    </script>
+
 </body>
 
 </html>
