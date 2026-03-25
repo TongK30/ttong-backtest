@@ -1,0 +1,1532 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê Mẫu hình Phản ứng – Minh Trị Duy Tân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } }
+        }
+    </script>
+    <style>
+        body {
+            min-height: 100vh;
+            transition: background-color .3s, color .3s;
+        }
+
+        .loader {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #3b82f6;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, .7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, .05);
+        }
+
+        .dark .glass-card {
+            background: rgba(24, 24, 27, .6);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .grad-win {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .grad-loss {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .grad-be {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            color: white;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tag-win {
+            background: rgba(16, 185, 129, .15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, .3);
+        }
+
+        .tag-loss {
+            background: rgba(239, 68, 68, .15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, .3);
+        }
+
+        .tag-be {
+            background: rgba(100, 116, 139, .15);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, .3);
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        tbody tr:hover {
+            background: rgba(59, 130, 246, .04);
+        }
+
+        .dark tbody tr:hover {
+            background: rgba(59, 130, 246, .08);
+        }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sortable:hover {
+            color: #3b82f6;
+        }
+
+        /* ===== GALLERY LIGHTBOX ===== */
+        #lightbox {
+            transition: opacity .2s;
+        }
+
+        #lb-counter {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: .05em;
+        }
+
+        .lb-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .18);
+            border: 1px solid rgba(255, 255, 255, .25);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background .2s, scale .15s;
+            backdrop-filter: blur(4px);
+        }
+
+        .lb-nav-btn:hover {
+            background: rgba(255, 255, 255, .35);
+            scale: 1.08;
+        }
+
+        .lb-nav-btn:active {
+            scale: .96;
+        }
+
+        #lb-prev {
+            left: 16px;
+        }
+
+        #lb-next {
+            right: 16px;
+        }
+
+        /* ===== DETAIL MODAL ===== */
+        #detail-modal {
+            transition: opacity .2s;
+        }
+
+        #detail-modal .modal-box {
+            max-width: 720px;
+            width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #8b5cf6 #27272a;
+        }
+
+        .detail-field-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #a1a1aa;
+        }
+
+        .detail-field-val {
+            font-size: 13px;
+            color: #e4e4e7;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .detail-img-thumb {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: zoom-in;
+            transition: transform .2s;
+        }
+
+        .detail-img-thumb:hover {
+            transform: scale(1.02);
+        }
+
+        .detail-img-thumb {
+            display: block;
+        }
+
+        /* ===== IMG LABEL BADGES ===== */
+        /* badge t\u00ean c\u1ed9t tr\u00ean thumbnail trong b\u1ea3ng */
+        .td-img-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .td-img-badge {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, .62);
+            backdrop-filter: blur(3px);
+            color: #e4e4e7;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 7px;
+            border-radius: 20px;
+            pointer-events: none;
+            letter-spacing: .03em;
+            white-space: nowrap;
+        }
+
+        /* Lightbox caption */
+        #lb-caption {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .72);
+            text-align: center;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            min-height: 16px;
+        }
+
+        /* ===== TABLE POLISH ===== */
+        #detail-table table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        /* Sticky header shadow khi scroll */
+        #detail-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--th-bg, #f4f4f5);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, .08), 0 2px 8px rgba(0, 0, 0, .06);
+            padding: 10px 14px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #71717a;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+        }
+
+        .dark #detail-table thead th {
+            --th-bg: #18181b;
+            color: #a1a1aa;
+        }
+
+        #detail-table thead th:hover {
+            background: #ede9fe !important;
+            color: #7c3aed;
+        }
+
+        .dark #detail-table thead th:hover {
+            background: #2d1b69 !important;
+            color: #c4b5fd;
+        }
+
+        #detail-table thead th .sort-icon {
+            margin-left: 4px;
+            opacity: .4;
+            font-size: 9px;
+        }
+
+        #detail-table thead th.sort-asc .sort-icon::before {
+            content: '▲';
+            opacity: 1;
+            color: #8b5cf6;
+        }
+
+        #detail-table thead th.sort-desc .sort-icon::before {
+            content: '▼';
+            opacity: 1;
+            color: #8b5cf6;
+        }
+
+        #detail-table thead th:not(.sort-asc):not(.sort-desc) .sort-icon::before {
+            content: '⇅';
+        }
+
+        /* Zebra rows */
+        #detail-table tbody tr:nth-child(even) td {
+            background: rgba(139, 92, 246, .03);
+        }
+
+        .dark #detail-table tbody tr:nth-child(even) td {
+            background: rgba(139, 92, 246, .05);
+        }
+
+        /* Hover row gradient */
+        #detail-table tbody tr {
+            transition: background .12s;
+        }
+
+        #detail-table tbody tr:hover td {
+            background: rgba(139, 92, 246, .08) !important;
+        }
+
+        .dark #detail-table tbody tr:hover td {
+            background: rgba(139, 92, 246, .13) !important;
+        }
+
+        /* First TD của mỗi row (nút Chi tiết) */
+        #detail-table tbody tr td:first-child {
+            padding: 8px 10px;
+        }
+
+        /* Ảnh trong bảng: bo cạnh đẹp hơn */
+        #detail-table .td-img-wrap img {
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        #detail-table .td-img-wrap img:hover {
+            transform: scale(1.06);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .28);
+        }
+    </style>
+</head>
+
+<body class="bg-zinc-100 dark:bg-[#09090b] text-zinc-800 dark:text-zinc-200 transition-colors duration-300 p-4 md:p-8">
+
+    <!-- API Config -->
+    <script>
+        // Thử CẢ HAI API từ index.html
+        const API_PRIMARY = "https://script.google.com/macros/s/AKfycbxL8WrU5YfmRA77dD8TnoFXKCkr-VmE4ttZYVvjA_uS9nXF5qtdx5d7H7Hj0EKujvYlMA/exec";
+        const API_SECONDARY = "https://script.google.com/macros/s/AKfycbz4wW8RLRipmtqbViIRXOxrdeV9SyPSmeaDE_4FM1OZt0ABxLET4Ja90P7rZKzCsAFvgw/exec";
+        // Tên sheet trong GAS (processForm ghi vào "phan_ung")
+        const SHEET_NAME = "phan_ung";
+    </script>
+
+    <div class="max-w-7xl mx-auto space-y-8">
+
+        <!-- ===== HEADER ===== -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/25">
+                    <i class="fa-solid fa-diagram-project text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Mẫu Hình Phản Ứng
+                    </h1>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-mono">Minh Trị Duy Tân · Sheet: <span
+                            class="text-violet-500 font-bold">Phan_ung</span></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="./thong-ke.html"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-zinc-500 dark:text-zinc-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                    <i class="fa-solid fa-chart-pie text-[10px]"></i> Thống kê chính
+                </a>
+                <a href="./index.html"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-zinc-500 dark:text-zinc-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <i class="fa-solid fa-pen-to-square text-[10px]"></i> Nhập liệu
+                </a>
+                <div class="w-px h-5 bg-zinc-200 dark:bg-zinc-700 mx-1"></div>
+                <button onclick="exportDashboard()" id="btn-export"
+                    class="glass-card flex items-center gap-1.5 px-3 py-2 rounded-xl text-emerald-500 hover:text-white hover:bg-emerald-600 transition text-xs font-bold shadow active:scale-95" title="Xuất ảnh PNG">
+                    <i class="fa-solid fa-image text-sm"></i>
+                    <span class="hidden sm:inline">Xuất ảnh</span>
+                </button>
+                <button onclick="toggleTheme()"
+                    class="glass-card w-9 h-9 rounded-xl text-yellow-500 hover:text-white hover:bg-yellow-500 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-700 transition flex items-center justify-center shadow active:scale-95">
+                    <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+                </button>
+                <button onclick="loadData()"
+                    class="glass-card w-9 h-9 rounded-xl text-blue-500 hover:text-white hover:bg-blue-600 transition flex items-center justify-center shadow active:scale-95 group">
+                    <i id="reload-icon" class="fa-solid fa-rotate text-sm transition"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== LOADING STATE ===== -->
+        <div id="loading-state" class="flex flex-col items-center justify-center py-32">
+            <span class="loader mb-4"></span>
+            <span class="text-zinc-500 text-sm font-medium animate-pulse">Đang tải dữ liệu...</span>
+        </div>
+
+        <!-- ===== ERROR STATE ===== -->
+        <div id="error-state" class="hidden">
+            <div
+                class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-2xl p-6 text-center">
+                <i class="fa-solid fa-circle-exclamation text-red-400 text-3xl mb-3"></i>
+                <p class="font-bold text-red-600 dark:text-red-400 mb-1">Lỗi tải dữ liệu</p>
+                <p id="error-msg" class="text-sm text-zinc-500"></p>
+                <p class="text-xs text-zinc-400 mt-3">Kiểm tra tham số <code
+                        class="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">?sheet=Phan_ung</code> trong Google Apps
+                    Script</p>
+            </div>
+        </div>
+
+        <!-- ===== MAIN CONTENT (hidden until loaded) ===== -->
+        <div id="main-content" class="hidden space-y-8">
+
+            <!-- Filters -->
+            <div
+                class="flex flex-wrap gap-3 items-center bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <span class="text-xs font-bold uppercase text-zinc-400 tracking-wider">Bộ lọc</span>
+                <select id="filter-result" onchange="applyFilters()"
+                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
+                    <option value="all">Tất cả kết quả</option>
+                    <option value="Win">✅ Win</option>
+                    <option value="Loss">❌ Loss</option>
+                    <option value="BE">⚪ Hòa (BE)</option>
+                </select>
+                <select id="filter-pattern" onchange="applyFilters()"
+                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
+                    <option value="all">Tất cả mẫu hình</option>
+                </select>
+                <select id="filter-money" onchange="applyFilters()"
+                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
+                    <option value="all">Tất cả cặp tiền</option>
+                </select>
+                <select id="filter-vol" onchange="applyFilters()"
+                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
+                    <option value="all">All Volume</option>
+                    <option value="Có">Có Volume</option>
+                    <option value="Không">Không Volume</option>
+                </select>
+                <span class="ml-auto text-xs text-zinc-400 font-mono" id="filter-count">0 kết quả</span>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div
+                    class="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Tổng phản ứng</div>
+                    <div class="flex items-end justify-between">
+                        <span id="s-total"
+                            class="text-2xl font-black text-zinc-700 dark:text-zinc-200 font-mono">0</span>
+                        <i class="fa-solid fa-diagram-project text-zinc-200 dark:text-zinc-700 text-3xl"></i>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Tỉ lệ Win</div>
+                    <div class="flex items-end justify-between">
+                        <span id="s-winrate" class="text-2xl font-black text-emerald-500 font-mono">0%</span>
+                        <i class="fa-solid fa-trophy text-zinc-200 dark:text-zinc-700 text-3xl"></i>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Avg RR (Win)</div>
+                    <div class="flex items-end justify-between">
+                        <span id="s-avg-rr" class="text-2xl font-black text-blue-500 font-mono">0</span>
+                        <i class="fa-solid fa-scale-balanced text-zinc-200 dark:text-zinc-700 text-3xl"></i>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Tổng mẫu hình</div>
+                    <div class="flex items-end justify-between">
+                        <span id="s-patterns" class="text-2xl font-black text-violet-500 font-mono">0</span>
+                        <i class="fa-solid fa-chess-board text-zinc-200 dark:text-zinc-700 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Winrate by Pattern – NEW DESIGN -->
+                <div
+                    class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm md:col-span-2">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                                <i class="fa-solid fa-chess-board text-white text-xs"></i>
+                            </div>
+                            <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
+                                Winrate theo Mẫu Hình</h3>
+                        </div>
+                        <div class="flex items-center gap-3 text-[10px] font-bold text-zinc-400">
+                            <span class="flex items-center gap-1"><span
+                                    class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>Win</span>
+                            <span class="flex items-center gap-1"><span
+                                    class="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block"></span>Loss</span>
+                            <span class="flex items-center gap-1"><span
+                                    class="w-2.5 h-2.5 rounded-sm bg-slate-500 inline-block"></span>BE</span>
+                        </div>
+                    </div>
+                    <!-- Chart canvas -->
+                    <div class="relative mb-5" id="pattern-chart-wrap" style="min-height:160px">
+                        <canvas id="chart-pattern"></canvas>
+                    </div>
+                    <!-- Pattern stat cards -->
+                    <div id="pattern-cards" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2"></div>
+                </div>
+            </div>
+
+            <!-- Hàng: Phân bổ + Ảnh hưởng Volume -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Win rate by Volume -->
+                <div
+                    class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-wave-square text-amber-500"></i>
+                        <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Ảnh
+                            hưởng
+                            của Volume</h3>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4" id="vol-stats"></div>
+                </div>
+
+                <!-- Phân bổ Win/Loss/BE -->
+                <div
+                    class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-chart-pie text-blue-500"></i>
+                        <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Phân bổ
+                            Win / Loss / BE</h3>
+                    </div>
+                    <div class="relative flex-1 min-h-[180px] flex items-center justify-center">
+                        <canvas id="chart-donut"></canvas>
+                    </div>
+                    <div id="donut-legend" class="mt-3 flex justify-center gap-4 text-xs font-bold"></div>
+                </div>
+            </div>
+
+            <!-- Detail Table (full-width) -->
+            <div id="detail-table"
+                class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+                <!-- Header bar -->
+                <div class="flex flex-wrap items-center gap-2.5 px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/40">
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow">
+                            <i class="fa-solid fa-table-list text-white text-xs"></i>
+                        </div>
+                        <span class="font-black text-sm text-zinc-700 dark:text-zinc-200 whitespace-nowrap">Danh sách chi tiết</span>
+                        <span id="filter-count-badge" class="px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 text-[10px] font-black font-mono">0</span>
+                    </div>
+                    <select id="table-filter-money" onchange="applyFilters()"
+                        class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
+                        <option value="all">Tất cả dòng tiền</option>
+                    </select>
+                    <div class="flex items-center gap-1">
+                        <button onclick="quickFilterResult('all')" id="qf-all" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition bg-violet-500/10 border-violet-500/30 text-violet-400">Tất cả</button>
+                        <button onclick="quickFilterResult('win')" id="qf-win" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-emerald-500/40 hover:text-emerald-400">Win</button>
+                        <button onclick="quickFilterResult('loss')" id="qf-loss" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-red-500/40 hover:text-red-400">Loss</button>
+                        <button onclick="quickFilterResult('be')" id="qf-be" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-zinc-500/40 hover:text-zinc-300">BE</button>
+                    </div>
+                    <div class="flex items-center gap-2 ml-auto">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] pointer-events-none"></i>
+                            <input type="text" id="table-search" oninput="applyFilters()" placeholder="Tìm kiếm..."
+                                class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-7 pr-3 py-1.5 text-xs outline-none w-36 focus:ring-2 focus:ring-violet-500 dark:text-zinc-200 transition">
+                        </div>
+                        <button onclick="resetTableFilters()" class="text-[10px] text-zinc-400 hover:text-violet-400 transition font-bold flex items-center gap-1 whitespace-nowrap">
+                            <i class="fa-solid fa-rotate-left text-[9px]"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                <!-- Scroll container -->
+                <div style="max-height:540px;overflow:auto;scrollbar-width:thin;scrollbar-color:#8b5cf6 #3f3f46">
+                    <table>
+                        <thead>
+                            <tr id="table-head"></tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+                <!-- Empty state -->
+                <div id="table-empty"
+                    class="hidden flex flex-col items-center justify-center py-16 text-zinc-400 gap-2">
+                    <i class="fa-regular fa-folder-open text-4xl opacity-40"></i>
+                    <p class="text-sm font-medium">Không có dữ liệu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rawData = [];
+        let filteredData = [];
+        let sortState = { key: null, asc: true }; // trạng thái sort
+        let chartPattern = null, chartDonut = null;
+
+                // ===== EXPORT IMAGE =====
+        async function exportDashboard() {
+            const btn = document.getElementById('btn-export');
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-sm"></i>';
+            btn.disabled = true;
+
+            // Ẩn bảng chi tiết và scroll-to-top trong lúc chụp
+            const tblEl  = document.getElementById('detail-table');
+            const sttBtn = document.getElementById('scroll-top-btn');
+            const tblOld = tblEl?.style.display;
+            if (tblEl)  tblEl.style.display  = 'none';
+            if (sttBtn) sttBtn.style.display = 'none';
+
+            try {
+                const target = document.getElementById('main-content');
+                const canvas = await html2canvas(target, {
+                    backgroundColor: document.documentElement.classList.contains('dark') ? '#09090b' : '#f4f4f5',
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                });
+                const link = document.createElement('a');
+                const now  = new Date();
+                const ts   = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+                // Thêm footer "SMC Trading" bên dưới
+                const isDark = document.documentElement.classList.contains('dark');
+                const footerH = 48;
+                const final = document.createElement('canvas');
+                final.width  = canvas.width;
+                final.height = canvas.height + footerH * 2;
+                const ctx = final.getContext('2d');
+                ctx.fillStyle = isDark ? '#09090b' : '#f4f4f5';
+                ctx.fillRect(0, 0, final.width, final.height);
+                ctx.drawImage(canvas, 0, 0);
+                // Footer bar
+                ctx.fillStyle = isDark ? '#18181b' : '#e4e4e7';
+                ctx.fillRect(0, canvas.height, final.width, footerH * 2);
+                // Text
+                ctx.fillStyle = isDark ? '#f59e0b' : '#d97706';
+                ctx.font = 'bold 28px Inter, Segoe UI, Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⚡ SMC Trading', final.width / 2, canvas.height + footerH);
+
+                link.download = `phan-ung_dashboard_${ts}.png`;
+                link.href = final.toDataURL('image/png');
+                link.click();
+            } catch(e) {
+                alert('Xuất ảnh thất bại: ' + e.message);
+            } finally {
+                if (tblEl)  tblEl.style.display  = tblOld ?? '';
+                if (sttBtn) sttBtn.style.display = '';
+                btn.innerHTML = origHtml;
+                btn.disabled  = false;
+            }
+        }
+// ===== THEME =====
+        function initTheme() {
+            const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            document.documentElement.classList.toggle('dark', isDark);
+            document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-moon text-sm' : 'fa-solid fa-sun text-sm';
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-moon text-sm' : 'fa-solid fa-sun text-sm';
+            if (filteredData.length) { renderCharts(filteredData); }
+        }
+        initTheme();
+
+        // ===== LOAD DATA =====
+        // Cột ảnh sẽ bị ẩn trong bảng
+        const IMG_COLS = ['HTF (Ảnh)', 'LTF (Ảnh)', 'Hình ảnh (Phụ)'];
+
+        async function loadData() {
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+            document.getElementById('reload-icon').classList.add('animate-spin');
+
+            // Thử tất cả tổ hợp API + sheet name
+            const endpoints = [
+                `${API_PRIMARY}?mode=api&sheet=phan_ung`,
+                `${API_SECONDARY}?mode=api&sheet=phan_ung`,
+                `${API_PRIMARY}?mode=api&sheet=Phan_ung`,
+                `${API_SECONDARY}?mode=api&sheet=Phan_ung`,
+            ];
+
+            let data = null, lastErr = '', debugInfo = [];
+
+            for (const url of endpoints) {
+                try {
+                    const r = await fetch(url);
+                    const json = await r.json();
+                    debugInfo.push(`✅ ${url.split('?')[0].slice(-20)} → ${JSON.stringify(json).slice(0, 80)}`);
+                    if (Array.isArray(json) && json.length > 0) { data = json; break; }
+                    if (json?.data && Array.isArray(json.data) && json.data.length > 0) { data = json.data; break; }
+                } catch (e) {
+                    debugInfo.push(`❌ ${url.split('?')[0].slice(-20)} → ${e.message}`);
+                    lastErr = e.message;
+                }
+            }
+
+            document.getElementById('reload-icon').classList.remove('animate-spin');
+            document.getElementById('loading-state').classList.add('hidden');
+
+            if (!data || data.length === 0) {
+                document.getElementById('error-state').classList.remove('hidden');
+                document.getElementById('error-msg').innerHTML =
+                    (lastErr || 'Tất cả endpoints trả về rỗng.') +
+                    `<br><br><b>Debug log:</b><pre style="text-align:left;font-size:10px;background:#1a1a1a;color:#aaa;padding:8px;border-radius:6px;overflow:auto;margin-top:6px">${debugInfo.join('\n')}</pre>`;
+                return;
+            }
+
+            rawData = data;
+            buildFilters(data);
+            applyFilters();
+            document.getElementById('main-content').classList.remove('hidden');
+        }
+
+        // Helper: tìm value theo keyword + normalize Unicode (NFC) tránh lỗi NFC vs NFD
+        const n = s => String(s).normalize('NFC').toLowerCase().replace(/\s+/g, '');
+        function getVal(row, ...keywords) {
+            const keys = Object.keys(row);
+            for (const kw of keywords) {
+                const found = keys.find(k => n(k).includes(n(kw)));
+                if (found !== undefined) return String(row[found] ?? '').normalize('NFC').trim();
+            }
+            return '';
+        }
+        // So sánh có dấu an toàn
+        const includes_n = (a, b) => n(a).includes(n(b));
+
+        // ===== BUILD FILTERS =====
+        function buildFilters(data) {
+            // Mẫu hình filter
+            const patterns = [...new Set(data.map(r => getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup')).filter(Boolean))].sort();
+            document.getElementById('filter-pattern').innerHTML =
+                '<option value="all">Tất cả mẫu hình</option>' + patterns.map(p => `<option value="${p}">${p}</option>`).join('');
+
+            // Dòng tiền filter
+            const moneys = [...new Set(data.map(r => getVal(r, 'Dòng tiền', 'dongtien', 'money')).filter(Boolean))].sort();
+            document.getElementById('filter-money').innerHTML =
+                '<option value="all">Tất cả dòng tiền</option>' + moneys.map(m => `<option value="${m}">${m}</option>`).join('');
+
+            // Table header — cột có thể sort
+            const SORTABLE = ['Kết quả', 'Thời gian', 'Dòng tiền', 'Mẫu hình', 'R:R', 'RR'];
+            const keys = Object.keys(data[0] || {});
+            const detailTh = `<th class="px-3 py-3 text-center text-zinc-400 whitespace-nowrap" style="width:28px">#</th>
+                <th class="px-3 py-3 text-left whitespace-nowrap text-violet-400"><i class="fa-solid fa-circle-info"></i></th>`;
+            document.getElementById('table-head').innerHTML = detailTh + keys.map(k => {
+                const isSortable = SORTABLE.some(s => n(k).includes(n(s)));
+                if (!isSortable) return `<th class="px-4 py-3 text-left whitespace-nowrap">${k}</th>`;
+                const isActive = sortState.key && n(sortState.key) === n(k);
+                const arrowCls = isActive ? (sortState.asc ? 'sort-asc' : 'sort-desc') : '';
+                return `<th class="px-4 py-3 text-left whitespace-nowrap cursor-pointer select-none hover:text-violet-500 transition-colors ${arrowCls}"
+                         onclick="sortTable('${k}')">
+                    ${k} <span class="sort-icon"></span>
+                </th>`;
+            }).join('');
+
+            // Populate table-filter-money dropdown
+            const tblMoneyEl = document.getElementById('table-filter-money');
+            if (tblMoneyEl) {
+                const cur = tblMoneyEl.value;
+                tblMoneyEl.innerHTML = '<option value="all">Tất cả dòng tiền</option>'
+                    + moneys.map(m => `<option value="${m}">${m}</option>`).join('');
+                if (moneys.includes(cur)) tblMoneyEl.value = cur;
+            }
+        }
+
+        // ===== SORT =====
+        function sortTable(key) {
+            if (sortState.key && n(sortState.key) === n(key)) {
+                sortState.asc = !sortState.asc;
+            } else {
+                sortState.key = key;
+                sortState.asc = true;
+            }
+            buildFilters(rawData);
+            renderTable(filteredData);
+        }
+
+        // ===== QUICK FILTER RESULT (buttons trong bảng) =====
+        let _qfResult = 'all';
+        function quickFilterResult(val) {
+            _qfResult = val;
+            // Visual active state
+            ['all', 'win', 'loss', 'be'].forEach(v => {
+                const btn = document.getElementById('qf-' + v);
+                if (!btn) return;
+                if (v === val) {
+                    btn.className = 'px-2.5 py-1 rounded-lg border text-[11px] font-bold transition '
+                        + (v === 'win' ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                            : v === 'loss' ? 'bg-red-500/15 border-red-500/40 text-red-400'
+                                : v === 'be' ? 'bg-zinc-500/15 border-zinc-500/40 text-zinc-300'
+                                    : 'bg-violet-500/10 border-violet-500/30 text-violet-400');
+                } else {
+                    btn.className = 'px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:text-zinc-300';
+                }
+            });
+            applyFilters();
+        }
+
+        // ===== RESET TABLE FILTERS =====
+        function resetTableFilters() {
+            _qfResult = 'all';
+            const m = document.getElementById('table-filter-money');
+            if (m) m.value = 'all';
+            document.getElementById('table-search').value = '';
+            quickFilterResult('all');
+        }
+
+        // ===== APPLY FILTERS =====
+        function applyFilters() {
+            const fResult = document.getElementById('filter-result').value;
+            const fPattern = document.getElementById('filter-pattern').value;
+            const fMoney = document.getElementById('filter-money').value;
+            const fVol = document.getElementById('filter-vol').value;
+            const fSearch = document.getElementById('table-search').value.toLowerCase();
+            // Table-local filter
+            const fTblMoney = (document.getElementById('table-filter-money')?.value) || 'all';
+            const fQfResult = _qfResult || 'all';
+
+            filteredData = rawData.filter(r => {
+                const result = getVal(r, 'Kết quả', 'ketqua', 'result');
+                const pattern = getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup');
+                const money = getVal(r, 'Dòng tiền', 'dongtien', 'money');
+                const vol = getVal(r, 'Có Vol', 'covol', 'vol');
+                if (fResult !== 'all' && !includes_n(result, fResult)) return false;
+                if (fPattern !== 'all' && n(pattern) !== n(fPattern)) return false;
+                if (fMoney !== 'all' && n(money) !== n(fMoney)) return false;
+                if (fVol !== 'all' && !includes_n(vol, fVol)) return false;
+                if (fTblMoney !== 'all' && n(money) !== n(fTblMoney)) return false;
+                if (fQfResult !== 'all' && !includes_n(result, fQfResult)) return false;
+                if (fSearch && !n(JSON.stringify(r)).includes(n(fSearch))) return false;
+                return true;
+            });
+
+            document.getElementById('filter-count').textContent = `${filteredData.length} kết quả`;
+            const badge = document.getElementById('filter-count-badge');
+            if (badge) badge.textContent = filteredData.length;
+            renderSummary(filteredData);
+            renderCharts(filteredData);
+            renderDonutChart(filteredData);
+            renderTable(filteredData);
+            renderVolStats(filteredData);
+        }
+
+        // ===== SUMMARY =====
+        function renderSummary(data) {
+            const wins = data.filter(r => getVal(r, 'Kết quả', 'ketqua', 'result').toLowerCase().includes('win'));
+            const wr = data.length ? Math.round(wins.length / data.length * 100) : 0;
+            const winsRR = wins.filter(r => parseFloat(getVal(r, 'R:R', 'rr', 'RR')) > 0);
+            const avgRR = winsRR.length ? (winsRR.reduce((s, r) => s + parseFloat(getVal(r, 'R:R', 'rr', 'RR')), 0) / winsRR.length).toFixed(2) : '—';
+            const patterns = new Set(data.map(r => getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup')).filter(Boolean));
+
+            document.getElementById('s-total').textContent = data.length;
+            document.getElementById('s-winrate').textContent = wr + '%';
+            document.getElementById('s-avg-rr').textContent = avgRR;
+            document.getElementById('s-patterns').textContent = patterns.size;
+        }
+
+        // ===== CHARTS =====
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return { grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', text: isDark ? '#a1a1aa' : '#71717a' };
+        }
+
+        function renderCharts(data) {
+            const getResult = r => getVal(r, 'Kết quả', 'ketqua', 'result').trim();
+            const getPattern = r => getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup') || 'Không rõ';
+            const { grid, text } = getChartColors();
+
+            // --- Pattern Map ---
+            const patternMap = {};
+            data.forEach(r => {
+                const p = getPattern(r);
+                const res = getResult(r).toLowerCase();
+                if (!patternMap[p]) patternMap[p] = { win: 0, loss: 0, be: 0, total: 0 };
+                patternMap[p].total++;
+                if (res.includes('win')) patternMap[p].win++;
+                else if (res.includes('loss')) patternMap[p].loss++;
+                else patternMap[p].be++;
+            });
+
+            // Sắp xếp theo total giảm dần, lấy tối đa 12
+            const sortedPatterns = Object.keys(patternMap)
+                .sort((a, b) => patternMap[b].total - patternMap[a].total)
+                .slice(0, 12);
+
+            // --- Horizontal Stacked Bar Chart ---
+            const barH = Math.max(36 * sortedPatterns.length + 40, 160);
+            document.getElementById('pattern-chart-wrap').style.height = barH + 'px';
+
+            if (chartPattern) chartPattern.destroy();
+            chartPattern = new Chart(document.getElementById('chart-pattern'), {
+                type: 'bar',
+                data: {
+                    labels: sortedPatterns,
+                    datasets: [
+                        {
+                            label: 'Win',
+                            data: sortedPatterns.map(p => patternMap[p].win),
+                            backgroundColor: 'rgba(16,185,129,0.85)',
+                            borderRadius: { topLeft: 6, bottomLeft: 6, topRight: 0, bottomRight: 0 },
+                            borderSkipped: false,
+                        },
+                        {
+                            label: 'Loss',
+                            data: sortedPatterns.map(p => patternMap[p].loss),
+                            backgroundColor: 'rgba(239,68,68,0.82)',
+                            borderRadius: 0,
+                            borderSkipped: false,
+                        },
+                        {
+                            label: 'BE',
+                            data: sortedPatterns.map(p => patternMap[p].be),
+                            backgroundColor: 'rgba(100,116,139,0.75)',
+                            borderRadius: { topLeft: 0, bottomLeft: 0, topRight: 6, bottomRight: 6 },
+                            borderSkipped: false,
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterBody: (items) => {
+                                    const lbl = items[0].label;
+                                    const pm = patternMap[lbl];
+                                    const wr = Math.round(pm.win / pm.total * 100);
+                                    return [`Tổng: ${pm.total} lệnh`, `Winrate: ${wr}% — Click để lọc`];
+                                }
+                            }
+                        }
+                    },
+                    onClick(evt, elements) {
+                        if (!elements.length) return;
+                        const idx = elements[0].index;
+                        const lbl = sortedPatterns[idx];
+                        if (lbl) filterByPattern(lbl);
+                    },
+                    onHover(evt) {
+                        evt.native.target.style.cursor = evt.chart.getElementsAtEventForMode(evt.native, 'index', { intersect: false }, false).length ? 'pointer' : 'default';
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: { color: text, font: { size: 10 }, stepSize: 1 },
+                            grid: { color: grid }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: { color: text, font: { size: 11, weight: '600' } },
+                            grid: { color: grid }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'inlineLabels',
+                    afterDatasetsDraw(chart) {
+                        const { ctx } = chart;
+                        // Vẽ count trên mỗi segment dataset (Win / Loss / BE)
+                        const datasetColors = ['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.92)', 'rgba(255,255,255,0.85)'];
+                        [0, 1, 2].forEach(dsIdx => {
+                            const meta = chart.getDatasetMeta(dsIdx);
+                            meta.data.forEach((bar, i) => {
+                                const val = chart.data.datasets[dsIdx].data[i];
+                                if (!val) return;
+                                const barWidth = Math.abs(bar.x - bar.base);
+                                if (barWidth < 18) return; // quá hẹp, bỏ qua
+                                const cx = bar.base + barWidth / 2;
+                                const cy = bar.y;
+                                ctx.save();
+                                ctx.font = 'bold 10px Inter, sans-serif';
+                                ctx.fillStyle = datasetColors[dsIdx];
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(val, cx, cy);
+                                ctx.restore();
+                            });
+                        });
+                        // Vẽ winrate % sau segment cuối (BE = index 2)
+                        const metaBE = chart.getDatasetMeta(2);
+                        chart.data.labels.forEach((lbl, i) => {
+                            const pm = patternMap[lbl];
+                            if (!pm) return;
+                            const wr = Math.round(pm.win / pm.total * 100);
+                            const bar = metaBE.data[i];
+                            if (!bar) return;
+                            // x = cuối bar (BE.x nếu có, nếu không = Win bar cuối)
+                            // Tìm bar cuối cùng có dữ liệu
+                            let endX = bar.base; // fallback
+                            for (let d = 2; d >= 0; d--) {
+                                const m = chart.getDatasetMeta(d);
+                                const b = m.data[i];
+                                if (b && chart.data.datasets[d].data[i] > 0) {
+                                    endX = b.x;
+                                    break;
+                                }
+                            }
+                            const y = bar.y;
+                            ctx.save();
+                            ctx.font = 'bold 11px JetBrains Mono, monospace';
+                            ctx.fillStyle = wr >= 60 ? '#10b981' : wr >= 40 ? '#f59e0b' : '#ef4444';
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(`${wr}%`, endX + 6, y);
+                            ctx.restore();
+                        });
+                    }
+                }]
+            });
+
+            // --- Pattern Stat Cards ---
+            renderPatternCards(sortedPatterns, patternMap);
+
+        }
+
+        // ===== PATTERN CARDS =====
+        function renderPatternCards(patterns, patternMap) {
+            const el = document.getElementById('pattern-cards');
+            if (!el) return;
+            if (!patterns.length) { el.innerHTML = ''; return; }
+            // Đọc filter hiện tại
+            const activePattern = document.getElementById('filter-pattern').value;
+            el.innerHTML = patterns.map(p => {
+                const pm = patternMap[p];
+                const wr = Math.round(pm.win / pm.total * 100);
+                const wrColor = wr >= 60 ? 'text-emerald-400' : wr >= 40 ? 'text-amber-400' : 'text-red-400';
+                const barColor = wr >= 60 ? 'bg-emerald-500' : wr >= 40 ? 'bg-amber-500' : 'bg-red-500';
+                const ringColor = wr >= 60 ? 'border-emerald-500/40' : wr >= 40 ? 'border-amber-500/40' : 'border-red-500/40';
+                const isActive = (activePattern !== 'all' && n(activePattern) === n(p));
+                const activeCls = isActive ? 'ring-2 ring-violet-400 bg-zinc-800' : '';
+                return `
+                <div class="relative rounded-xl p-3 bg-zinc-800/50 border ${ringColor} ${activeCls} hover:bg-zinc-800 hover:ring-2 hover:ring-violet-500/50 transition cursor-pointer select-none"
+                    onclick="filterByPattern('${p.replace(/'/g, "\\'")}')"
+                    title="Click để lọc: ${p.replace(/"/g, '&quot;')}">
+                    <!-- Active indicator -->
+                    ${isActive ? '<div class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-violet-400"></div>' : ''}
+                    <!-- Winrate lớn -->
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="text-[11px] font-bold text-zinc-300 leading-tight pr-3 truncate" title="${p}">${p}</span>
+                        <span class="text-lg font-black font-mono ${wrColor} shrink-0 leading-none">${wr}%</span>
+                    </div>
+                    <!-- Mini progress bar -->
+                    <div class="w-full h-1.5 rounded-full bg-zinc-700 overflow-hidden mb-2">
+                        <div class="${barColor} h-full rounded-full transition-all" style="width:${wr}%"></div>
+                    </div>
+                    <!-- Win / Loss / BE counts -->
+                    <div class="flex items-center gap-2 text-[10px] font-bold">
+                        <span class="text-emerald-400">W ${pm.win}</span>
+                        <span class="text-red-400">L ${pm.loss}</span>
+                        <span class="text-zinc-500">BE ${pm.be}</span>
+                        <span class="ml-auto text-zinc-500 font-mono">${pm.total} lệnh</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ===== FILTER BY PATTERN (click từ chart/card) =====
+        function filterByPattern(pattern) {
+            const sel = document.getElementById('filter-pattern');
+            const current = sel.value;
+            // Toggle: click lại cùng pattern → bỏ lọc
+            const newVal = (current !== 'all' && n(current) === n(pattern)) ? 'all' : pattern;
+            // Tìm đúng option value (match normalize)
+            const opt = Array.from(sel.options).find(o => n(o.value) === n(newVal));
+            sel.value = opt ? opt.value : 'all';
+            applyFilters();
+            // Scroll mượt đến bảng chi tiết
+            const tbl = document.getElementById('table-body');
+            if (tbl) tbl.closest('.rounded-2xl')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderDonutChart(data) {
+            const getResult = r => getVal(r, 'Kết quả', 'ketqua', 'result').trim();
+            const wins = data.filter(r => getResult(r).toLowerCase().includes('win')).length;
+            const losses = data.filter(r => getResult(r).toLowerCase().includes('loss')).length;
+            const bes = data.length - wins - losses;
+
+            if (chartDonut) chartDonut.destroy();
+            chartDonut = new Chart(document.getElementById('chart-donut'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Win', 'Loss', 'BE'],
+                    datasets: [{ data: [wins, losses, bes], backgroundColor: ['#10b981', '#ef4444', '#64748b'], borderWidth: 0, hoverOffset: 6 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${data.length ? Math.round(ctx.parsed / data.length * 100) : 0}%)` } } }
+                }
+            });
+            document.getElementById('donut-legend').innerHTML =
+                `<span class="flex items-center gap-1 text-emerald-500"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>Win: ${wins}</span>
+                 <span class="flex items-center gap-1 text-red-400"><span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>Loss: ${losses}</span>
+                 <span class="flex items-center gap-1 text-zinc-400"><span class="w-3 h-3 rounded-full bg-slate-500 inline-block"></span>BE: ${bes}</span>`;
+        }
+
+        // ===== VOLUME STATS =====
+        function renderVolStats(data) {
+            const getRes = r => getVal(r, 'Kết quả', 'ketqua', 'result').toLowerCase();
+            const withVol = data.filter(r => includes_n(getVal(r, 'Có Vol', 'covol', 'vol'), 'có'));
+            const noVol = data.filter(r => !includes_n(getVal(r, 'Có Vol', 'covol', 'vol'), 'có'));
+
+            const wc = arr => arr.filter(r => getRes(r).includes('win')).length;
+            const lc = arr => arr.filter(r => getRes(r).includes('loss')).length;
+            const bc = arr => arr.filter(r => !getRes(r).includes('win') && !getRes(r).includes('loss')).length;
+            const wr = arr => arr.length ? Math.round(wc(arr) / arr.length * 100) : 0;
+
+            const wrW = wr(withVol), wrN = wr(noVol);
+            const delta = wrW - wrN;
+            const deltaSign = delta > 0 ? '+' : '';
+            const deltaCls = delta > 0 ? 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30'
+                : delta < 0 ? 'text-red-400 bg-red-500/15 border-red-500/30'
+                    : 'text-zinc-400 bg-zinc-500/15 border-zinc-500/30';
+            const deltaIcon = delta > 0 ? '▲' : delta < 0 ? '▼' : '=';
+
+            // Stacked bar segments (W/L/BE) cho mỗi nhóm
+            const makeBar = (arr, wr) => {
+                const total = arr.length || 1;
+                const wp = Math.round(wc(arr) / total * 100);
+                const lp = Math.round(lc(arr) / total * 100);
+                const bp = 100 - wp - lp;
+                return `
+                <div class="flex w-full h-5 rounded-full overflow-hidden gap-px">
+                    <div class="bg-emerald-500 flex items-center justify-center text-[9px] font-black text-white transition-all" style="width:${wp}%">${wp > 8 ? wp + '%' : ''}</div>
+                    <div class="bg-red-500 flex items-center justify-center text-[9px] font-black text-white transition-all" style="width:${lp}%">${lp > 8 ? lp + '%' : ''}</div>
+                    <div class="bg-zinc-500 flex items-center justify-center text-[9px] font-black text-white transition-all" style="width:${bp}%">${bp > 8 ? bp + '%' : ''}</div>
+                </div>`;
+            };
+
+            const el = document.getElementById('vol-stats');
+            el.innerHTML = `
+            <div class="flex flex-col gap-4">
+                <!-- Delta badge -->
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-500">So sánh Winrate</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-black font-mono ${deltaCls}">
+                        ${deltaIcon} ${deltaSign}${delta}% khi có Vol
+                    </span>
+                </div>
+
+                <!-- Có Volume -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="text-zinc-300">Có Volume</span>
+                            <span class="text-zinc-500 font-mono">${withVol.length} lệnh</span>
+                        </span>
+                        <span class="font-black font-mono text-sm ${wrW >= 60 ? 'text-emerald-400' : wrW >= 40 ? 'text-amber-400' : 'text-red-400'}">${wrW}%</span>
+                    </div>
+                    ${makeBar(withVol, wrW)}
+                </div>
+
+                <!-- Không Volume -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-zinc-500 inline-block"></span>
+                            <span class="text-zinc-300">Không Volume</span>
+                            <span class="text-zinc-500 font-mono">${noVol.length} lệnh</span>
+                        </span>
+                        <span class="font-black font-mono text-sm ${wrN >= 60 ? 'text-emerald-400' : wrN >= 40 ? 'text-zinc-300' : 'text-red-400'}">${wrN}%</span>
+                    </div>
+                    ${makeBar(noVol, wrN)}
+                </div>
+
+                <!-- Legend -->
+                <div class="flex items-center gap-3 text-[10px] font-bold pt-1 border-t border-zinc-700/30">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>Win</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block"></span>Loss</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-zinc-500 inline-block"></span>BE</span>
+                    <span class="ml-auto text-zinc-600">${data.length} tổng lệnh</span>
+                </div>
+            </div>`;
+        }
+
+        // ===== TABLE =====
+        let _rowGalleries = []; // [{urls:[], labels:[]}] — index = gallery id
+
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            const empty = document.getElementById('table-empty');
+
+            if (data.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+            empty.classList.add('hidden');
+
+            // Áp dụng sort nếu có
+            let sorted = [...data];
+            if (sortState.key) {
+                const sk = sortState.key;
+                sorted.sort((a, b) => {
+                    const av = n(getVal(a, sk) || String(a[sk] || ''));
+                    const bv = n(getVal(b, sk) || String(b[sk] || ''));
+                    return sortState.asc ? av.localeCompare(bv, 'vi') : bv.localeCompare(av, 'vi');
+                });
+            }
+
+            const keys = Object.keys(rawData[0] || {});
+            _rowGalleries = []; // reset mỗi lần render
+
+            tbody.innerHTML = sorted.map((row, rowIdx) => {
+                const res = getVal(row, 'Kết quả', 'ketqua', 'result').toLowerCase();
+                const rowCls = res.includes('win') ? 'border-l-2 border-l-emerald-400' : res.includes('loss') ? 'border-l-2 border-l-red-400' : '';
+
+                // Thu thập ảnh+label của dòng → lưu vào global array
+                const rowImgEntries = keys
+                    .filter(k => String(row[k] ?? '').startsWith('http'))
+                    .map(k => ({ url: String(row[k]), label: k }));
+                const galleryId = _rowGalleries.length;
+                _rowGalleries.push(rowImgEntries);
+
+                const cells = keys.map(k => {
+                    let val = row[k] ?? '';
+                    const vStr = String(val);
+                    // Nếu là URL ảnh → render thumbnail
+                    if (vStr.startsWith('http')) {
+                        const imgIdx = rowImgEntries.findIndex(e => e.url === vStr);
+                        return `<td class="px-2 py-2">
+                            <div class="td-img-wrap">
+                                <img src="${vStr}" loading="lazy"
+                                    onclick="openRowImg(${galleryId}, ${imgIdx})"
+                                    class="h-36 w-48 object-cover rounded-lg cursor-zoom-in border border-zinc-200 dark:border-zinc-700 hover:scale-105 transition-transform shadow-sm block"
+                                    onerror="this.closest('td').innerHTML='<span class=\'text-zinc-400 text-[10px]\'>Lỗi ảnh</span>'">
+                                <span class="td-img-badge">${k}</span>
+                            </div>
+                        </td>`;
+                    }
+                    // Style của kết quả — badge pill nổi bật
+                    const lower = vStr.toLowerCase();
+                    if (lower.includes('win'))
+                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">✅ Win</span>`;
+                    else if (lower.includes('loss'))
+                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-red-500/15 text-red-400 border border-red-500/30">❌ Loss</span>`;
+                    else if (lower === 'be' || lower.includes('hòa') || lower.includes('hoa'))
+                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-zinc-500/15 text-zinc-400 border border-zinc-500/30">⚪ BE</span>`;
+                    else if (!vStr) val = '<span class="text-zinc-300 dark:text-zinc-600">—</span>';
+                    return `<td class="px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-300 whitespace-nowrap max-w-[200px] truncate" title="${vStr}">${val}</td>`;
+                }).join('');
+
+                // Nút Chi tiết + STT
+                const sttTd = `<td class="px-3 py-2 text-center text-[10px] font-mono text-zinc-500">${rowIdx + 1}</td>`;
+                const detailBtn = `<td class="px-3 py-2">
+                    <button onclick='openDetail(${JSON.stringify(JSON.stringify(row))})'
+                        class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 hover:from-violet-500/25 hover:to-fuchsia-500/25 text-violet-400 hover:text-violet-300 text-[11px] font-bold transition active:scale-95 border border-violet-500/25 shadow-sm">
+                        <i class="fa-solid fa-circle-info text-[10px]"></i> Chi tiết
+                    </button>
+                </td>`;
+                // Border trái màu theo kết quả
+                const borderStyle = res.includes('win')
+                    ? 'border-left: 3px solid #10b981;'
+                    : res.includes('loss') ? 'border-left: 3px solid #ef4444;'
+                        : 'border-left: 3px solid #52525b;';
+                return `<tr style="${borderStyle}">${sttTd}${detailBtn}${cells}</tr>`;
+            }).join('');
+        }
+
+        // ===== GALLERY LIGHTBOX =====
+        let _gallery = [], _galIdx = 0; // [{url, label}]
+
+        // Mở gallery từ bảng (dùng id từ _rowGalleries)
+        function openRowImg(galleryId, imgIdx) {
+            const entries = _rowGalleries[galleryId] || [];
+            _gallery = entries;
+            _galIdx = (imgIdx >= 0 && imgIdx < _gallery.length) ? imgIdx : 0;
+            _showLightbox();
+        }
+
+        // Mở gallery từ modal chi tiết
+        let _detailImgs = []; // [{url, label}]
+        function openDetailImg(idx) {
+            _gallery = _detailImgs;
+            _galIdx = (idx >= 0 && idx < _gallery.length) ? idx : 0;
+            _showLightbox();
+        }
+
+        function _showLightbox() {
+            _showGalleryImg();
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden');
+            document.getElementById('lb-prev').style.display = _gallery.length > 1 ? 'flex' : 'none';
+            document.getElementById('lb-next').style.display = _gallery.length > 1 ? 'flex' : 'none';
+        }
+
+        function _showGalleryImg() {
+            if (!_gallery.length) return;
+            const item = _gallery[_galIdx];
+            document.getElementById('lb-img').src = item.url;
+            const total = _gallery.length;
+            document.getElementById('lb-counter').textContent = total > 1 ? `${_galIdx + 1} / ${total}` : '';
+            document.getElementById('lb-caption').textContent = item.label || '';
+        }
+
+        function lbPrev(e) { e.stopPropagation(); _galIdx = (_galIdx - 1 + _gallery.length) % _gallery.length; _showGalleryImg(); }
+        function lbNext(e) { e.stopPropagation(); _galIdx = (_galIdx + 1) % _gallery.length; _showGalleryImg(); }
+
+        // Backward compat
+        function openImg(src, label) {
+            _gallery = [{ url: src, label: label || '' }];
+            _galIdx = 0;
+            _showLightbox();
+        }
+
+        // keyboard nav
+        document.addEventListener('keydown', e => {
+            const lb = document.getElementById('lightbox');
+            if (lb.classList.contains('hidden')) return;
+            if (e.key === 'ArrowLeft') lbPrev(e);
+            else if (e.key === 'ArrowRight') lbNext(e);
+            else if (e.key === 'Escape') lb.classList.add('hidden');
+        });
+
+        // ===== DETAIL MODAL =====
+
+        // Màu sắc cho từng loại field
+        function getFieldStyle(key) {
+            const k = key.normalize('NFC').toLowerCase().replace(/\s+/g, '');
+            if (/th(ờ|o)igian|ng(à|a)y|date|time/.test(k))
+                return { card: 'border-blue-500 bg-blue-950/40', label: 'text-blue-400', val: 'text-blue-200', icon: 'fa-solid fa-calendar-days' };
+            if (/k(ế|e)tqu(ả|a)|result/.test(k))
+                return { card: 'border-emerald-500 bg-emerald-950/40', label: 'text-emerald-400', val: 'text-emerald-200', icon: 'fa-solid fa-circle-check' };
+            if (/m(ẫ|a)uhinh|pattern|setup/.test(k))
+                return { card: 'border-violet-500 bg-violet-950/40', label: 'text-violet-400', val: 'text-violet-200', icon: 'fa-solid fa-chess-board' };
+            if (/r:r|rr|reward|risk/.test(k))
+                return { card: 'border-amber-500 bg-amber-950/40', label: 'text-amber-400', val: 'text-amber-200', icon: 'fa-solid fa-scale-balanced' };
+            if (/vol|kh(ố|o)il(ư|u)(ợ|o)ng/.test(k))
+                return { card: 'border-orange-500 bg-orange-950/40', label: 'text-orange-400', val: 'text-orange-200', icon: 'fa-solid fa-wave-square' };
+            if (/c(ặ|a)pti(ề|e)n|dongtien|symbol|pair|money/.test(k))
+                return { card: 'border-cyan-500 bg-cyan-950/40', label: 'text-cyan-400', val: 'text-cyan-200', icon: 'fa-solid fa-coins' };
+            if (/ghi(ch(ú|u)|c(h|ú))|note|comment|nhan(x|ét)/.test(k))
+                return { card: 'border-pink-500 bg-pink-950/40', label: 'text-pink-400', val: 'text-pink-200', icon: 'fa-solid fa-note-sticky' };
+            if (/huong|direction|bu(ổ|o)i|session|khung|timeframe|tf/.test(k))
+                return { card: 'border-indigo-500 bg-indigo-950/40', label: 'text-indigo-400', val: 'text-indigo-200', icon: 'fa-solid fa-compass' };
+            // default
+            return { card: 'border-zinc-600 bg-zinc-800/60', label: 'text-zinc-400', val: 'text-zinc-200', icon: 'fa-solid fa-tag' };
+        }
+
+        function openDetail(rowJson) {
+            const row = JSON.parse(rowJson);
+            const modal = document.getElementById('detail-modal');
+            const body = document.getElementById('detail-body');
+            const res = getVal(row, 'Kết quả', 'ketqua', 'result').toLowerCase();
+            const badgeCls = res.includes('win') ? 'grad-win' : res.includes('loss') ? 'grad-loss' : 'grad-be';
+            const badgeTxt = res.includes('win') ? '✅ Win' : res.includes('loss') ? '❌ Loss' : '⚪ BE';
+
+            // Tách dữ liệu ảnh và text
+            const textFields = [], imgFields = [];
+            Object.entries(row).forEach(([k, v]) => {
+                const vStr = String(v ?? '');
+                if (vStr.startsWith('http')) imgFields.push({ k, v: vStr });
+                else textFields.push({ k, v: vStr });
+            });
+
+            // === Trích xuất các field đặc biệt ===
+            const dongtien = getVal(row, 'Dòng tiền', 'dongtien', 'money', 'symbol', 'pair', 'cặptiền');
+            const mauhinh = getVal(row, 'Mẫu hình', 'mauhinh', 'pattern', 'setup');
+            const thoigian = getVal(row, 'Thời gian', 'thoigian', 'ngày', 'date', 'time');
+            // Các key cần ẩn khỏi phần field phía dưới (vì đã hiển thị ở trên)
+            const isSpecialKey = k => {
+                const nk = n(k);
+                return nk.includes(n('dòngtiền')) || nk.includes(n('dongtien')) || nk.includes('money') || nk.includes('symbol') || nk.includes('pair')
+                    || nk.includes(n('mẫuhình')) || nk.includes(n('mauhinh')) || nk.includes('pattern') || nk.includes('setup')
+                    || nk.includes(n('thờigian')) || nk.includes(n('thoigian')) || nk.includes('date') || nk.includes('time')
+                    || nk.includes(n('ngày')) || nk.includes('ngay')
+                    || nk.includes(n('kếtquả')) || nk.includes(n('ketqua')) || nk.includes('result');
+            };
+
+            _detailImgs = imgFields.map(f => ({ url: f.v, label: f.k }));
+
+            body.innerHTML = `
+                <!-- ===== HERO HEADER: Dòng tiền + Ngày + Kết quả ===== -->
+                <div class="flex items-center justify-between gap-3 mb-4 pb-4 border-b border-zinc-700/60">
+                    <!-- Trái: Dòng tiền (to, không label) + Ngày -->
+                    <div class="flex flex-col gap-1">
+                        ${dongtien ? `<div class="text-2xl font-black text-white tracking-widest font-mono leading-none">${dongtien}</div>` : ''}
+                        ${thoigian ? `<div class="text-xs text-zinc-400 font-mono mt-0.5"><i class="fa-regular fa-clock mr-1 opacity-60"></i>${thoigian}</div>` : ''}
+                    </div>
+                    <!-- Phải: Badge kết quả -->
+                    <span class="tag ${badgeCls} text-sm px-4 py-1.5 rounded-xl shadow-lg shrink-0">${badgeTxt}</span>
+                </div>
+
+                <!-- ===== MẪU HÌNH: Nổi bật ở giữa ===== -->
+                ${mauhinh ? `
+                <div class="flex justify-center mb-5">
+                    <div class="text-center bg-gradient-to-br from-violet-900/60 to-fuchsia-900/40 border border-violet-500/40 rounded-2xl px-6 py-3 shadow-lg shadow-violet-900/30">
+                        <div class="text-[9px] font-black uppercase tracking-[.2em] text-violet-400 mb-1.5">
+                            <i class="fa-solid fa-chess-board mr-1"></i>Mẫu Hình
+                        </div>
+                        <div class="text-xl font-black text-violet-100 tracking-wide">${mauhinh}</div>
+                    </div>
+                </div>` : ''}
+
+                <!-- ===== HÌNH ẢNH ===== -->
+                ${imgFields.length ? `
+                <div class="mb-5 rounded-xl border border-violet-800/40 bg-violet-950/20 p-3">
+                    <div class="text-[10px] font-black uppercase tracking-widest text-violet-400 flex items-center gap-1.5 mb-3">
+                        <i class="fa-solid fa-images"></i> Hình Ảnh (${imgFields.length})
+                    </div>
+                    <div class="grid grid-cols-${Math.min(imgFields.length, 2)} gap-3">
+                        ${imgFields.map((f, i) => `
+                            <div class="relative group cursor-zoom-in" onclick="openDetailImg(${i})">
+                                <div class="text-[10px] font-bold text-violet-300 uppercase tracking-wider mb-1.5">
+                                    <i class="fa-solid fa-image mr-1 opacity-70"></i>${f.k}
+                                </div>
+                                <div class="relative overflow-hidden rounded-xl ring-1 ring-violet-700/40">
+                                    <img src="${f.v}" loading="lazy" class="detail-img-thumb"
+                                        onerror="this.closest('.relative').innerHTML='<div class=\\'flex items-center justify-center h-24 bg-zinc-800 rounded-xl\\'><span class=\\'text-zinc-500 text-xs\\'>Lỗi ảnh</span></div>'">
+                                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center pointer-events-none">
+                                        <div class="opacity-0 group-hover:opacity-100 transition bg-black/60 rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-magnifying-glass-plus text-white text-sm"></i>
+                                            <span class="text-white text-xs font-bold">Phóng to</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                </div>` : ''}
+
+                <!-- ===== CÁC FIELD CÒN LẠI ===== -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    ${textFields.filter(f => f.v && !isSpecialKey(f.k)).map(f => {
+                const s = getFieldStyle(f.k);
+                const displayVal = f.v.toLowerCase().includes('win') ? '<span class="tag tag-win">✅ Win</span>'
+                    : f.v.toLowerCase().includes('loss') ? '<span class="tag tag-loss">❌ Loss</span>'
+                        : (f.v.toLowerCase() === 'be' || f.v.toLowerCase().includes('hòa')) ? '<span class="tag tag-be">⚪ BE</span>'
+                            : f.v;
+                return `<div class="rounded-xl px-3 py-2.5 border-l-4 ${s.card}">
+                            <div class="text-[9px] font-black uppercase tracking-widest mb-1 flex items-center gap-1.5 ${s.label}">
+                                <i class="${s.icon} text-[9px]"></i>${f.k}
+                            </div>
+                            <div class="text-[13px] font-semibold leading-snug ${s.val}">${displayVal}</div>
+                        </div>`;
+            }).join('')}
+                </div>`;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeDetail() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        window.onload = loadData;
+    </script>
+
+    <!-- Gallery Lightbox -->
+    <div id="lightbox" onclick="this.classList.add('hidden')"
+        class="hidden fixed inset-0 z-[9999] bg-black/90 flex flex-col items-center justify-center p-4 cursor-zoom-out">
+        <!-- Counter -->
+        <div id="lb-counter" class="absolute top-4 left-1/2 -translate-x-1/2 text-white/60 text-xs font-mono"></div>
+        <!-- Image + Caption wrapper -->
+        <div class="flex flex-col items-center gap-2" onclick="event.stopPropagation()" style="max-height:92vh">
+            <img id="lb-img" src="" class="max-w-full rounded-xl shadow-2xl object-contain pointer-events-none"
+                style="max-height:82vh; max-width:92vw">
+            <!-- Caption: tên cột ảnh -->
+            <div id="lb-caption" class="text-xs font-bold text-white/70 tracking-wider uppercase"></div>
+        </div>
+        <!-- Close -->
+        <button onclick="document.getElementById('lightbox').classList.add('hidden')"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-xl transition z-10">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <!-- Prev -->
+        <button id="lb-prev" onclick="lbPrev(event)" class="lb-nav-btn" style="display:none">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <!-- Next -->
+        <button id="lb-next" onclick="lbNext(event)" class="lb-nav-btn" style="display:none">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" onclick="if(event.target===this)closeDetail()"
+        class="hidden fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="modal-box bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-500 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-info text-white text-sm"></i>
+                    </div>
+                    <h2 class="font-bold text-white tracking-tight">Chi Tiết Phản Ứng</h2>
+                </div>
+                <button onclick="closeDetail()"
+                    class="w-8 h-8 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div id="detail-body" class="px-6 py-5"></div>
+        </div>
+    </div>
+
+    <!-- Scroll to top button -->
+    <button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        class="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/30 flex items-center justify-center transition-all duration-300 opacity-0 translate-y-4 pointer-events-none hover:scale-110 active:scale-95"
+        title="Lên đầu trang">
+        <i class="fa-solid fa-chevron-up text-sm"></i>
+    </button>
+    <script>
+        (function() {
+            const btn = document.getElementById('scroll-top-btn');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    btn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                    btn.classList.add('opacity-100', 'translate-y-0');
+                } else {
+                    btn.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                    btn.classList.remove('opacity-100', 'translate-y-0');
+                }
+            }, { passive: true });
+        })();
+    </script>
+</body>
+
+</html>

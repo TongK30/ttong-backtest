@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trading Journal Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 750: '#293548', 850: '#172033', 900: '#0f172a', 950: '#020617' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        /* --- INPUT STYLES --- */
+        .input-custom {
+            width: 100%;
+            padding: 0.7rem 0.85rem;
+            border-radius: 0.65rem;
+            font-size: 0.875rem;
+            outline: none;
+            transition: all 0.25s ease;
+            background-color: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        .dark .input-custom {
+            background-color: #0f172a;
+            border-color: #1e293b;
+            color: #f1f5f9;
+        }
+
+        .input-custom:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            background-color: white;
+        }
+
+        .dark .input-custom:focus {
+            background-color: #1e293b;
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+        }
+
+        .input-custom::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* --- SECTION CARDS --- */
+        .section-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .dark .section-card {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .section-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.875rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dark .section-header {
+            border-bottom-color: #1e293b;
+        }
+
+        .section-header .icon-circle {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+        }
+
+        .section-header h3 {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+        }
+
+        .dark .section-header h3 {
+            color: #94a3b8;
+        }
+
+        /* --- ANIMATIONS --- */
+        .fade-in {
+            animation: fadeSlideIn 0.4s ease-out;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- LOADING OVERLAY --- */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- 3D TRANSFORMS --- */
+        .perspective-2000 {
+            perspective: 2000px;
+        }
+
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+
+        .rotate-y-0 {
+            transform: rotateY(0deg);
+        }
+
+        .rotate-y--100 {
+            transform: rotateY(-100deg);
+        }
+
+        .origin-left-center {
+            transform-origin: left center;
+        }
+
+        /* --- GLASS EFFECT --- */
+        .glass-page {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .dark .glass-page {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+
+        /* --- SUBMIT BUTTON GLOW --- */
+        .btn-submit {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #818cf8 100%);
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            transform: rotate(45deg);
+            transition: 0.6s;
+        }
+
+        .btn-submit:hover::before {
+            left: 100%;
+        }
+
+        .dark .btn-submit {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+        }
+
+        /* --- LABEL PILL STYLE --- */
+        .label-pill {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #64748b;
+            margin-left: 2px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dark .label-pill {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body
+    class="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50/30 text-slate-800 dark:from-[#0a0f1a] dark:via-[#0f172a] dark:to-[#0a0f1a] dark:text-slate-200 transition-colors duration-300">
+
+    <div id="loadingOverlay">
+        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-white font-bold animate-pulse">Đang đồng bộ dữ liệu kép...</p>
+    </div>
+
+    <!-- Custom Scrollbar -->
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+
+    <script>
+        const API_PRIMARY = "https://script.google.com/macros/s/AKfycbxL8WrU5YfmRA77dD8TnoFXKCkr-VmE4ttZYVvjA_uS9nXF5qtdx5d7H7Hj0EKujvYlMA/exec";
+        const API_SECONDARY = "https://script.google.com/macros/s/AKfycbz4wW8RLRipmtqbViIRXOxrdeV9SyPSmeaDE_4FM1OZt0ABxLET4Ja90P7rZKzCsAFvgw/exec";
+    </script>
+
+    <header
+        class="bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-700/50 z-50 shrink-0 shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-all text-zinc-900 dark:text-white">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-bolt text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-sm leading-tight tracking-tight">Minh Trị Duy Tân</h1>
+                    <p class="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-widest">
+                        Smart Money Concepts</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <a href="./thong-ke.html"
+                    class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 text-slate-500 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400">
+                    <i class="fa-solid fa-chart-pie text-[10px]"></i>
+                    Thống kê
+                </a>
+                <a href="./date.html"
+                    class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400">
+                    <i class="fa-solid fa-calendar-check text-[10px]"></i>
+                    Cập nhật
+                </a>
+                <a href="./phan-ung.html"
+                    class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-300 text-slate-500 dark:text-slate-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-600 dark:hover:text-violet-400">
+                    <i class="fa-solid fa-diagram-project text-[10px]"></i>
+                    Mẫu hình PƯ
+                </a>
+                <div class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                <button onclick="toggleTheme()"
+                    class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-yellow-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center text-xs">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <button onclick="reloadData()"
+                    class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 transition-all flex items-center justify-center text-xs">
+                    <i id="icon-reload" class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Navigation Sidebar -->
+    <div class="fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-6 hidden md:flex">
+        <!-- Form Tab -->
+        <div class="group relative">
+            <button onclick="switchTab('form')" id="nav-form"
+                class="nav-btn w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:scale-110 active:scale-95 active">
+                <i class="fa-solid fa-pen-to-square text-lg"></i>
+            </button>
+            <span
+                class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                Nhập Lệnh
+            </span>
+        </div>
+
+        <!-- History Tab -->
+        <div class="group relative">
+            <button onclick="switchTab('history')" id="nav-history"
+                class="nav-btn w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                <i class="fa-solid fa-list-ul text-lg"></i>
+            </button>
+            <span
+                class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                Lịch Sử
+            </span>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="group relative">
+            <button onclick="switchTab('stats')" id="nav-stats"
+                class="nav-btn w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                <i class="fa-solid fa-chart-pie text-lg"></i>
+            </button>
+            <span
+                class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                Thống Kê
+            </span>
+        </div>
+
+        <!-- Playbook Tab -->
+        <div class="group relative">
+            <button onclick="switchTab('playbook')" id="nav-playbook"
+                class="nav-btn w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                <i class="fa-solid fa-book-bookmark text-lg"></i>
+            </button>
+            <span
+                class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                Playbook
+            </span>
+        </div>
+
+        <!-- API Sheet Tab -->
+        <div class="group relative">
+            <button onclick="switchTab('sheet')" id="nav-sheet"
+                class="nav-btn w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-green-500 dark:hover:text-green-400 shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                <i class="fa-solid fa-table text-lg"></i>
+            </button>
+            <span
+                class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                API Sheet
+            </span>
+        </div>
+
+        <!-- Mẫu hình PƯ Tab -->
+        <div class="group relative">
+            <a href="./phan-ung.html"
+                class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-400 shadow-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+                <i class="fa-solid fa-diagram-project text-lg"></i>
+            </a>
+            <span
+                class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
+                Mẫu hình PƯ
+            </span>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Bar (Bottom Fixed) - Visible only on mobile -->
+    <div
+        class="fixed bottom-0 left-0 w-full bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 z-50 flex justify-around p-3 md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('form')" id="mob-nav-form"
+            class="mob-nav-btn flex flex-col items-center gap-1 text-slate-400 active">
+            <i class="fa-solid fa-pen-to-square text-lg"></i>
+            <span class="text-[9px] font-bold">Nhập</span>
+        </button>
+        <button onclick="switchTab('history')" id="mob-nav-history"
+            class="mob-nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i class="fa-solid fa-list-ul text-lg"></i>
+            <span class="text-[9px] font-bold">Lịch sử</span>
+        </button>
+        <button onclick="switchTab('stats')" id="mob-nav-stats"
+            class="mob-nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i class="fa-solid fa-chart-pie text-lg"></i>
+            <span class="text-[9px] font-bold">Thống kê</span>
+        </button>
+        <button onclick="switchTab('playbook')" id="mob-nav-playbook"
+            class="mob-nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i class="fa-solid fa-book-bookmark text-lg"></i>
+            <span class="text-[9px] font-bold">Playbook</span>
+        </button>
+        <button onclick="switchTab('sheet')" id="mob-nav-sheet"
+            class="mob-nav-btn flex flex-col items-center gap-1 text-slate-400">
+            <i class="fa-solid fa-table text-lg"></i>
+            <span class="text-[9px] font-bold">Sheet</span>
+        </button>
+        <a href="./phan-ung.html"
+            class="flex flex-col items-center gap-1 text-slate-400 hover:text-violet-500 transition-colors">
+            <i class="fa-solid fa-diagram-project text-lg"></i>
+            <span class="text-[9px] font-bold">PƯ</span>
+        </a>
+    </div>
+
+    <div class="flex-1 overflow-y-auto relative pb-20 md:pb-0">
+        <div class="max-w-5xl mx-auto p-4 pb-24 min-h-full">
+            <div id="view-form" class="fade-in">
+                <form id="unifiedForm" onsubmit="submitUnifiedTrade(event)" class="space-y-6 max-w-4xl mx-auto">
+
+                    <!-- Section 1: Thông tin cơ bản -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div
+                                class="icon-circle bg-gradient-to-br from-blue-500 to-cyan-500 shadow-md shadow-blue-500/20">
+                                <i class="fa-solid fa-crosshairs"></i>
+                            </div>
+                            <h3>Thông tin cơ bản</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Thời gian</label>
+                                <input type="datetime-local" name="thoigian" id="thoigian" class="input-custom"
+                                    required>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Cặp tiền</label>
+                                <input type="text" name="pair" list="dl-money"
+                                    class="input-custom font-bold text-blue-600 dark:text-blue-400"
+                                    placeholder="EURUSD..." required>
+                                <datalist id="dl-money"></datalist>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Phiên</label>
+                                <select name="phien" class="input-custom">
+                                    <option value="Phiên Á">Phiên Á</option>
+                                    <option value="Phiên Âu">Phiên Âu</option>
+                                    <option value="Phiên Mỹ">Phiên Mỹ</option>
+                                    <option value="Giao thoa">Giao thoa</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1 md:col-span-1">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Setup / Mẫu
+                                    hình</label>
+                                <div id="entry-container" class="space-y-2">
+                                    <div class="flex gap-1 entry-row">
+                                        <input type="text"
+                                            class="entry-input input-custom font-bold text-indigo-600 dark:text-indigo-400"
+                                            list="dl-pattern" placeholder="Chọn mẫu...">
+                                        <button type="button" onclick="addEntryField()"
+                                            class="px-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg border border-indigo-100 dark:border-indigo-800 hover:bg-indigo-600 hover:text-white transition-all">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <datalist id="dl-pattern"></datalist>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Section 2: Phân tích kỹ thuật & Hình ảnh -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div
+                                class="icon-circle bg-gradient-to-br from-violet-500 to-purple-600 shadow-md shadow-violet-500/20">
+                                <i class="fa-solid fa-chart-area"></i>
+                            </div>
+                            <h3>Hình ảnh & Phân tích</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+                            <div class="space-y-1 group">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">D1 Chart</label>
+                                <input type="url" name="img_d1" class="input-custom text-xs"
+                                    placeholder="Link ảnh D1..." oninput="previewImg(this)">
+                                <div class="mt-2 preview-container hidden aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 cursor-zoom-in"
+                                    onclick="zoomPreview(this)"><img src="" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="space-y-1 group">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">H4 Chart</label>
+                                <input type="url" name="img_h4" class="input-custom text-xs"
+                                    placeholder="Link ảnh H4..." oninput="previewImg(this)">
+                                <div class="mt-2 preview-container hidden aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 cursor-zoom-in"
+                                    onclick="zoomPreview(this)"><img src="" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="space-y-1 group">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">H1 / HTF</label>
+                                <input type="url" name="img_h1" class="input-custom text-xs"
+                                    placeholder="Link ảnh H1..." oninput="previewImg(this)">
+                                <div class="mt-2 preview-container hidden aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 cursor-zoom-in"
+                                    onclick="zoomPreview(this)"><img src="" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="space-y-1 group">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">M15 / LTF</label>
+                                <input type="url" name="img_m15" class="input-custom text-xs"
+                                    placeholder="Link ảnh M15..." oninput="previewImg(this)">
+                                <div class="mt-2 preview-container hidden aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 cursor-zoom-in"
+                                    onclick="zoomPreview(this)"><img src="" class="w-full h-full object-cover"></div>
+                            </div>
+                            <div class="space-y-1 group">
+                                <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Entry /
+                                    Actual</label>
+                                <input type="url" name="img_actual" class="input-custom text-xs"
+                                    placeholder="Link ảnh thực tế..." oninput="previewImg(this)">
+                                <div class="mt-2 preview-container hidden aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 cursor-zoom-in"
+                                    onclick="zoomPreview(this)"><img src="" class="w-full h-full object-cover"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <textarea name="cam_nhan" rows="2" class="input-custom"
+                                placeholder="📝 Cảm nhận & Tâm lý..."></textarea>
+                            <textarea name="htf_vs_ltf" rows="2" class="input-custom"
+                                placeholder="🔍 Góc nhìn HTF vs LTF..."></textarea>
+                        </div>
+                    </div>
+
+
+                    <!-- Section 3: Quản lý lệnh & Kết quả -->
+                    <!-- Section 3: Quản lý lệnh & Kết quả (3D BOOK FLIP) -->
+                    <!-- WRAPPER for Split Layout -->
+                    <div id="results-split-container" class="grid grid-cols-1 gap-4 transition-all duration-300">
+                        <!-- Section 3: Quản lý lệnh & Kết quả (Primary) -->
+                        <div id="primary-section" class="section-card transition-all duration-300">
+                            <div class="section-header">
+                                <div
+                                    class="icon-circle bg-gradient-to-br from-orange-500 to-red-500 shadow-md shadow-orange-500/20">
+                                    <i class="fa-solid fa-book-open"></i>
+                                </div>
+                                <h3>Nhật Ký (Primary)</h3>
+                            </div>
+
+                            <div class="space-y-4">
+                                <!-- Primary Result -->
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold uppercase text-blue-500 ml-1">Kết quả
+                                        Chính</label>
+                                    <select name="ket_qua_primary" id="ket_qua_primary" onchange="updateResultUI(this)"
+                                        class="input-custom font-bold text-xs text-blue-600 bg-blue-50 border-blue-200">
+                                        <option value="Đang chạy" selected>⏳ Đang chạy</option>
+                                    </select>
+                                </div>
+
+                                <!-- Pips & Time -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Số
+                                            Pip</label>
+                                        <input type="number" id="pipInput" name="pip" step="0.1" class="input-custom"
+                                            placeholder="50.5">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">TG Gồng
+                                            lệnh</label>
+                                        <input type="text" name="gong_lenh" class="input-custom"
+                                            placeholder="2h 30m...">
+                                    </div>
+                                </div>
+
+                                <!-- Checkbox Save to Pattern -->
+                                <div class="pt-2 border-t border-slate-100 dark:border-slate-700 mt-4">
+                                    <label class="flex items-center cursor-pointer group select-none">
+                                        <input type="checkbox" id="save_to_secondary" onchange="toggleBookFlip(this)"
+                                            class="hidden">
+                                        <div class="w-5 h-5 border-2 border-slate-300 rounded flex items-center justify-center transition-colors group-hover:border-indigo-500"
+                                            id="flip-checkbox-ui">
+                                            <i
+                                                class="fa-solid fa-check text-xs text-indigo-600 opacity-0 transition-opacity"></i>
+                                        </div>
+                                        <span
+                                            class="ml-2 text-xs font-bold text-slate-500 group-hover:text-indigo-500 transition-colors">THÊM
+                                            MẪU HÌNH (SECONDARY)</span>
+                                        <i class="fa-solid fa-chevron-right ml-auto text-slate-300 transform transition-transform duration-300"
+                                            id="flip-arrow"></i>
+                                    </label>
+                                </div>
+
+                                <div class="mt-4">
+                                    <textarea name="dien_bien" rows="3" class="input-custom w-full"
+                                        placeholder="⏳ Ghi chú diễn biến (Gồng lệnh...)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Quản lý lệnh & Kết quả (Secondary) -->
+                        <div id="secondary-page"
+                            class="hidden bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors border-l-4 border-l-indigo-500">
+                            <div class="flex items-center gap-2 mb-4">
+                                <i class="fa-solid fa-layer-group text-indigo-500"></i>
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-500">Mẫu Hình
+                                    (Secondary)
+                                </h3>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold uppercase text-indigo-500 ml-1">Kết quả Mẫu
+                                        Hình</label>
+                                    <select name="ket_qua_secondary" onchange="updateResultUI(this)"
+                                        class="input-custom font-bold text-xs text-indigo-600 bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800">
+                                        <option value="Đang chạy" selected>⏳ Đang chạy</option>
+                                        <option value="Win">✅ Win</option>
+                                        <option value="Loss">❌ Loss</option>
+                                        <option value="BE">⚪ Hòa (BE)</option>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">RR Ratio</label>
+                                    <input type="number" name="rr_ratio" step="0.1" class="input-custom font-bold"
+                                        placeholder="2.5">
+                                </div>
+
+                                <div
+                                    class="p-3 bg-indigo-100/50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800 text-[10px] text-indigo-800 dark:text-indigo-300 italic">
+                                    <i class="fa-solid fa-circle-info mr-1"></i> Dữ liệu này sẽ được lưu vào hệ thống
+                                    Thống
+                                    kê Mẫu hình riêng biệt.
+                                </div>
+
+                                <textarea name="ket_luan" rows="2" class="input-custom"
+                                    placeholder="💡 Bài học rút ra (Lesson learned...)"></textarea>
+
+                                <div class="flex items-center pt-1">
+                                    <label class="flex items-center cursor-pointer group">
+                                        <input type="checkbox" name="co_vol" id="co_vol"
+                                            class="w-4 h-4 accent-indigo-600 rounded">
+                                        <span
+                                            class="ml-2 text-[10px] font-bold text-indigo-500 group-hover:text-indigo-400 transition-colors">CÓ
+                                            VOLUME XÁC NHẬN</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <button type="submit" id="btnSubmit"
+                        class="btn-submit w-full py-4 text-white rounded-2xl font-black text-base shadow-xl shadow-indigo-500/20 hover:shadow-2xl hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> LƯU DỮ LIỆU
+                    </button>
+                </form>
+            </div>
+
+            <!-- View History -->
+            <div id="view-history" class="hidden fade-in space-y-4">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-sm font-bold text-slate-500 uppercase tracking-widest"><i
+                            class="fa-solid fa-list-ul mr-2"></i>Lịch sử lệnh (Primary)</span>
+                    <span id="total-trades"
+                        class="text-xs font-bold bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1 rounded-full">Tổng:
+                        0</span>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden text-zinc-900 dark:text-white">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead
+                                class="bg-slate-50 dark:bg-slate-750 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100 dark:border-slate-700">
+                                <tr>
+                                    <th class="px-4 py-3">Thời gian</th>
+                                    <th class="px-4 py-3">Cặp tiền</th>
+                                    <th class="px-4 py-3">Setup</th>
+                                    <th class="px-4 py-3 text-center">Kết quả</th>
+                                    <th class="px-4 py-3 text-center">RR / Pip</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body"
+                                class="text-sm divide-y divide-slate-100 dark:divide-slate-700">
+                                <!-- Data rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Stats -->
+            <div id="view-stats" class="hidden fade-in space-y-6">
+                <!-- Filters Section -->
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors">
+                    <div class="font-bold text-slate-700 dark:text-slate-300 text-sm uppercase tracking-widest">Bộ lọc
+                        thống kê</div>
+
+                    <div class="flex gap-2 items-center">
+                        <div
+                            class="bg-slate-100 dark:bg-slate-750 p-1 rounded-xl border border-slate-200 dark:border-slate-600 inline-flex">
+                            <label
+                                class="px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all has-[:checked]:bg-blue-600 has-[:checked]:text-white text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                <input type="radio" name="volFilter" value="all" checked onchange="renderStats()"
+                                    class="hidden"> All Vol
+                            </label>
+                            <label
+                                class="px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all has-[:checked]:bg-blue-600 has-[:checked]:text-white text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                <input type="radio" name="volFilter" value="Có" onchange="renderStats()" class="hidden">
+                                Có Vol
+                            </label>
+                            <label
+                                class="px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all has-[:checked]:bg-blue-600 has-[:checked]:text-white text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700">
+                                <input type="radio" name="volFilter" value="Không" onchange="renderStats()"
+                                    class="hidden"> No
+                                Vol
+                            </label>
+                        </div>
+
+                        <div class="relative min-w-[150px]">
+                            <select id="filter-money" onchange="renderStats()"
+                                class="appearance-none w-full bg-slate-50 dark:bg-slate-750 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold py-2 pl-3 pr-8 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-slate-100 transition-all">
+                                <option value="all">Tất cả Dòng tiền</option>
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><i
+                                    class="fa-solid fa-chevron-down text-[8px]"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="blocks-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Stat blocks will be rendered here -->
+                </div>
+
+                <div
+                    class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-zinc-900 dark:text-white transition-colors">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-sm uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-blue-500"></i> Tăng trưởng tài khoản
+                        </h3>
+                        <div id="chart-info"
+                            class="text-xs font-black px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
+                            Total: 0R</div>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Playbook -->
+            <div id="view-playbook" class="hidden fade-in space-y-6">
+                <div class="flex justify-between items-end px-1">
+                    <div>
+                        <h2 class="text-xl font-bold">Trading Playbook</h2>
+                        <p class="text-xs text-slate-400 font-medium">Chỉ hiển thị các lệnh THẮNG có ảnh Entry</p>
+                    </div>
+                </div>
+                <div id="playbook-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Playbook cards -->
+                </div>
+            </div>
+
+            <!-- View API Sheet -->
+            <div id="view-sheet" class="hidden fade-in space-y-4">
+                <div class="flex justify-between items-center px-1">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-green-500/30">
+                            <i class="fa-solid fa-table text-sm"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold">API Sheet</h2>
+                            <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">Google Sheets
+                                Data</p>
+                        </div>
+                    </div>
+                    <a href="https://docs.google.com/spreadsheets/d/1GWBI8UVNRfeueSuiUjKvI-pFunSFj2dwqF7MvLx8nZc/edit?gid=0#gid=0"
+                        target="_blank"
+                        class="flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-xl text-xs font-bold hover:bg-green-100 dark:hover:bg-green-900/40 transition-all border border-green-200 dark:border-green-800">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        Mở Google Sheet
+                    </a>
+                </div>
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"
+                    style="height: calc(100vh - 180px);">
+                    <iframe
+                        src="https://docs.google.com/spreadsheets/d/1GWBI8UVNRfeueSuiUjKvI-pFunSFj2dwqF7MvLx8nZc/edit?gid=0#gid=0"
+                        class="w-full h-full border-0" allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal"
+        class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl">
+            <div
+                class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-750">
+                <div class="text-zinc-900 dark:text-white">
+                    <h3 class="font-bold" id="modal-title">Chi tiết lệnh</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" id="modal-time"></p>
+                </div>
+                <button onclick="closeModal()"
+                    class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition flex items-center justify-center text-slate-600 dark:text-slate-300"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div
+                class="flex-1 overflow-y-auto p-4 flex flex-col md:flex-row gap-6 bg-white dark:bg-[#0f172a] text-zinc-900 dark:text-slate-200">
+                <div class="flex-1 space-y-4">
+                    <div
+                        class="aspect-video bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+                        <img id="modal-img" src="" class="max-w-full max-h-full object-contain hidden">
+                        <div id="modal-ph" class="text-slate-400 text-xs italic">Không có ảnh</div>
+                    </div>
+                    <div class="grid grid-cols-5 gap-2" id="modal-thumbnails">
+                        <!-- Thumbs -->
+                    </div>
+                </div>
+                <div class="md:w-80 space-y-4">
+                    <div
+                        class="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                        <label class="text-[9px] font-black text-blue-500 uppercase block mb-1">Cảm nhận & Tâm
+                            lý</label>
+                        <p id="modal-cam-nhan" class="text-xs leading-relaxed italic">--</p>
+                    </div>
+                    <div
+                        class="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <label class="text-[9px] font-black text-slate-400 uppercase block mb-1">Diễn biến lệnh</label>
+                        <p id="modal-dien-bien" class="text-xs leading-relaxed">--</p>
+                    </div>
+                    <div
+                        class="p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-100 dark:border-yellow-900/30">
+                        <label class="text-[9px] font-black text-yellow-600 uppercase block mb-1">Bài học rút ra</label>
+                        <p id="modal-lesson" class="text-xs leading-relaxed font-bold">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Zoom Modal -->
+    <div id="zoomModal"
+        class="fixed inset-0 z-[100] hidden bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
+        onclick="closeZoom()">
+        <img id="zoomImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl transition-transform duration-300">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // --- DATA LOAD & SYNC ---
+        window.onload = () => {
+            resetTime();
+            fetchOptions();
+            initTheme();
+            reloadData();
+        };
+
+        function determineResult(item) {
+            let res = item.ketqua || item.ket_qua || item.result || "Đang chạy";
+            const pip = parseFloat(item.pip);
+            if (!isNaN(pip)) {
+                if (pip > 10) return "Win";
+                else if (pip < 0) return "Loss";
+                else return "BE";
+            }
+            return res;
+        }
+
+        function resetTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('thoigian').value = now.toISOString().slice(0, 16);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            icon.className = document.documentElement.classList.contains('dark') ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        }
+
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeIcon();
+        }
+
+        function fetchOptions() {
+            // Fetch from both logic sources for datalists
+            fetch(API_PRIMARY + "?mode=options").then(r => r.json()).then(data => {
+                if (data.dongtien) populateList("dl-money", data.dongtien);
+                if (data.entry) populateList("dl-pattern", data.entry);
+                if (data.ketqua) populateSelect("ket_qua_primary", data.ketqua);
+            });
+            // Also append from secondary just in case they differ
+            fetch(API_SECONDARY + "?mode=options").then(r => r.json()).then(data => {
+                if (data.money) populateList("dl-money", data.money, true);
+                if (data.patterns) populateList("dl-pattern", data.patterns, true);
+            });
+        }
+
+        function populateSelect(id, items) {
+            const s = document.getElementById(id);
+            if (!s) return;
+            // Keep the first option (Đang chạy)
+            const first = s.options[0];
+            s.innerHTML = "";
+            s.appendChild(first);
+            items.forEach(it => {
+                const o = document.createElement('option');
+                o.value = it;
+                o.textContent = it;
+                s.appendChild(o);
+            });
+        }
+
+        function populateList(id, items, append = false) {
+            const dl = document.getElementById(id);
+            if (!append) dl.innerHTML = "";
+            items.forEach(it => {
+                if (![...dl.options].some(o => o.value === it)) {
+                    const opt = document.createElement('option');
+                    opt.value = it;
+                    dl.appendChild(opt);
+                }
+            });
+        }
+
+        let globalData = [];
+        let myChart = null;
+
+        function reloadData() {
+            const icon = document.getElementById('icon-reload');
+            icon.classList.add('fa-spin');
+
+            fetch(API_PRIMARY + "?mode=history")
+                .then(r => r.json())
+                .then(data => {
+                    globalData = data;
+                    renderHistoryTable();
+                    if (document.getElementById('tab-stats').classList.contains('active')) renderStats();
+                    if (document.getElementById('tab-playbook').classList.contains('active')) renderPlaybook();
+                })
+                .finally(() => {
+                    setTimeout(() => icon.classList.remove('fa-spin'), 600);
+                });
+        }
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            const totalEl = document.getElementById('total-trades');
+            totalEl.innerText = `Tổng: ${globalData.length}`;
+
+            let html = '';
+            globalData.forEach((item, idx) => {
+                const res = determineResult(item);
+                const rr = parseFloat(item.rr_ratio || item.rr || 0);
+                const pipVal = parseFloat(item.pip) || 0;
+
+                let badgeCls = "bg-slate-100 text-slate-400";
+                if (res.includes("Win")) badgeCls = "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400";
+                else if (res.includes("Loss")) badgeCls = "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400";
+                else if (res.includes("BE")) badgeCls = "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400";
+                else if (res.includes("Đang chạy")) badgeCls = "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
+
+                html += `
+                    <tr onclick="openModal(${idx})" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors cursor-pointer">
+                        <td class="px-4 py-4">
+                            <div class="font-bold text-xs text-zinc-900 dark:text-white">${item.time.split(' ')[1] || ''}</div>
+                            <div class="text-[10px] text-slate-400">${item.time.split(' ')[0] || ''}</div>
+                        </td>
+                        <td class="px-4 py-4 font-black text-blue-600 dark:text-blue-400 text-xs uppercase">${item.trade || item.pair || item.dong_tien || item.moneyFlow || ''}</td>
+                        <td class="px-4 py-4">
+                            <div class="font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase">${item.entry || item.setup || item.pattern || item.mau_hinh || ''}</div>
+                            ${(item.co_vol === 'Có' || item.hasVol === 'Có') ? '<span class="text-[9px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 px-1 rounded border border-indigo-100 dark:border-indigo-800">VOL</span>' : ''}
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                            <span class="px-2 py-1 rounded-md text-[9px] font-black uppercase ${badgeCls}">${res}</span>
+                        </td>
+                        <td class="px-4 py-4 text-center font-mono font-bold text-xs text-zinc-900 dark:text-white">
+                            ${rr}R / ${pipVal}P
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        let currentModalImages = [];
+        function openModal(idx) {
+            const d = globalData[idx];
+            document.getElementById('modal-title').innerText = d.trade || d.pair || d.dong_tien || d.moneyFlow || "Chi tiết";
+            document.getElementById('modal-time').innerText = d.time;
+
+            // Smart Text Allocation
+            // index.html: gong_lenh(prog), ghi_chu(lesson)
+            // mau-hinh: ghi_chu(prog), ket_luan(lesson)
+            let progression = d.gong_lenh || d.note || "--";
+            let lesson = d.ghi_chu || d.conclusion || d.ket_luan || "--";
+
+            if (d.ket_luan) { // Definitely from mau-hinh
+                progression = d.ghi_chu || d.gong_lenh || "--";
+                lesson = d.ket_luan || "--";
+            }
+
+            document.getElementById('modal-cam-nhan').innerText = d.cam_nhan || "--";
+            document.getElementById('modal-dien-bien').innerText = progression;
+            document.getElementById('modal-lesson').innerText = lesson;
+
+            // Add Confirmation Badge to Modal Title if exists
+            if (d.co_vol === 'Có' || d.hasVol === 'Có') {
+                document.getElementById('modal-title').innerHTML += ' <span class="bg-indigo-500 text-white text-[9px] px-1 rounded ml-2">CONFIRMED</span>';
+            }
+
+            const thumbs = document.getElementById('modal-thumbnails');
+            thumbs.innerHTML = "";
+            currentModalImages = [
+                { title: 'D1', url: d.d1 },
+                { title: 'H4', url: d.h4 },
+                { title: 'H1', url: d.h1 || d.htf },
+                { title: 'M15', url: d.m15 || d.ltf },
+                { title: 'Entry', url: d.thucte || d.entryImg || d.image_link }
+            ].filter(img => img.url && img.url.length > 5);
+
+            if (currentModalImages.length > 0) {
+                currentModalImages.forEach((img, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = "aspect-video bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden border-2 border-transparent hover:border-blue-500 transition-all";
+                    btn.innerHTML = `<img src="${img.url}" class="w-full h-full object-cover">`;
+                    btn.onclick = () => showModalImg(i);
+                    thumbs.appendChild(btn);
+                });
+                showModalImg(0);
+            } else {
+                document.getElementById('modal-img').classList.add('hidden');
+                document.getElementById('modal-ph').classList.remove('hidden');
+            }
+
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function showModalImg(i) {
+            const imgEl = document.getElementById('modal-img');
+            imgEl.src = currentModalImages[i].url;
+            imgEl.classList.remove('hidden');
+            document.getElementById('modal-ph').classList.add('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        function renderStats() {
+            const container = document.getElementById('blocks-container');
+            container.innerHTML = "";
+
+            // Basic grouping by setup
+            const groups = {};
+            globalData.forEach(d => {
+                const k = d.entry || d.setup || d.pattern || d.mau_hinh || "Khác";
+                if (!groups[k]) groups[k] = [];
+                groups[k].push(d);
+            });
+
+            Object.keys(groups).forEach(k => {
+                const list = groups[k];
+                const win = list.filter(x => determineResult(x).includes("Win")).length;
+                const wr = list.length > 0 ? Math.round((win / list.length) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-xs truncate max-w-[120px]">${k}</span>
+                        <span class="text-[10px] font-black ${wr >= 50 ? 'text-green-500' : 'text-red-500'}">${wr}% WR</span>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1">
+                        ${list.slice(0, 10).map(t => {
+                    let cls = "bg-slate-100 dark:bg-slate-700";
+                    const res = t.ketqua || t.ket_qua || "";
+                    if (res.includes("Win")) cls = "bg-green-500";
+                    else if (res.includes("Loss")) cls = "bg-red-500";
+                    return `<div class="aspect-square rounded-sm ${cls}"></div>`;
+                }).join('')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            renderEquityChart();
+        }
+
+        function renderEquityChart() {
+            const ctx = document.getElementById('equityChart');
+            if (myChart) myChart.destroy();
+
+            let labels = [0];
+            let values = [0];
+            let totalR = 0;
+
+            [...globalData].reverse().forEach((d, i) => {
+                let r = 0;
+                const res = d.ketqua || d.ket_qua || "";
+                if (res.includes("Win")) r = parseFloat(d.rr_ratio || d.rr || 0);
+                else if (res.includes("Loss")) r = -1;
+
+                totalR += r;
+                labels.push(i + 1);
+                values.push(totalR);
+            });
+
+            const info = document.getElementById('chart-info');
+            info.innerText = `Total: ${totalR.toFixed(1)}R`;
+            info.className = `text-xs font-black ${totalR >= 0 ? 'text-green-500' : 'text-red-500'}`;
+
+            const isDark = document.documentElement.classList.contains('dark');
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        borderColor: totalR >= 0 ? '#10b981' : '#ef4444',
+                        backgroundColor: totalR >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { grid: { color: isDark ? '#334155' : '#f1f5f9' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function renderPlaybook() {
+            const grid = document.getElementById('playbook-grid');
+            grid.innerHTML = "";
+
+            const wins = globalData.filter(d => {
+                const res = determineResult(d);
+                const hasImg = d.thucte || d.entryImg || d.image_link;
+                return res.includes("Win") && hasImg;
+            });
+
+            wins.sort((a, b) => parseFloat(b.rr_ratio || b.rr || 0) - parseFloat(a.rr_ratio || a.rr || 0));
+
+            wins.forEach(d => {
+                const img = d.thucte || d.entryImg || d.image_link || "";
+                const setup = d.entry || d.mau_hinh || d.pattern || "Setup";
+                const pair = d.trade || d.pair || d.dong_tien || d.moneyFlow || "PAIR";
+                const rr = parseFloat(d.rr_ratio || d.rr || 0);
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 shadow-sm transition-transform hover:-translate-y-1";
+                card.innerHTML = `
+                    <div class="aspect-video bg-slate-100 relative">
+                        <img src="${img}" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-lg">+${d.rr_ratio || d.rr || 0}R</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="text-[10px] font-black text-blue-500 mb-1 uppercase">${d.trade || d.pair}</div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">${d.cam_nhan || d.note || 'No notes available.'}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function switchTab(tab) {
+            ['form', 'history', 'stats', 'playbook', 'sheet'].forEach(t => {
+                document.getElementById('view-' + t).classList.add('hidden');
+
+                // Reset Desktop Sidebar
+                const deskBtn = document.getElementById('nav-' + t);
+                if (deskBtn) {
+                    deskBtn.classList.remove('bg-blue-600', 'bg-green-600', 'text-white', 'shadow-blue-500/50', 'shadow-green-500/50', 'scale-110');
+                    deskBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-400', 'dark:text-slate-500');
+                }
+
+                // Reset Mobile Nav
+                const mobBtn = document.getElementById('mob-nav-' + t);
+                if (mobBtn) {
+                    mobBtn.classList.remove('text-blue-600', 'text-green-600', 'dark:text-blue-400', 'dark:text-green-400');
+                    mobBtn.classList.add('text-slate-400');
+                }
+            });
+
+            document.getElementById('view-' + tab).classList.remove('hidden');
+
+            // Active Desktop Sidebar
+            const activeDesk = document.getElementById('nav-' + tab);
+            if (activeDesk) {
+                const isSheet = tab === 'sheet';
+                activeDesk.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-400', 'dark:text-slate-500');
+                activeDesk.classList.add(isSheet ? 'bg-green-600' : 'bg-blue-600', 'text-white', isSheet ? 'shadow-green-500/50' : 'shadow-blue-500/50', 'scale-110');
+            }
+
+            // Active Mobile Nav
+            const activeMob = document.getElementById('mob-nav-' + tab);
+            if (activeMob) {
+                const isSheet = tab === 'sheet';
+                activeMob.classList.remove('text-slate-400');
+                activeMob.classList.add(isSheet ? 'text-green-600' : 'text-blue-600', isSheet ? 'dark:text-green-400' : 'dark:text-blue-400');
+            }
+
+            if (tab === 'history') renderHistoryTable();
+            if (tab === 'stats') renderStats();
+            if (tab === 'playbook') renderPlaybook();
+        }
+
+        function updateResultUI(select) {
+            const val = select.value;
+            const cls = "input-custom font-bold ";
+            if (val === 'Win') select.className = cls + "text-green-600 bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800";
+            else if (val === 'Loss') select.className = cls + "text-red-600 bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800";
+            else if (val === 'BE') select.className = cls + "text-slate-500 bg-slate-50 border-slate-200 dark:bg-slate-800 dark:border-slate-700";
+            else select.className = cls + "text-blue-600 bg-blue-50 border-blue-200 dark:bg-slate-900 dark:border-slate-600";
+        }
+
+        function autoCalculatePrimary(input) {
+            const pip = parseFloat(input.value);
+            const select = document.querySelector('select[name="ket_qua_primary"]');
+            if (isNaN(pip) || !select) return;
+
+            let target = "";
+            if (pip > 10) target = "WIN";
+            else if (pip < 0) target = "LOSS";
+            else target = "BE";
+
+            // Optimize matching logic
+            let found = false;
+            for (let i = 0; i < select.options.length; i++) {
+                const text = select.options[i].text.toUpperCase();
+                const val = select.options[i].value.toUpperCase();
+
+                // Prioritize exact matches or clear inclusion
+                if (text.includes(target) || val === target) {
+                    select.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) updateResultUI(select);
+        }
+
+        // --- IMAGE PREVIEW & ZOOM ---
+        function previewImg(input) {
+            const container = input.parentElement.querySelector('.preview-container');
+            const img = container.querySelector('img');
+            const url = input.value.trim();
+
+            if (url && (url.startsWith('http') || url.startsWith('https'))) {
+                img.src = url;
+                container.classList.remove('hidden');
+                img.onerror = () => container.classList.add('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function zoomPreview(container) {
+            const url = container.querySelector('img').src;
+            const modal = document.getElementById('zoomModal');
+            const img = document.getElementById('zoomImg');
+            img.src = url;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeZoom() {
+            document.getElementById('zoomModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // --- MULTI-SETUP LOGIC ---
+        function addEntryField() {
+            const container = document.getElementById('entry-container');
+            const div = document.createElement('div');
+            div.className = 'flex gap-1 entry-row fade-in';
+            div.innerHTML = `
+                <input type="text" class="entry-input input-custom font-bold text-indigo-600 dark:text-indigo-400" list="dl-pattern" placeholder="Thêm setup...">
+                <button type="button" onclick="this.parentElement.remove()" class="px-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg border border-red-100 dark:border-red-800 hover:bg-red-600 hover:text-white transition-all">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        // --- BOOK FLIP ANIMATION ---
+        // --- TOGGLE SECONDARY SECTION (Dynamic Split) ---
+        function toggleBookFlip(checkbox) {
+            const container = document.getElementById('results-split-container');
+            const page2 = document.getElementById('secondary-page');
+            const formContainer = document.getElementById('unifiedForm');
+            const checkUI = document.getElementById('flip-checkbox-ui');
+            const arrow = document.getElementById('flip-arrow');
+            const checkIcon = checkUI.querySelector('i');
+
+            if (checkbox.checked) {
+                // Show Secondary & Enlarge Form
+                page2.classList.remove('hidden');
+                page2.classList.add('fade-in');
+
+                // Switch to 2-column grid on desktop
+                container.classList.replace('grid-cols-1', 'md:grid-cols-2');
+                formContainer.classList.replace('max-w-4xl', 'max-w-6xl');
+
+                checkUI.classList.add('bg-indigo-600', 'border-indigo-600');
+                checkUI.classList.remove('border-slate-300');
+                checkIcon.classList.remove('opacity-0');
+                arrow.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                arrow.classList.remove('text-slate-300');
+                arrow.classList.add('text-indigo-500');
+            } else {
+                // Hide Secondary & Revert Form Width
+                page2.classList.add('hidden');
+
+                // Revert to single column
+                container.classList.replace('md:grid-cols-2', 'grid-cols-1');
+                formContainer.classList.replace('max-w-6xl', 'max-w-4xl');
+
+                checkUI.classList.remove('bg-indigo-600', 'border-indigo-600');
+                checkUI.classList.add('border-slate-300');
+                checkIcon.classList.add('opacity-0');
+                arrow.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                arrow.classList.add('text-slate-300');
+                arrow.classList.remove('text-indigo-500');
+            }
+        }
+
+        // --- DUAL SUBMISSION LOGIC ---
+        async function submitUnifiedTrade(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const overlay = document.getElementById('loadingOverlay');
+            const formData = new FormData(e.target);
+            const raw = Object.fromEntries(formData.entries());
+
+            overlay.style.display = 'flex';
+            btn.disabled = true;
+
+            // Mapping for API 1 (Primary - index copy.html logic)
+            const payload1 = {
+                thoigian: raw.thoigian.replace("T", " "),
+                trade: raw.pair,
+                phien: raw.phien,
+                entry: raw.setup,
+                d1: raw.img_d1,
+                h4: raw.img_h4,
+                h1: raw.img_h1,
+                m15: raw.img_m15,
+                thucte: raw.img_actual,
+                cam_nhan: raw.cam_nhan,
+                CainhinHTFvsLTF: raw.htf_vs_ltf,
+                ketqua: raw.ket_qua_primary,
+                pip: raw.pip,
+                gong_lenh: raw.gong_lenh, // Time Held
+                ghi_chu: `${raw.dien_bien} ${raw.ket_luan}`.trim() // Merge notes simply
+            };
+
+            // Mapping for API 2 (Secondary - mau-hinh copy.html logic)
+            const payload2 = {
+                htf: raw.img_h1, // Map H1 to HTF
+                ltf: raw.img_m15, // Map M15 to LTF
+                image_link: raw.img_actual, // Map Actual to Entry link
+                mau_hinh: raw.setup,
+                dong_tien: raw.pair,
+                co_vol: document.getElementById('co_vol').checked ? "Có" : "Không",
+                ket_qua: raw.ket_qua_secondary,
+                rr_ratio: raw.rr_ratio,
+                ghi_chu: raw.dien_bien,
+                ket_luan: raw.ket_luan
+            };
+
+            // Collect and Join Multiple Setups
+            const entries = [];
+            document.querySelectorAll('.entry-input').forEach(i => {
+                if (i.value.trim()) entries.push(i.value.trim());
+            });
+
+            // Logic cũ: Lọc các entry KHÔNG CÓ SỐ để lưu vào API mau-hinh (payload2)
+            const entriesWithoutNumbers = entries.filter(e => !/\d/.test(e));
+
+            const joinedAll = entries.join(", ");
+            const joinedFiltered = entriesWithoutNumbers.join(", ");
+
+            payload1.entry = joinedAll;
+            payload2.mau_hinh = joinedFiltered;
+
+            try {
+                // Conditional submission
+                const promises = [
+                    fetch(API_PRIMARY, { method: "POST", mode: "no-cors", body: JSON.stringify(payload1) })
+                ];
+
+                if (document.getElementById('save_to_secondary').checked) {
+                    promises.push(fetch(API_SECONDARY, { method: "POST", mode: "no-cors", body: JSON.stringify(payload2) }));
+                }
+
+                await Promise.all(promises);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Dữ liệu đã được lưu vào cả 2 hệ thống.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                e.target.reset();
+                document.querySelectorAll('.preview-container').forEach(c => c.classList.add('hidden'));
+                document.querySelectorAll('select[name^="ket_qua"]').forEach(s => {
+                    s.value = "Đang chạy";
+                    updateResultUI(s);
+                });
+                resetTime();
+            } catch (error) {
+                console.error("Submission error:", error);
+                Swal.fire('Lỗi', 'Không thể đồng bộ dữ liệu. Vui lòng kiểm tra kết nối.', 'error');
+            } finally {
+                overlay.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

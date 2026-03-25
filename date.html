@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theo Dõi Tài Khoản</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #fcfbf9;
+            --header-color: #1a1a1a;
+            --border-color: #eee;
+            --highlight-red: #d32f2f;
+            --footer-bg: #f8f9fa;
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: var(--bg-color); 
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .card { 
+            background: white; 
+            width: 100%; 
+            max-width: 800px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            border-radius: 8px;
+            overflow: hidden;
+            height: auto; 
+            display: block; 
+        }
+
+        /* --- HEADER --- */
+        .header-section {
+            padding: 30px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            background: #fff;
+        }
+        
+        .main-title {
+            font-family: 'Merriweather', serif;
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--header-color);
+            margin: 0 0 8px 0;
+        }
+
+        .update-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .dot {
+            height: 8px; width: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        /* --- TABLE --- */
+        .table-container { padding: 0; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        
+        thead th {
+            text-align: left;
+            padding: 15px 20px;
+            color: #a71d2a;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: #fff5f5;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tbody td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        tbody tr:hover { background-color: #fafafa; }
+
+        .tk-name { font-weight: 500; color: #333; font-size: 1em; }
+        .date-sub { font-size: 0.85em; color: #888; display: block; margin-top: 4px; }
+
+        /* Nút Cập nhật */
+        .btn-update {
+            background: white; border: 1px solid #2563eb; color: #2563eb;
+            padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: 0.2s;
+            font-weight: 500;
+        }
+        .btn-update:hover { background: #eff6ff; }
+        /* Khi đang bấm thì mờ đi chút */
+        .btn-update:disabled { opacity: 0.5; cursor: wait; background: #f1f1f1; border-color: #ddd; color: #999; }
+        
+        /* Progress Bar */
+        .progress-bar-bg { width: 100%; height: 5px; background: #eee; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+        .bg-green { background: #10b981; }
+        .bg-yellow { background: #f59e0b; }
+        .bg-red { background: #ef4444; }
+        .days-info { font-size: 0.85em; color: #666; display: flex; justify-content: space-between; }
+        .text-green { color: #059669; font-weight: bold; }
+        .text-yellow { color: #d97706; font-weight: bold; }
+        .text-red { color: #dc2626; font-weight: bold; }
+
+        /* --- FOOTER --- */
+        .footer-bar {
+            background-color: var(--footer-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-refresh {
+            color: var(--highlight-red); background: none; border: none; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 4px; font-size: 0.9em;
+        }
+        .btn-refresh:hover { background: rgba(211, 47, 47, 0.08); }
+        .auto-text { color: #888; font-style: italic; font-size: 0.8em; }
+
+        .loading-overlay { text-align: center; padding: 50px; color: #888; font-style: italic; }
+        .faded { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div id="app" class="card">
+    <div class="header-section">
+        <h1 class="main-title">Ước mơ phải gieo trồng, chăm và bón cây mới phát triển</h1>
+        <div class="update-status">
+            <span class="dot"></span> 
+            <span>Cập nhật mới nhất: {{ lastUpdatedTime }}</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div v-if="loading && accounts.length === 0" class="loading-overlay">
+            Đang đồng bộ dữ liệu...
+        </div>
+
+        <table v-if="accounts.length > 0">
+            <thead>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 30%">Tài Khoản</th>
+                    <th style="width: 45%">Tiến độ (20 ngày)</th>
+                    <th style="text-align: right;">Cập nhật</th>
+                </tr>
+            </thead>
+            <tbody :class="{ faded: loading }">
+                <tr v-for="(acc, index) in accounts" :key="index">
+                    <td style="color: #999; font-size: 0.9em;">{{ index + 1 }}</td>
+                    
+                    <td>
+                        <div class="tk-name">{{ acc.tk }}</div>
+                        <span class="date-sub"><i class="far fa-clock"></i> {{ acc.date_last }}</span>
+                    </td>
+
+                    <td>
+                        <div class="days-info">
+                            <span>Đã qua: {{ getDaysPassed(acc.date_last) }}</span>
+                            <span :class="getColor(getDaysRemaining(acc.date_last), 'text')">
+                                Còn lại: {{ getDaysRemaining(acc.date_last) }} ngày
+                            </span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" 
+                                 :class="getColor(getDaysRemaining(acc.date_last), 'bg')"
+                                 :style="{ width: getPercent(acc.date_last) + '%' }">
+                            </div>
+                        </div>
+                    </td>
+
+                    <td style="text-align: right;">
+                        <button class="btn-update" @click="updateAccount(acc)" :disabled="acc.updating">
+                            {{ acc.updating ? '...' : 'Cập nhật' }}
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div v-if="!loading && accounts.length === 0" style="text-align: center; padding: 40px; color: #999;">
+            Chưa có tài khoản nào được thêm.
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <button class="btn-refresh" @click="fetchAccounts(false)">
+            <i class="fas fa-sync-alt" :class="{'fa-spin': loading}"></i> Làm mới
+        </button>
+        <div class="auto-text">
+            * Tự động cập nhật mỗi {{ countdown }}s
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp } = Vue;
+    // ⚠️ LINK WEB APP CỦA BẠN:
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz6P3UwFO6vy4Rwd3XK_Ar1DSKhDsBmprCcS-FYcAEraKp-JesLUoUbHPdAWiujD_WC/exec";
+
+    createApp({
+        data() {
+            return {
+                accounts: [],
+                loading: false,
+                countdown: 30,
+                lastUpdatedTime: "--:--"
+            }
+        },
+        mounted() {
+            this.fetchAccounts();
+            this.startTimer();
+        },
+        methods: {
+            startTimer() {
+                setInterval(() => {
+                    if (this.countdown > 0) {
+                        this.countdown--;
+                    } else {
+                        this.fetchAccounts(true);
+                        this.countdown = 30;
+                    }
+                }, 1000);
+            },
+            updateTimestamp() {
+                const now = new Date();
+                this.lastUpdatedTime = now.toLocaleTimeString('vi-VN', { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' });
+            },
+            fetchAccounts(isBackground = false) {
+                if (!isBackground) this.loading = true;
+                
+                fetch(WEB_APP_URL + "?mode=trade")
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        const statusMap = {};
+                        this.accounts.forEach(a => statusMap[a.tk] = a.updating);
+                        this.accounts = data.map(item => ({ ...item, updating: statusMap[item.tk] || false }));
+                        this.updateTimestamp();
+                    }
+                    this.loading = false;
+                    if(!isBackground) this.countdown = 30;
+                })
+                .catch(e => {
+                    console.error(e);
+                    this.loading = false;
+                });
+            },
+            
+            // --- Logic tính ngày ---
+            parseDate(str) {
+                if(!str) return new Date();
+                const p = str.split('/');
+                return new Date(p[2], p[1]-1, p[0]);
+            },
+            getDaysPassed(str) {
+                const start = this.parseDate(str);
+                const today = new Date();
+                start.setHours(0,0,0,0); today.setHours(0,0,0,0);
+                const diff = Math.floor((today - start)/(86400000));
+                return diff > 0 ? diff : 0;
+            },
+            getDaysRemaining(str) {
+                const rem = 20 - this.getDaysPassed(str);
+                return rem > 0 ? rem : 0;
+            },
+            getPercent(str) {
+                return (this.getDaysRemaining(str) / 20) * 100;
+            },
+            getColor(rem, type) {
+                let c = 'green';
+                if(rem <= 10) c = 'yellow';
+                if(rem <= 5) c = 'red';
+                if(type === 'bg') return 'bg-' + c;
+                return 'text-' + c;
+            },
+
+            // --- HÀM CẬP NHẬT (Đã sửa logic) ---
+            updateAccount(acc) {
+                const todayStr = new Date().toLocaleDateString('en-GB'); // dd/mm/yyyy
+                
+                // Đã xóa bỏ đoạn kiểm tra if (acc.date_last === todayStr) return;
+                // Để cho phép người dùng bấm cập nhật lại bất cứ lúc nào.
+                
+                acc.updating = true;
+
+                fetch(WEB_APP_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: {'Content-Type': 'text/plain'},
+                    body: JSON.stringify({ tk: acc.tk, date: todayStr })
+                }).then(() => {
+                    // Giả lập độ trễ mạng một chút để thấy hiệu ứng
+                    setTimeout(() => {
+                        acc.date_last = todayStr;
+                        acc.updating = false; // Mở lại nút bấm ngay lập tức
+                        this.fetchAccounts(true); // Cập nhật ngầm lại danh sách
+                        
+                        // Thông báo nhỏ
+                        const Toast = Swal.mixin({
+                            toast: true, position: 'top-end', showConfirmButton: false, timer: 1500,
+                            timerProgressBar: true
+                        });
+                        Toast.fire({ icon: 'success', title: 'Đã cập nhật!' });
+                        
+                    }, 800);
+                });
+            }
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>

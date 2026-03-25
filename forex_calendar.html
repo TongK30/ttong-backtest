@@ -1,0 +1,1101 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForexFactory Calendar Viewer</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --card2: #0f172a;
+            --text: #f1f5f9;
+            --sub: #94a3b8;
+            --border: #334155;
+            --high: #ef4444;
+            --med: #f59e0b;
+            --low: #64748b;
+            --accent: #3b82f6;
+        }
+
+        [data-theme="light"] {
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --card2: #f8fafc;
+            --text: #0f172a;
+            --sub: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: 0.2s;
+        }
+
+        /* ===== HEADER ===== */
+        .top-bar {
+            background: linear-gradient(135deg, #1e3a5f, #1e293b);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-bar h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .top-bar h1 span {
+            color: #f59e0b;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        .status-txt {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .btn-refresh {
+            padding: 7px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-refresh:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-theme {
+            background: #334155;
+            border: none;
+            color: var(--sub);
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--sub);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .filter-bar select,
+        .filter-bar input[type="date"] {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--card2);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-bar select:focus,
+        .filter-bar input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Impact toggle buttons */
+        .impact-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .imp-btn {
+            padding: 5px 14px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            opacity: 0.45;
+        }
+
+        .imp-btn.active {
+            opacity: 1;
+        }
+
+        .imp-btn.high {
+            border-color: var(--high);
+            color: var(--high);
+        }
+
+        .imp-btn.high.active {
+            background: var(--high);
+            color: white;
+        }
+
+        .imp-btn.med {
+            border-color: var(--med);
+            color: var(--med);
+        }
+
+        .imp-btn.med.active {
+            background: var(--med);
+            color: white;
+        }
+
+        .imp-btn.low {
+            border-color: var(--low);
+            color: var(--sub);
+        }
+
+        .imp-btn.low.active {
+            background: var(--low);
+            color: white;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            margin-left: auto;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--sub);
+        }
+
+        .chip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* ===== MAIN TABLE ===== */
+        .main {
+            padding: 20px 24px;
+        }
+
+        .table-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .day-header.today-hl {
+            background: linear-gradient(90deg, #7c3aed 0%, #1e3a5f 60%, var(--card) 100%);
+            border-left: 4px solid #f59e0b;
+            color: #fde68a;
+            position: relative;
+        }
+        .day-header.today-hl::after {
+            content: "📍 HÔM NAY";
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            color: #f59e0b;
+            background: rgba(245,158,11,0.12);
+            border: 1px solid rgba(245,158,11,0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .today-row-hl {
+            background: rgba(124,58,237,0.04) !important;
+        }
+        .no-today-hl .today-hl,
+        .no-today-hl .today-row-hl { all: revert; }
+
+        .day-header {
+            padding: 10px 18px;
+            background: linear-gradient(90deg, #1e3a5f, var(--card));
+            font-weight: 800;
+            font-size: 13px;
+            color: #7dd3fc;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: var(--card2);
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--sub);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: 0.15s;
+        }
+
+        tbody tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        /* Impact badge */
+        .badge-impact {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .badge-impact .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .badge-high {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--high);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-high .dot {
+            background: var(--high);
+        }
+
+        .badge-med {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--med);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-med .dot {
+            background: var(--med);
+        }
+
+        .badge-low {
+            background: rgba(100, 116, 139, 0.12);
+            color: var(--sub);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+
+        .badge-low .dot {
+            background: var(--low);
+        }
+
+        /* Currency flag */
+        .currency-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 12px;
+            min-width: 42px;
+            text-align: center;
+        }
+
+        .c-USD {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .c-EUR {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        .c-GBP {
+            background: rgba(168, 85, 247, 0.15);
+            color: #d8b4fe;
+        }
+
+        .c-JPY {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        .c-AUD {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+        }
+
+        .c-CAD {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        .c-CHF {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+        }
+
+        .c-NZD {
+            background: rgba(20, 184, 166, 0.15);
+            color: #5eead4;
+        }
+
+        .c-DEF {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+        }
+
+        /* Value chips */
+        .val {
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .val-forecast {
+            color: #94a3b8;
+        }
+
+        .val-prev {
+            color: #64748b;
+        }
+
+        .val-empty {
+            color: #475569;
+            font-style: italic;
+        }
+
+        .event-link {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .event-link:hover {
+            color: var(--accent);
+        }
+
+        .time-col {
+            color: var(--sub);
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* Past / upcoming event rows */
+        .event-past { opacity: 0.38; }
+        .event-past td { color: var(--sub) !important; }
+        .event-upcoming {
+            background: rgba(245,158,11,0.07) !important;
+        }
+        .event-upcoming .time-col {
+            color: #f59e0b !important;
+            font-weight: 900 !important;
+            font-size: 13px !important;
+        }
+        .event-upcoming td { font-weight: 700; }
+        /* Strip these when exporting */
+        .exporting .event-past,
+        .exporting .event-upcoming { opacity: 1; background: none !important; }
+        .exporting .event-past td { color: inherit !important; }
+        .exporting .event-upcoming .time-col { color: var(--sub) !important; font-weight: normal !important; }
+        .exporting .event-upcoming td { font-weight: normal; }
+
+        .tentative {
+            color: #f59e0b;
+            font-style: italic;
+            font-size: 11px;
+        }
+
+        /* ===== LOADING / EMPTY ===== */
+        .loading-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px;
+            gap: 16px;
+            color: var(--sub);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-box {
+            text-align: center;
+            padding: 60px;
+            color: var(--sub);
+        }
+
+        .empty-box .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        /* Error */
+        .error-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 24px;
+            color: #fca5a5;
+            font-size: 14px;
+        }
+
+        .error-box a {
+            color: #60a5fa;
+        }
+
+        /* ===== COUNT BADGE ===== */
+        .count-badge {
+            background: var(--accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 12px 16px;
+            }
+
+            .filter-bar {
+                padding: 10px 16px;
+            }
+
+            .main {
+                padding: 12px;
+            }
+
+            thead th:nth-child(5),
+            tbody td:nth-child(5) {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+
+<body data-theme="dark">
+
+    <div class="top-bar">
+        <h1>⚡ Forex<span>Factory</span> Calendar</h1>
+        <div class="top-bar-right">
+            <div class="status-dot" id="statusDot"></div>
+            <span class="status-txt" id="statusTxt">Đang tải...</span>
+            <button class="btn-refresh" id="btnRefresh" onclick="loadData()">🔄 Làm mới</button>
+            <button class="btn-refresh" onclick="clearCache()" style="background:#ef4444;" title="Xóa cache và tải lại">🗑 Xóa cache</button>
+            <button class="btn-theme" onclick="toggleTheme()">🌓</button>
+            <button class="btn-refresh" id="btn-export" onclick="exportCalendar()" style="background:#10b981;" title="Xuất ảnh PNG bộ lọc hiện tại">
+                📷 Xuất ảnh
+            </button>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label>Impact</label>
+            <div class="impact-btns">
+                <button class="imp-btn high active" data-impact="High" onclick="toggleImpact(this)">🔴 High</button>
+                <button class="imp-btn med active" data-impact="Medium" onclick="toggleImpact(this)">🟡 Medium</button>
+                <button class="imp-btn low" data-impact="Low" onclick="toggleImpact(this)">⚪ Low</button>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label>Tiền tệ</label>
+            <select id="filterCurrency" onchange="renderTable()">
+                <option value="">Tất cả</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="AUD">AUD</option>
+                <option value="CAD">CAD</option>
+                <option value="CHF">CHF</option>
+                <option value="NZD">NZD</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Ngày</label>
+            <select id="filterDate" onchange="renderTable()">
+                <option value="">Tất cả tuần</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Tìm kiếm</label>
+            <input type="text" id="filterSearch" placeholder="Tên tin tức..." oninput="renderTable()"
+                style="padding:6px 10px; border:1px solid var(--border); border-radius:6px; background:var(--card2); color:var(--text); font-size:13px; outline:none; width:180px;">
+        </div>
+
+        <div class="stats-bar" id="statsBar">
+            <span class="stat-chip"><span class="chip-dot" style="background:var(--high)"></span><span
+                    id="cntHigh">0</span> High</span>
+            <span class="stat-chip"><span class="chip-dot" style="background:var(--med)"></span><span
+                    id="cntMed">0</span> Medium</span>
+            <span class="stat-chip"><span class="chip-dot" style="background:var(--low)"></span><span
+                    id="cntLow">0</span> Low</span>
+            <span class="stat-chip">📋 Tổng: <b id="cntTotal">0</b></span>
+        </div>
+    </div>
+
+    <div class="main" id="mainContent">
+        <div class="loading-wrap" id="loadingEl">
+            <div class="spinner"></div>
+            <span>Đang tải dữ liệu từ ForexFactory...</span>
+        </div>
+    </div>
+
+    <script>
+        let allEvents = [];
+        let activeImpacts = new Set(['High', 'Medium']);
+
+        const PROXY_URLS = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest=',
+            'https://thingproxy.freeboard.io/fetch/',
+            'https://proxy.cors.sh/',
+        ];
+        const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.xml';
+        const CACHE_KEY = 'ff_calendar_cache';
+        const CACHE_TTL = 30 * 60 * 1000; // 30 phút
+
+        const DAY_NAMES = { '0': 'CN', '1': 'T2', '2': 'T3', '3': 'T4', '4': 'T5', '5': 'T6', '6': 'T7' };
+
+        function toggleTheme() {
+            const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', t);
+        }
+
+        function toggleImpact(btn) {
+            const impact = btn.dataset.impact;
+            if (activeImpacts.has(impact)) { activeImpacts.delete(impact); btn.classList.remove('active'); }
+            else { activeImpacts.add(impact); btn.classList.add('active'); }
+            renderTable();
+        }
+
+                // ===== EXPORT IMAGE =====
+        async function exportCalendar() {
+            const btn = document.getElementById('btn-export');
+            const orig = btn.textContent;
+            btn.textContent = '⏳ Đang xuất...';
+            btn.disabled = true;
+
+            try {
+                document.body.classList.add("exporting");
+                // Tạm ẩn highlight ngày hôm nay khi in
+                document.querySelectorAll(".today-hl").forEach(el => el.classList.add("_export_hide"));
+                document.querySelectorAll(".today-hl").forEach(el => { el.classList.remove("today-hl"); });
+                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.add("_was_today_row"));
+                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.remove("today-row-hl"));
+                const target = document.getElementById('mainContent');
+                const canvas = await html2canvas(target, {
+                    backgroundColor: document.body.getAttribute('data-theme') === 'dark' ? '#0f172a' : '#f1f5f9',
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    windowWidth: target.scrollWidth + 48,
+                });
+
+                // Lấy ngày đang lọc để đặt tên file
+                const dateSel = document.getElementById('filterDate');
+                const dateLabel = dateSel?.options[dateSel.selectedIndex]?.textContent?.trim().replace(/[^\w\/]/g,'_') || 'all';
+                const now = new Date();
+                const ts  = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+                const link = document.createElement('a');
+                // Thêm footer "SMC Trading" bên dưới
+                const isDark = document.body.getAttribute('data-theme') === 'dark';
+                const footerH = 48;
+                const final = document.createElement('canvas');
+                final.width  = canvas.width;
+                final.height = canvas.height + footerH * 2; // scale=2 nên *2
+                const ctx = final.getContext('2d');
+                // Nền footer
+                ctx.fillStyle = isDark ? '#0f172a' : '#f1f5f9';
+                ctx.fillRect(0, 0, final.width, final.height);
+                // Vẽ ảnh gốc
+                ctx.drawImage(canvas, 0, 0);
+                // Footer bar
+                ctx.fillStyle = isDark ? '#1e293b' : '#e2e8f0';
+                ctx.fillRect(0, canvas.height, final.width, footerH * 2);
+                // Text "SMC Trading"
+                ctx.fillStyle = isDark ? '#f59e0b' : '#d97706';
+                ctx.font = 'bold 28px Segoe UI, Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⚡ SMC Trading', final.width / 2, canvas.height + footerH);
+
+                link.download = `forex_calendar_${dateLabel}_${ts}.png`;
+                link.href = final.toDataURL('image/png');
+                link.click();
+            } catch(e) {
+                alert('Xuất ảnh thất bại: ' + e.message);
+            } finally {
+                btn.textContent = orig;
+                btn.disabled = false;
+            }
+        }
+async function fetchWithProxy(url) {
+            // 1. Kiểm tra cache trước
+            try {
+                const cached = localStorage.getItem(CACHE_KEY);
+                if (cached) {
+                    const { ts, data } = JSON.parse(cached);
+                    if (Date.now() - ts < CACHE_TTL) {
+                        console.log('[Cache] Using cached data, expires in', Math.round((CACHE_TTL-(Date.now()-ts))/60000), 'min');
+                        return data;
+                    }
+                }
+            } catch(e) {}
+
+            // 2. Thử trực tiếp
+            try {
+                const r = await fetch(url, { cache: 'no-store' });
+                if (r.ok) {
+                    const text = await r.text();
+                    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: text })); } catch(e){}
+                    return text;
+                }
+            } catch(e) {}
+
+            // 3. Thử từng proxy
+            for (const proxy of PROXY_URLS) {
+                try {
+                    const r = await fetch(proxy + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
+                    if (r.ok) {
+                        const text = await r.text();
+                        try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: text })); } catch(e){}
+                        return text;
+                    }
+                } catch(e) {}
+            }
+
+            // 4. Dùng cache cũ nếu tất cả fail
+            try {
+                const cached = localStorage.getItem(CACHE_KEY);
+                if (cached) {
+                    console.warn('[Cache] All proxies failed - using stale cache');
+                    return JSON.parse(cached).data;
+                }
+            } catch(e) {}
+
+            throw new Error('Tất cả ' + PROXY_URLS.length + ' proxy đều thất bại. Thử lại sau vài phút hoặc xóa cache.');
+        }
+
+        async function loadData() {
+            const btn = document.getElementById('btnRefresh');
+            const statusTxt = document.getElementById('statusTxt');
+            const dot = document.getElementById('statusDot');
+            btn.disabled = true;
+            statusTxt.textContent = 'Đang tải...';
+            dot.style.background = '#f59e0b';
+
+            document.getElementById('mainContent').innerHTML = `
+            <div class="loading-wrap"><div class="spinner"></div><span>Đang tải dữ liệu từ ForexFactory...</span></div>`;
+
+            try {
+                document.body.classList.add("exporting");
+                // Tạm ẩn highlight ngày hôm nay khi in
+                document.querySelectorAll(".today-hl").forEach(el => el.classList.add("_export_hide"));
+                document.querySelectorAll(".today-hl").forEach(el => { el.classList.remove("today-hl"); });
+                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.add("_was_today_row"));
+                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.remove("today-row-hl"));
+                const xml = await fetchWithProxy(FF_URL);
+                parseXML(xml);
+                populateDateFilter();
+                renderTable();
+                const now = new Date().toLocaleTimeString('vi-VN');
+                statusTxt.textContent = `Cập nhật lúc ${now}`;
+                dot.style.background = '#10b981';
+            } catch (e) {
+                document.getElementById('mainContent').innerHTML = `
+                <div class="error-box">
+                    ⚠️ <b>Lỗi tải dữ liệu:</b> ${e.message}<br><br>
+                    <small>Thử mở trang qua <a href="http://localhost" target="_blank">localhost</a> hoặc dùng extension CORS như <b>CORS Unblock</b>.</small>
+                </div>`;
+                statusTxt.textContent = 'Lỗi kết nối';
+                dot.style.background = '#ef4444';
+            }
+            btn.disabled = false;
+        }
+
+                // ===== UTC → VN (+7) conversion =====
+        // XML: date = "MM-DD-YYYY", time = "h:mmam" UTC hoặc "Tentative" / "All Day"
+        function convertUTCToVN(timeStr, dateStr) {
+            if (!timeStr) return { display: '', date: dateStr };
+            const lower = timeStr.trim().toLowerCase();
+            if (lower === 'tentative' || lower === 'all day') {
+                return { display: timeStr, date: dateStr };
+            }
+            try {
+                document.body.classList.add("exporting");
+                // Tạm ẩn highlight ngày hôm nay khi in
+                document.querySelectorAll(".today-hl").forEach(el => el.classList.add("_export_hide"));
+                document.querySelectorAll(".today-hl").forEach(el => { el.classList.remove("today-hl"); });
+                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.add("_was_today_row"));
+                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.remove("today-row-hl"));
+                const m = timeStr.match(/(\d+):(\d+)(am|pm)/i);
+                if (!m) return { display: timeStr, date: dateStr };
+
+                let h = parseInt(m[1]), min = parseInt(m[2]);
+                const ispm = m[3].toLowerCase() === 'pm';
+                if (ispm && h !== 12) h += 12;
+                if (!ispm && h === 12) h = 0;
+
+                // Parse date MM-DD-YYYY từ XML
+                const p = dateStr.split('-');
+                const MM = parseInt(p[0]), DD = parseInt(p[1]), YYYY = parseInt(p[2]);
+
+                // Tạo timestamp UTC rồi cộng +7h
+                const utcMs = Date.UTC(YYYY, MM - 1, DD, h, min, 0);
+                const vnMs  = utcMs + 7 * 3600 * 1000;
+                const vn    = new Date(vnMs);
+
+                // Đọc ngày/giờ VN qua UTC methods (vì đã offset thủ công)
+                const vnH    = vn.getUTCHours();
+                const vnMin  = String(vn.getUTCMinutes()).padStart(2, '0');
+                const vnDD   = String(vn.getUTCDate()).padStart(2, '0');
+                const vnMM   = String(vn.getUTCMonth() + 1).padStart(2, '0');
+                const vnYYYY = vn.getUTCFullYear();
+
+                const period = vnH >= 12 ? 'pm' : 'am';
+                const h12    = vnH % 12 || 12;
+
+                return {
+                    display: `${h12}:${vnMin}${period}`,
+                    date:    `${vnMM}-${vnDD}-${vnYYYY}`
+                };
+            } catch(e) {
+                return { display: timeStr, date: dateStr };
+            }
+        }
+
+        // Ngày hôm nay theo UTC+7 (không phụ thuộc timezone máy)
+        function getTodayVN() {
+            const now   = new Date();
+            const vnNow = new Date(now.getTime() + (7 * 60 - now.getTimezoneOffset()) * 60 * 1000);
+            const MM = String(vnNow.getUTCMonth() + 1).padStart(2, '0');
+            const DD = String(vnNow.getUTCDate()).padStart(2, '0');
+            const YYYY = vnNow.getUTCFullYear();
+            return `${MM}-${DD}-${YYYY}`; // MM-DD-YYYY
+        }
+
+        function populateDateFilter() {
+            const dates = [...new Set(allEvents.map(e => e.date))].sort((a, b) => {
+                const pa = a.split('-'), pb = b.split('-');
+                // So sánh theo năm-tháng-ngày
+                const da = new Date(parseInt(pa[2]), parseInt(pa[0]) - 1, parseInt(pa[1]));
+                const db = new Date(parseInt(pb[2]), parseInt(pb[0]) - 1, parseInt(pb[1]));
+                return da - db;
+            });
+            const sel = document.getElementById('filterDate');
+            sel.innerHTML = '<option value="">Tất cả tuần</option>';
+            const todayStr = getTodayVN();
+            dates.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                const p  = d.split('-');
+                const dt = new Date(parseInt(p[2]), parseInt(p[0]) - 1, parseInt(p[1]));
+                const dow = ['CN','T2','T3','T4','T5','T6','T7'][dt.getDay()];
+                opt.textContent = `${dow} ${p[0]}/${p[1]}/${p[2]}`;
+                if (d === todayStr) { opt.textContent += ' ★ Hôm nay'; opt.selected = true; }
+                sel.appendChild(opt);
+            });
+        }
+
+        function parseXML(xmlStr) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xmlStr, 'text/xml');
+            const events = doc.getElementsByTagName('event');
+            allEvents = [];
+            for (let ev of events) {
+                const getText = tag => ev.getElementsByTagName(tag)[0]?.textContent?.trim() || '';
+                const rawDate = getText('date');
+                const rawTime = getText('time');
+                const converted = convertUTCToVN(rawTime, rawDate);
+                allEvents.push({
+                    title: getText('title'),
+                    country: getText('country'),
+                    date: converted.date,   // ngày VN
+                    time: converted.display, // giờ VN
+                    impact: getText('impact'),
+                    forecast: getText('forecast'),
+                    previous: getText('previous'),
+                    url: getText('url'),
+                });
+            }
+            // Update stats
+            document.getElementById('cntHigh').textContent = allEvents.filter(e => e.impact === 'High').length;
+            document.getElementById('cntMed').textContent = allEvents.filter(e => e.impact === 'Medium').length;
+            document.getElementById('cntLow').textContent = allEvents.filter(e => e.impact === 'Low').length;
+            document.getElementById('cntTotal').textContent = allEvents.length;
+        }
+
+        function populateDateFilter() {
+            const dates = [...new Set(allEvents.map(e => e.date))].sort();
+            const sel = document.getElementById('filterDate');
+            sel.innerHTML = '<option value="">Tất cả tuần</option>';
+            const today = new Date();
+            const todayStr = String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0') + '-' + today.getFullYear();
+            dates.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                const p = d.split('-'); // MM-DD-YYYY
+                const dt = new Date(parseInt(p[2]), parseInt(p[0]) - 1, parseInt(p[1]));
+                const dow = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][dt.getDay()];
+                opt.textContent = `${dow} ${p[0]}/${p[1]}/${p[2]}`;
+                if (d === todayStr) { opt.textContent += ' ★ Hôm nay'; opt.selected = true; }
+                sel.appendChild(opt);
+            });
+        }
+
+        // Lấy giờ hiện tại VN dạng "số phút & ngày" để so sánh
+        // Trả về {d: Date object đại diện cho thời điểm VN hiện tại tính theo UTC epoch}
+        function getVNNowMs() {
+            const now = new Date();
+            // Lấy giờ/phút/ngày VN qua UTC offset thủ công
+            const vnMs = now.getTime() + (7 * 60 - now.getTimezoneOffset()) * 60 * 1000;
+            // dùng Date object UTC để đọc giờ VN
+            const vn = new Date(vnMs);
+            // Rebuild thành Date.UTC với các giá trị giờ VN → cùng reference với parseEventMs
+            return Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), vn.getUTCDate(), vn.getUTCHours(), vn.getUTCMinutes(), 0);
+        }
+
+        // Parse event VN date+time → timestamp (ms, same reference as getVNNowMs)
+        function parseEventMs(dateStr, timeStr) {
+            if (!timeStr || !dateStr) return null;
+            const lower = (timeStr||"").toLowerCase();
+            if (lower === "tentative" || lower === "all day" || lower === "") return null;
+            const m = timeStr.match(/(\d+):(\d+)(am|pm)/i);
+            if (!m) return null;
+            let h = parseInt(m[1]), min = parseInt(m[2]);
+            const ispm = m[3].toLowerCase() === "pm";
+            if (ispm && h !== 12) h += 12;
+            if (!ispm && h === 12) h = 0;
+            const p = dateStr.split("-"); // MM-DD-YYYY (VN time)
+            // Cùng reference: dùng Date.UTC với giờ VN → match getVNNowMs()
+            return Date.UTC(+p[2], +p[0]-1, +p[1], h, min, 0);
+        }
+
+        function impactBadge(impact) {
+            const map = { High: ['badge-high', '🔴', 'High'], Medium: ['badge-med', '🟡', 'Medium'], Low: ['badge-low', '⚪', 'Low'] };
+            const [cls, icon, label] = map[impact] || ['badge-low', '⚪', impact];
+            return `<span class="badge-impact ${cls}"><span class="dot"></span>${icon} ${label}</span>`;
+        }
+
+        function currencyBadge(c) {
+            const cls = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD'].includes(c) ? `c-${c}` : 'c-DEF';
+            return `<span class="currency-badge ${cls}">${c}</span>`;
+        }
+
+        function fmtDate(dateStr) {
+            // dateStr: MM-DD-YYYY
+            const p = dateStr.split('-');
+            const dt = new Date(parseInt(p[2]), parseInt(p[0]) - 1, parseInt(p[1]));
+            const dow = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'][dt.getDay()];
+            return `${dow}, ${p[0]}/${p[1]}/${p[2]}`;
+        }
+
+        function renderTable() {
+            const filterDate = document.getElementById('filterDate').value;
+            const filterCurrency = document.getElementById('filterCurrency').value;
+            const filterSearch = document.getElementById('filterSearch').value.toLowerCase();
+
+            const filtered = allEvents.filter(e =>
+                activeImpacts.has(e.impact) &&
+                (!filterDate || e.date === filterDate) &&
+                (!filterCurrency || e.country === filterCurrency) &&
+                (!filterSearch || e.title.toLowerCase().includes(filterSearch))
+            );
+
+            if (filtered.length === 0) {
+                document.getElementById('mainContent').innerHTML = `
+                <div class="table-card">
+                    <div class="empty-box"><div class="icon">📭</div><div>Không có tin nào khớp bộ lọc</div></div>
+                </div>`;
+                return;
+            }
+
+            // Group by date
+            const grouped = {};
+            filtered.forEach(e => { if (!grouped[e.date]) grouped[e.date] = []; grouped[e.date].push(e); });
+
+            let html = '<div class="table-card"><table>';
+            html += `<thead><tr>
+            <th style="width:110px">Giờ (VN +7) 🇻🇳</th>
+            <th style="width:70px">Tiền tệ</th>
+            <th>Tên Tin Tức</th>
+            <th style="width:110px">Impact</th>
+            <th style="width:90px">Forecast</th>
+            <th style="width:90px">Previous</th>
+        </tr></thead><tbody>`;
+
+            const todayVN = getTodayVN();
+            Object.keys(grouped).sort((a,b) => {
+                const pa=a.split('-'),pb=b.split('-');
+                return new Date(+pa[2],+pa[0]-1,+pa[1]) - new Date(+pb[2],+pb[0]-1,+pb[1]);
+            }).forEach(date => {
+                const isToday = (date === todayVN);
+                html += `<tr><td colspan="6" style="padding:0">
+                <div class="day-header${isToday ? ' today-hl' : ''}">📅 ${fmtDate(date)} <span class="count-badge">${grouped[date].length}</span></div>
+            </td></tr>`;
+                grouped[date].forEach(ev => {
+                    const forecast = ev.forecast ? `<span class="val val-forecast">${ev.forecast}</span>` : `<span class="val-empty">—</span>`;
+                    const previous = ev.previous ? `<span class="val val-prev">${ev.previous}</span>` : `<span class="val-empty">—</span>`;
+                    const timeCell = ev.time === 'Tentative'
+                        ? `<span class="tentative">Tentative</span>`
+                        : isUpcoming
+                            ? `<span class="time-col" style="color:#f59e0b;font-weight:900;">${ev.time} ⚡</span>`
+                            : isPast
+                                ? `<span class="time-col" style="color:#64748b;">${ev.time}</span>`
+                                : `<span class="time-col">${ev.time}</span>`;
+                    const titleCell = ev.url
+                        ? `<a class="event-link" href="${ev.url}" target="_blank">${ev.title}</a>`
+                        : ev.title;
+                    // Tính trạng thái thời gian - inline style để chắc chắn override
+                    const evMs  = parseEventMs(ev.date, ev.time);
+                    const nowMs = getVNNowMs();
+                    const SOON  = 90 * 60 * 1000;
+                    const isUpcoming = (evMs !== null && evMs >= nowMs && (evMs - nowMs) <= SOON);
+                    const isPast     = (evMs !== null && evMs < nowMs);
+                    let trStyle = '';
+                    let tdOpacity = '';
+                    if (evMs !== null) {
+                        if (evMs < nowMs) {
+                            // Đã qua: mờ
+                            trStyle = 'opacity:0.35; filter:grayscale(30%);';
+                        } else if ((evMs - nowMs) <= SOON) {
+                            // Sắp tới trong 90 phút: highlight vàng
+                            trStyle = 'background:rgba(245,158,11,0.10); box-shadow:inset 3px 0 0 #f59e0b;';
+                        }
+                    }
+                    html += `<tr style="${trStyle}">
+                    <td>${timeCell}</td>
+                    <td>${currencyBadge(ev.country)}</td>
+                    <td>${titleCell}</td>
+                    <td>${impactBadge(ev.impact)}</td>
+                    <td>${forecast}</td>
+                    <td>${previous}</td>
+                </tr>`;
+                });
+            });
+
+            html += '</tbody></table></div>';
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // Load ngay khi mở
+        loadData();
+        // Tự động làm mới mỗi 5 phút
+        setInterval(loadData, 5 * 60 * 1000);
+    </script>
+</body>
+
+</html>
