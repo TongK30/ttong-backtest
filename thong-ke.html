@@ -69,24 +69,25 @@
             box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
         }
 
-        /* --- TRADING BOXES --- */
+        /* --- TRADING BOXES (FLAT UI CSS) --- */
         .grad-win {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-            border: 1px solid rgba(16, 185, 129, 0.5);
+            background-color: #10b981;
+            box-shadow: 0 6px 12px -2px rgba(16, 185, 129, 0.3);
+            border: 1px solid #10b981;
             color: white;
         }
 
         .grad-loss {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-            border: 1px solid rgba(239, 68, 68, 0.5);
+            background-color: #ef4444;
+            box-shadow: 0 6px 12px -2px rgba(239, 68, 68, 0.3);
+            border: 1px solid #ef4444;
             color: white;
         }
 
         .grad-be {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            border: 1px solid rgba(148, 163, 184, 0.2);
+            background-color: #94a3b8;
+            box-shadow: 0 6px 12px -2px rgba(148, 163, 184, 0.2);
+            border: 1px solid #94a3b8;
             color: white;
         }
 
@@ -145,18 +146,20 @@
 </head>
 
 <body class="bg-zinc-100 dark:bg-[#09090b] text-zinc-800 dark:text-zinc-200 transition-colors duration-300 p-4 md:p-8">
-<div id="_debug_errors" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:#ef4444;color:white;padding:12px 16px;font-family:monospace;font-size:13px;font-weight:bold"></div>
-<script>
-window.onerror = function(msg, src, line, col, err) {
-    var d = document.getElementById('_debug_errors');
-    if(d){ d.style.display='block'; d.textContent = 'JS ERROR: ' + msg + ' (line '+line+')'; }
-    return false;
-};
-window.addEventListener('unhandledrejection', function(e) {
-    var d = document.getElementById('_debug_errors');
-    if(d){ d.style.display='block'; d.textContent = 'Promise Error: ' + (e.reason||e); }
-});
-</script>
+    <div id="_debug_errors"
+        style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:#ef4444;color:white;padding:12px 16px;font-family:monospace;font-size:13px;font-weight:bold">
+    </div>
+    <script>
+        window.onerror = function (msg, src, line, col, err) {
+            var d = document.getElementById('_debug_errors');
+            if (d) { d.style.display = 'block'; d.textContent = 'JS ERROR: ' + msg + ' (line ' + line + ')'; }
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function (e) {
+            var d = document.getElementById('_debug_errors');
+            if (d) { d.style.display = 'block'; d.textContent = 'Promise Error: ' + (e.reason || e); }
+        });
+    </script>
 
 
     <script> const API_URL = "https://script.google.com/macros/s/AKfycbzFbTYhhgSevExqO7eS_BaeJYrhya_29MWzukuVCYeWz8Y9h4Rl85MQstYK3OhHkr2-Og/exec"; </script>
@@ -489,14 +492,17 @@ window.addEventListener('unhandledrejection', function(e) {
         <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h3 class="font-bold text-zinc-700 dark:text-zinc-200 text-lg uppercase tracking-wider flex items-center">
+                    <h3
+                        class="font-bold text-zinc-700 dark:text-zinc-200 text-lg uppercase tracking-wider flex items-center">
                         <i class="fa-solid fa-clock mr-2 text-cyan-500"></i>Best Trading Hours
                     </h3>
                     <p class="text-xs text-zinc-500 mt-1">Giờ nào trong ngày bạn trade hiệu quả nhất?</p>
                 </div>
             </div>
             <div class="relative h-80 w-full"><canvas id="hoursChart"></canvas></div>
-            <div id="hours-advice" class="mt-4 text-center text-sm font-mono text-zinc-400 italic border-t border-zinc-100 dark:border-zinc-800 pt-4"></div>
+            <div id="hours-advice"
+                class="mt-4 text-center text-sm font-mono text-zinc-400 italic border-t border-zinc-100 dark:border-zinc-800 pt-4">
+            </div>
         </div>
     </div>
 
@@ -506,12 +512,15 @@ window.addEventListener('unhandledrejection', function(e) {
         <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
                         <i class="fa-solid fa-brain text-white text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-zinc-700 dark:text-zinc-200 text-lg uppercase tracking-wider">Trade Journal AI</h3>
-                        <p class="text-xs text-zinc-500 mt-0.5">Tự động phân tích ghi chú &amp; bài học từ nhật ký giao dịch</p>
+                        <h3 class="font-bold text-zinc-700 dark:text-zinc-200 text-lg uppercase tracking-wider">Trade
+                            Journal AI</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5">Tự động phân tích ghi chú &amp; bài học từ nhật ký giao
+                            dịch</p>
                     </div>
                 </div>
             </div>
@@ -528,16 +537,22 @@ window.addEventListener('unhandledrejection', function(e) {
                     <h4 class="text-xs font-bold text-red-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-triangle-exclamation"></i> Top lỗi sai lặp lại (Loss)
                     </h4>
-                    <div id="ai-top-mistakes" class="space-y-2"><span class="text-zinc-300 dark:text-zinc-600 italic text-sm">Đang phân tích...</span></div>
+                    <div id="ai-top-mistakes" class="space-y-2"><span
+                            class="text-zinc-300 dark:text-zinc-600 italic text-sm">Đang phân tích...</span></div>
                 </div>
-                <div class="bg-green-50/50 dark:bg-green-900/5 p-5 rounded-xl border border-green-100 dark:border-green-900/20">
-                    <h4 class="text-xs font-bold text-green-600 dark:text-green-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <div
+                    class="bg-green-50/50 dark:bg-green-900/5 p-5 rounded-xl border border-green-100 dark:border-green-900/20">
+                    <h4
+                        class="text-xs font-bold text-green-600 dark:text-green-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-graduation-cap"></i> Top bài học (Win)
                     </h4>
-                    <div id="ai-top-lessons" class="space-y-2"><span class="text-zinc-300 dark:text-zinc-600 italic text-sm">Đang phân tích...</span></div>
+                    <div id="ai-top-lessons" class="space-y-2"><span
+                            class="text-zinc-300 dark:text-zinc-600 italic text-sm">Đang phân tích...</span></div>
                 </div>
             </div>
-            <div id="ai-stats-bar" class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-4 justify-center text-xs font-mono text-zinc-400"></div>
+            <div id="ai-stats-bar"
+                class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap gap-4 justify-center text-xs font-mono text-zinc-400">
+            </div>
         </div>
     </div>
 
@@ -547,22 +562,30 @@ window.addEventListener('unhandledrejection', function(e) {
         <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
                         <i class="fa-solid fa-cubes-stacked text-white text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-zinc-700 dark:text-zinc-200 text-lg uppercase tracking-wider">Phân tích Block 10 Lệnh</h3>
-                        <p class="text-xs text-zinc-500 mt-0.5">Cứ 10 lệnh liên tiếp, thống kê W / L / BE, WR%, Net R</p>
+                        <h3 class="font-bold text-zinc-700 dark:text-zinc-200 text-lg uppercase tracking-wider">Phân
+                            tích Block 10 Lệnh</h3>
+                        <p class="text-xs text-zinc-500 mt-0.5">Cứ 10 lệnh liên tiếp, thống kê W / L / BE, WR%, Net R
+                        </p>
                     </div>
                 </div>
                 <div id="block10-stats" class="flex flex-wrap gap-2"></div>
             </div>
-            <div id="block10-rows" class="space-y-2" style="max-height:320px;overflow-y:auto;padding-right:6px;scrollbar-width:thin;scrollbar-color:#f59e0b #27272a"></div>
+            <div id="block10-rows" class="space-y-2"
+                style="max-height:320px;overflow-y:auto;padding-right:6px;scrollbar-width:thin;scrollbar-color:#f59e0b #27272a">
+            </div>
             <div class="mt-6">
-                <div class="text-[10px] text-zinc-400 uppercase tracking-widest mb-2 font-bold">Xu hướng Winrate qua từng Block</div>
+                <div class="text-[10px] text-zinc-400 uppercase tracking-widest mb-2 font-bold">Xu hướng Winrate qua
+                    từng Block</div>
                 <div class="relative h-36 w-full"><canvas id="block10Chart"></canvas></div>
             </div>
-            <div id="block10-advice" class="mt-4 text-center text-sm font-mono text-zinc-400 italic border-t border-zinc-100 dark:border-zinc-800 pt-4"></div>
+            <div id="block10-advice"
+                class="mt-4 text-center text-sm font-mono text-zinc-400 italic border-t border-zinc-100 dark:border-zinc-800 pt-4">
+            </div>
         </div>
     </div>
 
@@ -753,88 +776,101 @@ window.addEventListener('unhandledrejection', function(e) {
             </div>
         </div>
     </div>
-    <div class="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-1.5 sm:gap-2 md:gap-3 scale-[0.75] sm:scale-[0.8] md:scale-90 xl:scale-100 origin-right transition-transform">
+    <div
+        class="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-1.5 sm:gap-2 md:gap-3 scale-[0.75] sm:scale-[0.8] md:scale-90 xl:scale-100 origin-right transition-transform">
 
         <button onclick="scrollToSection('dashboard-grid')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-purple-600 dark:text-purple-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-purple-600 dark:text-purple-400 mr-3 hidden group-hover:block">
                 Nhat ky
             </span>
             <i class="fa-solid fa-layer-group text-purple-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('stats-area')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-blue-600 dark:text-blue-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-blue-600 dark:text-blue-400 mr-3 hidden group-hover:block">
                 Thong ke
             </span>
             <i class="fa-solid fa-chart-line text-blue-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('analytics-area')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-blue-600 dark:text-blue-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-blue-600 dark:text-blue-400 mr-3 hidden group-hover:block">
                 Phan tich
             </span>
             <i class="fa-solid fa-seedling text-green-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('relative-symbol')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-rose-600 dark:text-rose-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-rose-600 dark:text-rose-400 mr-3 hidden group-hover:block">
                 Quan he cap tien
             </span>
             <i class="fa-solid fa-chart-gantt text-rose-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('pattern-section')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-teal-600 dark:text-teal-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-teal-600 dark:text-teal-400 mr-3 hidden group-hover:block">
                 Hieu suat tiem nang
             </span>
             <i class="fa-solid fa-signal text-teal-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('duration-section')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-amber-600 dark:text-amber-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-amber-600 dark:text-amber-400 mr-3 hidden group-hover:block">
                 Thoi gian giu lenh
             </span>
             <i class="fa-solid fa-hourglass-half text-amber-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('hours-section')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-cyan-600 dark:text-cyan-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-cyan-600 dark:text-cyan-400 mr-3 hidden group-hover:block">
                 Best Hours
             </span>
             <i class="fa-solid fa-clock text-cyan-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('ai-summary-section')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-violet-600 dark:text-violet-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-violet-600 dark:text-violet-400 mr-3 hidden group-hover:block">
                 Journal AI
             </span>
             <i class="fa-solid fa-brain text-violet-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('block10-section')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-orange-600 dark:text-orange-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-orange-600 dark:text-orange-400 mr-3 hidden group-hover:block">
                 Block 10
             </span>
             <i class="fa-solid fa-cubes-stacked text-orange-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="scrollToSection('insights-section')"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-orange-600 dark:text-orange-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-orange-600 dark:text-orange-400 mr-3 hidden group-hover:block">
                 Nhat ky bai hoc
             </span>
             <i class="fa-solid fa-lightbulb text-orange-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="loadData()"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-blue-600 dark:text-blue-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-blue-600 dark:text-blue-400 mr-3 hidden group-hover:block">
                 Lay du lieu moi
             </span>
             <i class="fa-solid fa-rotate loading-icon text-blue-500 text-lg min-w-[20px] text-center"></i>
         </button>
         <button onclick="document.getElementById('report-section').scrollIntoView({behavior: 'smooth'})"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-indigo-600 dark:text-indigo-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-indigo-600 dark:text-indigo-400 mr-3 hidden group-hover:block">
                 Bao cao
             </span>
             <i class="fa-solid fa-file-invoice text-indigo-500 text-lg min-w-[20px] text-center"></i>
@@ -842,15 +878,15 @@ window.addEventListener('unhandledrejection', function(e) {
 
         <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
             class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap mt-4">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-zinc-500 dark:text-zinc-400 mr-3 hidden group-hover:block">
+            <span
+                class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-zinc-500 dark:text-zinc-400 mr-3 hidden group-hover:block">
                 Len dau
             </span>
             <i class="fa-solid fa-arrow-up text-zinc-400 text-lg min-w-[20px] text-center"></i>
         </button>
     </div>
     <style>
-    <style>
-        .img-tab {
+        <style>.img-tab {
             @apply px-4 py-1.5 rounded-lg text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition;
         }
 
@@ -955,10 +991,10 @@ window.addEventListener('unhandledrejection', function(e) {
                     resetAndRender();
 
                     // Render additional analytics sections
-                    setTimeout(function() {
-                        try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch(e) { console.error("[Hours]", e); }
-                        try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch(e) { console.error("[AI]", e); }
-                        fetch(API_PRIMARY_URL + "?mode=history").then(r=>r.json()).then(d=>{ block10Data=d; try{updatePrimaryReport();}catch(e_rep){} try{renderBlock10Chart(d);}catch(e2){console.error("[Block10]",e2);} }).catch(()=>{ try{renderBlock10Chart(globalData);}catch(e3){} });
+                    setTimeout(function () {
+                        try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { console.error("[Hours]", e); }
+                        try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { console.error("[AI]", e); }
+                        fetch(API_PRIMARY_URL + "?mode=history").then(r => r.json()).then(d => { block10Data = d; try { updatePrimaryReport(); } catch (e_rep) { } try { renderBlock10Chart(d); } catch (e2) { console.error("[Block10]", e2); } }).catch(() => { try { renderBlock10Chart(globalData); } catch (e3) { } });
                     }, 800);
 
 
@@ -1149,9 +1185,16 @@ window.addEventListener('unhandledrejection', function(e) {
                         yest.setDate(yest.getDate() - 1);
                         if (dStart.getTime() !== yest.getTime()) return false;
                     } else if (fDate === 'this-week') {
+                        // Tính Thứ Hai đầu tuần (ISO)
+                        const dayOfWeek = todayStart.getDay(); // 0=CN,1=T2,...6=T7
+                        const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
                         const weekStart = new Date(todayStart);
-                        weekStart.setDate(todayStart.getDate() - todayStart.getDay() + (todayStart.getDay() === 0 ? -6 : 1)); // Mon start
-                        if (dStart < weekStart) return false;
+                        weekStart.setDate(todayStart.getDate() + diffToMon);
+                        // Tính Chủ Nhật cuối tuần
+                        const weekEnd = new Date(weekStart);
+                        weekEnd.setDate(weekStart.getDate() + 6);
+                        weekEnd.setHours(23, 59, 59, 999);
+                        if (dDate < weekStart || dDate > weekEnd) return false;
                     } else if (fDate === 'this-month') {
                         if (dDate.getMonth() !== now.getMonth() || dDate.getFullYear() !== now.getFullYear()) return false;
                     } else if (fDate === 'last-month') {
@@ -1166,8 +1209,8 @@ window.addEventListener('unhandledrejection', function(e) {
             // 3. Cập nhật Stats dựa trên data đã lọc
             lastFilteredData = filtered;
             renderSummaryStats(filtered);
-            setTimeout(function(d){ try{renderHoursChart(d);}catch(e){} try{renderAISummary(d);}catch(e){} try{renderBlock10Chart(globalData);}catch(e){} }.bind(null, filtered), 50);
-            try { renderInsights(filtered); } catch(e) { console.error("[Insights]", e); document.getElementById("no-insights").classList.remove("hidden"); document.getElementById("no-insights").textContent = "Debug Insights Error: " + e.message; }
+            setTimeout(function (d) { try { renderHoursChart(d); } catch (e) { } try { renderAISummary(d); } catch (e) { } try { if (typeof block10Data !== 'undefined') renderBlock10Chart(block10Data); else renderBlock10Chart(globalData); } catch (e) { } }.bind(null, filtered), 50);
+            try { renderInsights(filtered); } catch (e) { console.error("[Insights]", e); document.getElementById("no-insights").classList.remove("hidden"); document.getElementById("no-insights").textContent = "Debug Insights Error: " + e.message; }
 
             // 4. Hiển thị Grid/Playbook
             if (currentView === 'dashboard') {
@@ -1181,8 +1224,8 @@ window.addEventListener('unhandledrejection', function(e) {
                 renderSessionChart(filtered);
                 renderSymbolChart(filtered);
                 renderPatternChart(filtered);
-                try { renderDurationChart(filtered); } catch(e) { console.error('[Dur]', e); }
-                try { renderDurationDistChart(filtered); } catch(e) { console.error('[DurDist]', e); }
+                try { renderDurationChart(filtered); } catch (e) { console.error('[Dur]', e); }
+                try { renderDurationDistChart(filtered); } catch (e) { console.error('[DurDist]', e); }
             } else {
                 container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20";
                 renderPlaybook(filtered, container, currentView);
@@ -1208,22 +1251,24 @@ window.addEventListener('unhandledrejection', function(e) {
             // Sử dụng spread và reverse để tránh mutation gốc nếu cần, ở đây filteredData là mảng mới nên ổn
             [...filteredData].reverse().forEach(t => {
                 let pips = parseFloat(t.pips) || 0;
-                let badgeClass = pips > 0 ? "bg-green-100 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-200";
-                let res = pips > 10 ? 'WIN' : (pips <= 0 ? 'LOSS' : 'BE');
-                t.calcRes = res;
+                let badgeClass = 'bg-gray-100 text-gray-500 border-gray-200';
+                if (pips > 10) badgeClass = 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800';
+                else if (pips < 0) badgeClass = 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800';
 
-                let imgSrc = t.imgEntry;
-                let imgDisplay = (imgSrc && imgSrc.length > 5)
-                    ? `<img src="${imgSrc}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-500" loading="lazy">`
-                    : `<div class="w-full h-48 bg-zinc-100 dark:bg-zinc-800 flex flex-col items-center justify-center text-zinc-300"><i class="fa-regular fa-image text-3xl mb-2"></i><span class="text-xs">No Image</span></div>`;
+                let imgDisplay = '';
+                if (t.image) {
+                    imgDisplay = `<img src="${t.image}" alt="Trade Setup" class="w-full h-full object-cover">`;
+                } else {
+                    imgDisplay = `<div class="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 flex-col text-zinc-400 text-xs"><i class="fa-regular fa-image text-3xl mb-2 opacity-50"></i>No Image</div>`;
+                }
 
                 const safeJson = JSON.stringify(t).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
 
                 html += `
-                    <div onclick='openModal(${safeJson})' class="glass-card rounded-xl overflow-hidden cursor-pointer group hover:ring-2 ring-blue-500 transition-all duration-300 relative">
-                        <div class="overflow-hidden relative border-b border-zinc-200 dark:border-zinc-700">
+                    <div onclick='openModal(${safeJson})' class="glass-card rounded-2xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-all duration-300 group animate-[fadeIn_0.5s_ease-out]">
+                        <div class="aspect-video bg-zinc-100 dark:bg-zinc-800 relative">
                             ${imgDisplay}
-                            <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold border ${badgeClass} shadow-sm">
+                            <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold border ${badgeClass} shadow-sm backdrop-blur-md">
                                 ${pips > 0 ? '+' : ''}${pips} R
                             </div>
                         </div>
@@ -1273,18 +1318,29 @@ window.addEventListener('unhandledrejection', function(e) {
 
                 trades.forEach(t => {
                     let pips = parseFloat(t.pips) || 0;
-                    let cls = 'grad-loss', txt = 'L', res = 'LOSS';
-                    if (pips > 10) { cls = 'grad-win'; txt = 'W'; res = 'WIN'; wins++; }
-                    else if (pips > 0 && pips <= 10) { cls = 'grad-be'; txt = 'B'; res = 'BE'; }
+                    let txt = 'B', col = '#d4d4d8', res = 'BE';
+                    if (pips > 10 || (pips > 0 && t.ketqua === 'win' && pips > 10) || (pips > 0 && t.calcRes === 'WIN')) { txt = 'W'; col = '#4ade80'; res = 'WIN'; wins++; }
+                    else if (pips < 0 || (pips <= 0 && t.ketqua === 'loss')) { txt = 'L'; col = '#f87171'; res = 'LOSS'; }
                     totalPips += pips; t.calcRes = res;
                     const safeJson = JSON.stringify(t).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-                    htmlBoxes += `<div onclick='openModal(${safeJson})' class="trade-box ${cls}" title="${pips} pips"><span class="drop-shadow-sm">${txt}</span></div>`;
+                    htmlBoxes += `
+                        <div onclick='openModal(${safeJson})' class="cursor-pointer z-10 hover:scale-105 transition-transform" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:42px;height:42px;background:transparent;border:2.5px solid ${col};border-radius:12px;box-shadow:inset 0 0 10px ${col}40, 0 0 10px ${col}40;position:relative;margin:0 auto 16px auto;" title="${pips} pips">
+                            <span style="font-family:'Arial Rounded MT Bold', 'Nunito', 'Segoe UI', sans-serif;font-size:26px;font-weight:900;color:transparent;-webkit-text-stroke:2px ${col};text-shadow:0 0 6px ${col}80;letter-spacing:1px">${txt}</span>
+                            <div style="display:flex;gap:3px;position:absolute;bottom:-12px;">
+                                <div style="width:4px;height:4px;background:${col};border-radius:50%;box-shadow:0 0 6px ${col};opacity:1"></div>
+                                <div style="width:4px;height:4px;background:${col};border-radius:50%;box-shadow:0 0 6px ${col};opacity:1"></div>
+                                <div style="width:4px;height:4px;background:${col};border-radius:50%;box-shadow:0 0 6px ${col};opacity:1"></div>
+                                <div style="width:4px;height:4px;background:${col};border-radius:50%;box-shadow:0 0 6px ${col};opacity:1"></div>
+                                <div style="width:4px;height:4px;background:${col};border-radius:50%;box-shadow:0 0 6px ${col};opacity:1"></div>
+                            </div>
+                        </div>
+                    `;
                 });
 
-                for (let i = trades.length; i < 10; i++) htmlBoxes += `<div class="trade-box box-empty">-</div>`;
+                for (let i = trades.length; i < 10; i++) htmlBoxes += `<div style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:transparent;border:2px dashed #4b5563;border-radius:10px;margin:0 auto 16px auto;"></div>`;
 
                 const wr = trades.length > 0 ? Math.round((wins / trades.length) * 100) : 0;
-                const pColor = totalPips > 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500';
+                const pColor = totalPips > 0 ? 'text-emerald-500' : 'text-red-500';
                 const isFirst = currentPage === 0;
                 const isLast = currentPage >= totalBlocks - 1;
 
@@ -1293,25 +1349,25 @@ window.addEventListener('unhandledrejection', function(e) {
                         <div class="flex justify-between items-start mb-5">
                             <div>
                                 <h3 class="font-bold text-zinc-900 dark:text-white text-lg truncate w-40" title="${key}">${key}</h3>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <div class="flex items-center bg-zinc-100 dark:bg-zinc-900/50 rounded-lg p-0.5 border border-zinc-200 dark:border-zinc-700/50 shadow-inner">
-                                        <button onclick="changeBlock('${safeKey}', -1)" ${isFirst ? 'disabled' : ''} class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent transition"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
-                                        <span class="text-[10px] font-bold px-2 text-blue-600 dark:text-blue-400 min-w-[60px] text-center font-mono tracking-tight">BLOCK ${currentPage + 1}</span>
-                                        <button onclick="changeBlock('${safeKey}', 1)" ${isLast ? 'disabled' : ''} class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent transition"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                                <div class="flex items-center gap-2 mt-3">
+                                    <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5 border border-zinc-200 dark:border-zinc-700/50 shadow-inner">
+                                        <button onclick="changeBlock('${safeKey}', -1)" ${isFirst ? 'disabled' : ''} class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent shadow-sm transition"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                                        <span class="text-[10px] font-bold px-3 text-blue-600 dark:text-blue-400 min-w-[70px] text-center font-mono tracking-wide">BLOCK ${currentPage + 1}</span>
+                                        <button onclick="changeBlock('${safeKey}', 1)" ${isLast ? 'disabled' : ''} class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent shadow-sm transition"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
                                     </div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-[10px] text-zinc-500 font-bold uppercase mb-1 tracking-wider">Hiệu suất</div>
+                                <div class="text-[10px] text-zinc-400 font-bold uppercase mb-1 tracking-wider">HIỆU SUẤT</div>
                                 <div class="flex items-center gap-2 justify-end">
-                                    <span class="text-zinc-700 dark:text-zinc-300 font-mono font-bold">${wr}%</span>
-                                    <span class="text-xs ${pColor} font-mono font-bold bg-zinc-100 dark:bg-zinc-900/50 px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 shadow-sm">${totalPips > 0 ? '+' : ''}${totalPips.toFixed(1)}</span>
+                                    <span class="text-zinc-600 dark:text-zinc-300 font-mono font-black text-lg">${wr}%</span>
+                                    <span class="text-xs ${pColor} font-mono font-black bg-zinc-50 dark:bg-zinc-900 px-2 py-1 rounded-md border border-zinc-200 dark:border-zinc-800 shadow-sm">${totalPips > 0 ? '+' : ''}${totalPips.toFixed(1)}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-5 gap-2.5 mb-2">${htmlBoxes}</div>
-                        <div class="mt-auto pt-4 text-[10px] text-right text-teal-400 dark:text-cyan-500 font-bold uppercase tracking-wider border-t border-zinc-200 dark:border-zinc-800/20">
-                             Tổng: ${allTrades.length} lệnh
+                        <div class="grid grid-cols-5 gap-3 mb-2">${htmlBoxes}</div>
+                        <div class="mt-auto pt-4 text-[10px] text-right text-teal-500 dark:text-teal-400 font-black uppercase tracking-wider border-t border-zinc-200 dark:border-zinc-800/20">
+                             TỔNG: ${allTrades.length} LỆNH
                         </div>
                     </div>
                 `;
@@ -2471,7 +2527,7 @@ window.addEventListener('unhandledrejection', function(e) {
             const scrollAmount = grid.clientWidth * 0.8; // Cuộn 80% chiều rộng khung nhìn
             grid.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
         }
-    
+
 
         // ===== HOURS CHART =====
         let hoursChartInst = null;
@@ -2479,7 +2535,7 @@ window.addEventListener('unhandledrejection', function(e) {
             const isDark = document.documentElement.classList.contains('dark');
             const tc = isDark ? '#a1a1aa' : '#71717a';
             const gc = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
-            const hours = Array.from({length:24}, (_,i) => ({h:i, wins:0, loss:0, be:0}));
+            const hours = Array.from({ length: 24 }, (_, i) => ({ h: i, wins: 0, loss: 0, be: 0 }));
             data.forEach(t => {
                 const dt = new Date(t.time); if (isNaN(dt)) return;
                 const h = dt.getHours(); const p = parseFloat(t.pips) || 0;
@@ -2490,66 +2546,68 @@ window.addEventListener('unhandledrejection', function(e) {
             if (hoursChartInst) { hoursChartInst.destroy(); hoursChartInst = null; }
             hoursChartInst = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: hours.map(h => h.h+'h'),
+                data: {
+                    labels: hours.map(h => h.h + 'h'),
                     datasets: [
-                        { label:'Win',  data: hours.map(h=>h.wins), backgroundColor:'rgba(16,185,129,0.75)', borderRadius:4, stack:'s' },
-                        { label:'BE',   data: hours.map(h=>h.be),   backgroundColor:'rgba(100,116,139,0.6)', borderRadius:4, stack:'s' },
-                        { label:'Loss', data: hours.map(h=>h.loss),  backgroundColor:'rgba(239,68,68,0.75)',  borderRadius:4, stack:'s' }
+                        { label: 'Win', data: hours.map(h => h.wins), backgroundColor: 'rgba(16,185,129,0.75)', borderRadius: 4, stack: 's' },
+                        { label: 'BE', data: hours.map(h => h.be), backgroundColor: 'rgba(100,116,139,0.6)', borderRadius: 4, stack: 's' },
+                        { label: 'Loss', data: hours.map(h => h.loss), backgroundColor: 'rgba(239,68,68,0.75)', borderRadius: 4, stack: 's' }
                     ]
                 },
-                options: { responsive:true, maintainAspectRatio:false,
-                    plugins: { legend: { labels: { color:tc, font:{size:10} } } },
-                    scales: { x:{stacked:true,ticks:{color:tc,font:{size:9}},grid:{color:gc}}, y:{stacked:true,ticks:{color:tc,stepSize:1},grid:{color:gc}} }
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: tc, font: { size: 10 } } } },
+                    scales: { x: { stacked: true, ticks: { color: tc, font: { size: 9 } }, grid: { color: gc } }, y: { stacked: true, ticks: { color: tc, stepSize: 1 }, grid: { color: gc } } }
                 }
             });
-            const bestH = hours.reduce((a,b)=>b.wins>a.wins?b:a,hours[0]);
+            const bestH = hours.reduce((a, b) => b.wins > a.wins ? b : a, hours[0]);
             const advEl = document.getElementById('hours-advice');
-            if (advEl && bestH.wins > 0) advEl.textContent = 'Khung gio ' + bestH.h + 'h - ' + (bestH.h+1) + 'h co nhieu win nhat (' + bestH.wins + ' lenh).';
+            if (advEl && bestH.wins > 0) advEl.textContent = 'Khung gio ' + bestH.h + 'h - ' + (bestH.h + 1) + 'h co nhieu win nhat (' + bestH.wins + ' lenh).';
         }
 
 
         // ===== AI SUMMARY =====
         function renderAISummary(data) {
-            const texts = data.map(t => (t.baihoc||'') + ' ' + (t.dienbien||'') + ' ' + (t.cam_nhan||'')).join(' ');
+            const texts = data.map(t => (t.baihoc || '') + ' ' + (t.dienbien || '') + ' ' + (t.cam_nhan || '')).join(' ');
             const words = texts.toLowerCase().split(/[\s,.!?"']+/).filter(w => w.length > 3);
             const freq = {};
-            words.forEach(w => { freq[w] = (freq[w]||0)+1; });
-            const sorted = Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+            words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+            const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
             const cloudEl = document.getElementById('ai-tag-cloud');
             if (cloudEl) {
                 const max = sorted[0]?.[1] || 1;
-                cloudEl.innerHTML = sorted.slice(0,30).map(([w,n]) => {
-                    const sz = 11 + Math.round((n/max)*10);
-                    const op = 0.5 + (n/max)*0.5;
-                    return '<span style="font-size:'+sz+'px;opacity:'+op+';font-weight:600;background:rgba(139,92,246,0.1);color:rgb(139,92,246);padding:3px 8px;border-radius:999px" title="'+n+' lan">'+w+'</span>';
+                cloudEl.innerHTML = sorted.slice(0, 30).map(([w, n]) => {
+                    const sz = 11 + Math.round((n / max) * 10);
+                    const op = 0.5 + (n / max) * 0.5;
+                    return '<span style="font-size:' + sz + 'px;opacity:' + op + ';font-weight:600;background:rgba(139,92,246,0.1);color:rgb(139,92,246);padding:3px 8px;border-radius:999px" title="' + n + ' lan">' + w + '</span>';
                 }).join('');
             }
-            const losses = data.filter(t => (parseFloat(t.pips)||0) < -0.1);
-            const wins   = data.filter(t => (parseFloat(t.pips)||0) > 0.1);
+            const losses = data.filter(t => (parseFloat(t.pips) || 0) < -0.1);
+            const wins = data.filter(t => (parseFloat(t.pips) || 0) > 0.1);
             function topPhrases(arr, field) {
                 const fp = {};
-                arr.forEach(t => { (t[field]||'').split(/[.\n!?]/).map(s=>s.trim()).filter(s=>s.length>10).slice(0,3).forEach(s => { fp[s]=(fp[s]||0)+1; }); });
-                return Object.entries(fp).sort((a,b)=>b[1]-a[1]).slice(0,5);
+                arr.forEach(t => { (t[field] || '').split(/[.\n!?]/).map(s => s.trim()).filter(s => s.length > 10).slice(0, 3).forEach(s => { fp[s] = (fp[s] || 0) + 1; }); });
+                return Object.entries(fp).sort((a, b) => b[1] - a[1]).slice(0, 5);
             }
             const mistakesEl = document.getElementById('ai-top-mistakes');
             if (mistakesEl) {
                 const top = topPhrases(losses, 'dienbien');
-                mistakesEl.innerHTML = top.length ? top.map(([s,n]) => '<div class="flex items-start gap-2 text-xs"><span class="text-red-400 font-bold min-w-[18px]">'+n+'x</span><span class="text-zinc-600 dark:text-zinc-300">'+s+'</span></div>').join('') : '<span class="text-zinc-400 italic text-xs">Chua du du lieu</span>';
+                mistakesEl.innerHTML = top.length ? top.map(([s, n]) => '<div class="flex items-start gap-2 text-xs"><span class="text-red-400 font-bold min-w-[18px]">' + n + 'x</span><span class="text-zinc-600 dark:text-zinc-300">' + s + '</span></div>').join('') : '<span class="text-zinc-400 italic text-xs">Chua du du lieu</span>';
             }
             const lessonsEl = document.getElementById('ai-top-lessons');
             if (lessonsEl) {
                 const top = topPhrases(wins, 'baihoc');
-                lessonsEl.innerHTML = top.length ? top.map(([s,n]) => '<div class="flex items-start gap-2 text-xs"><span class="text-green-500 font-bold min-w-[18px]">'+n+'x</span><span class="text-zinc-600 dark:text-zinc-300">'+s+'</span></div>').join('') : '<span class="text-zinc-400 italic text-xs">Chua du du lieu</span>';
+                lessonsEl.innerHTML = top.length ? top.map(([s, n]) => '<div class="flex items-start gap-2 text-xs"><span class="text-green-500 font-bold min-w-[18px]">' + n + 'x</span><span class="text-zinc-600 dark:text-zinc-300">' + s + '</span></div>').join('') : '<span class="text-zinc-400 italic text-xs">Chua du du lieu</span>';
             }
             const statsEl = document.getElementById('ai-stats-bar');
             if (statsEl) {
-                const withNotes = data.filter(t=>(t.baihoc||'').trim()).length;
-                statsEl.innerHTML = '<span>'+withNotes+' / '+data.length+' lenh co ghi chu</span><span>'+sorted.length+' tu khoa duy nhat</span>';
+                const withNotes = data.filter(t => (t.baihoc || '').trim()).length;
+                statsEl.innerHTML = '<span>' + withNotes + ' / ' + data.length + ' lenh co ghi chu</span><span>' + sorted.length + ' tu khoa duy nhat</span>';
             }
         }
 
 
-        
+
         // ===== BLOCK 10 CHART =====
         let block10ChartInst = null;
         function renderBlock10Chart(data) {
@@ -2558,40 +2616,40 @@ window.addEventListener('unhandledrejection', function(e) {
                 ...t,
                 _pips: parseFloat(t.pips || t.pip || 0),
                 _time: t.time || t.thoigian || ''
-            })).sort((a,b) => new Date(a._time) - new Date(b._time));
+            })).sort((a, b) => new Date(a._time) - new Date(b._time));
             const blocks = [];
             for (let i = 0; i < sorted.length; i += 10) {
                 const chunk = sorted.slice(i, i + 10);
-                let wins=0, losses=0, bes=0, netR=0;
+                let wins = 0, losses = 0, bes = 0, netR = 0;
                 chunk.forEach(t => {
-                    const p = t._pips; netR+=p;
+                    const p = t._pips; netR += p;
                     // Also check string result as fallback (Win/Loss/BE)
-                    const rs = (t.ket_qua_primary||t.ketqua||t.ket_qua||t.ket_qua_secondary||'').toLowerCase();
-                    if(p > 10 || (p > 0 && rs.includes('win') && p > 10)) wins++;
-                    else if(p < 0 || rs.includes('loss')) losses++;
+                    const rs = (t.ket_qua_primary || t.ketqua || t.ket_qua || t.ket_qua_secondary || '').toLowerCase();
+                    if (p > 10 || (p > 0 && rs.includes('win') && p > 10)) wins++;
+                    else if (p < 0 || rs.includes('loss')) losses++;
                     else bes++; // p >= 0 and p <= 10 is BE
                 });
-                const total = chunk.length, wr = total>0?(wins/total)*100:0;
-                const prevWR = blocks.length>0?blocks[blocks.length-1].wr:null;
-                const trend = prevWR===null?null:wr>prevWR+5?'up':wr<prevWR-5?'down':'flat';
-                blocks.push({idx:blocks.length+1, range:'L'+(i+1)+'\u2013L'+(i+total), chunk, wins, losses, bes, netR, wr, total, trend, prevWR});
+                const total = chunk.length, wr = total > 0 ? (wins / total) * 100 : 0;
+                const prevWR = blocks.length > 0 ? blocks[blocks.length - 1].wr : null;
+                const trend = prevWR === null ? null : wr > prevWR + 5 ? 'up' : wr < prevWR - 5 ? 'down' : 'flat';
+                blocks.push({ idx: blocks.length + 1, range: 'L' + (i + 1) + '\u2013L' + (i + total), chunk, wins, losses, bes, netR, wr, total, trend, prevWR });
             }
 
             // ---- SUMMARY CARDS ----
             const statsEl = document.getElementById('block10-stats');
             if (statsEl && blocks.length > 0) {
-                const best  = blocks.reduce((a,b)=>b.wr>a.wr?b:a,blocks[0]);
-                const worst = blocks.reduce((a,b)=>b.wr<a.wr?b:a,blocks[0]);
-                const avgWR = (blocks.reduce((s,b)=>s+b.wr,0)/blocks.length).toFixed(0);
-                const totalNetR = blocks.reduce((s,b)=>s+b.netR,0);
-                const nc = totalNetR>=0?'text-emerald-400':'text-red-400';
+                const best = blocks.reduce((a, b) => b.wr > a.wr ? b : a, blocks[0]);
+                const worst = blocks.reduce((a, b) => b.wr < a.wr ? b : a, blocks[0]);
+                const avgWR = (blocks.reduce((s, b) => s + b.wr, 0) / blocks.length).toFixed(0);
+                const totalNetR = blocks.reduce((s, b) => s + b.netR, 0);
+                const nc = totalNetR >= 0 ? 'text-emerald-400' : 'text-red-400';
                 statsEl.innerHTML = [
-                    ['#65a30d','fa-hashtag','Tổng Block',blocks.length,'text-lime-400'],
-                    ['#059669','fa-trophy','Block tốt nhất','C'+best.idx+': '+best.wr.toFixed(0)+'%','text-emerald-400'],
-                    ['#dc2626','fa-circle-xmark','Block tệ nhất','C'+worst.idx+': '+worst.wr.toFixed(0)+'%','text-red-400'],
-                    ['#d97706','fa-bullseye','WR trung bình',avgWR+'%','text-amber-400'],
-                    [totalNetR>=0?'#059669':'#dc2626','fa-coins','Net R tổng',(totalNetR>=0?'+':'')+totalNetR.toFixed(2)+'R',nc],
-                ].map(([border,icon,label,val,valcls])=>
+                    ['#65a30d', 'fa-hashtag', 'Tổng Block', blocks.length, 'text-lime-400'],
+                    ['#059669', 'fa-trophy', 'Block tốt nhất', 'C' + best.idx + ': ' + best.wr.toFixed(0) + '%', 'text-emerald-400'],
+                    ['#dc2626', 'fa-circle-xmark', 'Block tệ nhất', 'C' + worst.idx + ': ' + worst.wr.toFixed(0) + '%', 'text-red-400'],
+                    ['#d97706', 'fa-bullseye', 'WR trung bình', avgWR + '%', 'text-amber-400'],
+                    [totalNetR >= 0 ? '#059669' : '#dc2626', 'fa-coins', 'Net R tổng', (totalNetR >= 0 ? '+' : '') + totalNetR.toFixed(2) + 'R', nc],
+                ].map(([border, icon, label, val, valcls]) =>
                     `<div class="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 rounded-xl px-3.5 py-2.5 min-w-[130px]" style="border-left:3px solid ${border}">
                         <i class="fa-solid ${icon} text-xs" style="color:${border}"></i>
                         <div>
@@ -2607,36 +2665,104 @@ window.addEventListener('unhandledrejection', function(e) {
             if (rowsEl) {
                 rowsEl.innerHTML = blocks.map(b => {
                     const isGood = b.wr >= 60, isBad = b.wr < 40;
-                    const barCol = isGood?'#10b981':isBad?'#ef4444':'#f59e0b';
-                    const barBg  = isGood?'rgba(16,185,129,0.12)':isBad?'rgba(239,68,68,0.12)':'rgba(245,158,11,0.12)';
-                    const netCol = b.netR>=0?'#10b981':'#ef4444';
-                    const netTxt = (b.netR>=0?'+':'')+b.netR.toFixed(1)+'R';
+                    const barCol = isGood ? '#10b981' : isBad ? '#ef4444' : '#f59e0b';
+                    const barBg = isGood ? 'rgba(16,185,129,0.12)' : isBad ? 'rgba(239,68,68,0.12)' : 'rgba(245,158,11,0.12)';
+                    const netCol = b.netR >= 0 ? '#10b981' : '#ef4444';
+                    const netTxt = (b.netR >= 0 ? '+' : '') + b.netR.toFixed(1) + 'R';
 
                     // Trend badge
                     let trendHtml = '';
-                    if (b.trend==='up')   trendHtml = '<span style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800">\u2191 +'+Math.abs(b.wr-b.prevWR).toFixed(0)+'%</span>';
-                    else if (b.trend==='down') trendHtml = '<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800">\u2193 -'+Math.abs(b.wr-b.prevWR).toFixed(0)+'%</span>';
-                    else if (b.trend==='flat') trendHtml = '<span style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800">\u2192 \u1ed5n</span>';
+                    if (b.trend === 'up') trendHtml = '<span style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800">\u2191 +' + Math.abs(b.wr - b.prevWR).toFixed(0) + '%</span>';
+                    else if (b.trend === 'down') trendHtml = '<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800">\u2193 -' + Math.abs(b.wr - b.prevWR).toFixed(0) + '%</span>';
+                    else if (b.trend === 'flat') trendHtml = '<span style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800">\u2192 \u1ed5n</span>';
 
-                    // [W][L][BE] boxes
+                    // [W][L][BE] boxes - Neon Outline Design
                     const boxes = b.chunk.map(t => {
                         const p = t._pips;
                         const rs = (t.ket_qua_primary || t.ketqua || t.ket_qua || t.ket_qua_secondary || '').toLowerCase();
-                        let lbl = 'BE', bg = 'rgba(148,163,184,0.2)', col = '#94a3b8', bord = 'rgba(148,163,184,0.3)';
-                        if (p > 10 || (p > 0 && rs.includes('win') && p > 10)) { lbl = 'W'; bg = 'rgba(16,185,129,0.2)'; col = '#10b981'; bord = 'rgba(16,185,129,0.4)'; }
-                        else if (p < 0 || rs.includes('loss')) { lbl = 'L'; bg = 'rgba(239,68,68,0.2)'; col = '#ef4444'; bord = 'rgba(239,68,68,0.4)'; }
-                        return `<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:24px;background:${bg};border:1px solid ${bord};border-radius:5px;color:${col};font-weight:900;font-family:monospace;font-size:11px;letter-spacing:-0.5px">${lbl}</span>`;
+                        let lbl = 'B', col = '#d4d4d8', res = 'BE';
+                        if (p > 10 || (p > 0 && rs.includes('win') && p > 10)) { lbl = 'W'; col = '#4ade80'; }
+                        else if (p < 0 || rs.includes('loss')) { lbl = 'L'; col = '#f87171'; }
+
+                        return `
+                            <div style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:34px;height:34px;background:transparent;border:2px solid ${col};border-radius:10px;box-shadow:inset 0 0 8px ${col}40, 0 0 8px ${col}40;position:relative;margin:0 4px 10px 4px;">
+                                <span style="font-family:'Arial Rounded MT Bold', 'Nunito', 'Segoe UI', sans-serif;font-size:20px;font-weight:900;color:transparent;-webkit-text-stroke:1.5px ${col};text-shadow:0 0 4px ${col}80;letter-spacing:1px">${lbl}</span>
+                                <div style="display:flex;gap:3px;position:absolute;bottom:-10px;">
+                                    <div style="width:3px;height:3px;background:${col};border-radius:50%;box-shadow:0 0 4px ${col};opacity:1"></div>
+                                    <div style="width:3px;height:3px;background:${col};border-radius:50%;box-shadow:0 0 4px ${col};opacity:1"></div>
+                                    <div style="width:3px;height:3px;background:${col};border-radius:50%;box-shadow:0 0 4px ${col};opacity:1"></div>
+                                    <div style="width:3px;height:3px;background:${col};border-radius:50%;box-shadow:0 0 4px ${col};opacity:1"></div>
+                                    <div style="width:3px;height:3px;background:${col};border-radius:50%;box-shadow:0 0 4px ${col};opacity:1"></div>
+                                </div>
+                            </div>
+                        `;
                     }).join('');
 
-                    // Progress bar unicode
-                    const filled=Math.round(b.wr/10);
-                    const barStr='\u2588'.repeat(filled)+'\u2591'.repeat(10-filled);
+                    // SVG Semicircle Gauge — bán nguyệt, cắt phần dưới
+                    const cx = 60, cy = 58, r = 44, r2 = 30;
+                    function arcPath2(pcx, pcy, pr, startDeg, endDeg) {
+                        const s = startDeg * Math.PI / 180, e = endDeg * Math.PI / 180;
+                        const x1 = pcx + pr * Math.cos(s), y1 = pcy + pr * Math.sin(s);
+                        const x2 = pcx + pr * Math.cos(e), y2 = pcy + pr * Math.sin(e);
+                        return 'M ' + x1.toFixed(2) + ' ' + y1.toFixed(2) + ' A ' + pr + ' ' + pr + ' 0 0 1 ' + x2.toFixed(2) + ' ' + y2.toFixed(2);
+                    }
+                    const tracks = [
+                        { start: 180, end: 216, col: '#ef4444' },
+                        { start: 216, end: 252, col: '#f97316' },
+                        { start: 252, end: 288, col: '#f59e0b' },
+                        { start: 288, end: 324, col: '#84cc16' },
+                        { start: 324, end: 360, col: '#10b981' },
+                    ];
+                    const trackSvg = tracks.map(t =>
+                        '<path d="' + arcPath2(cx, cy, r, t.start, t.end) + '" stroke="' + t.col + '" stroke-width="9" fill="none" opacity="0.25"/>'
+                    ).join('');
+                    const fillTracks = tracks.map(t => {
+                        const tStart = t.start - 180;
+                        const tEnd = t.end - 180;
+                        if (b.wr <= 0) return '';
+                        const wrDeg = b.wr / 100 * 180;
+                        if (wrDeg <= tStart) return '';
+                        const actualEnd = Math.min(wrDeg, tEnd);
+                        const s = t.start * Math.PI / 180;
+                        const e = (t.start + (actualEnd - tStart)) * Math.PI / 180;
+                        const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s);
+                        const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+                        return '<path d="M ' + x1.toFixed(2) + ' ' + y1.toFixed(2) + ' A ' + r + ' ' + r + ' 0 0 1 ' + x2.toFixed(2) + ' ' + y2.toFixed(2) + '" stroke="' + t.col + '" stroke-width="9" fill="none" stroke-linecap="butt"/>';
+                    }).join('');
+                    const needleDeg = (180 + b.wr / 100 * 180) * Math.PI / 180;
+                    const nx = (cx + 33 * Math.cos(needleDeg)).toFixed(2);
+                    const ny = (cy + 33 * Math.sin(needleDeg)).toFixed(2);
+                    // viewBox cắt phần dưới: chỉ hiện từ y=10 đến y=cy+14 (ngang đáy + nhãn)
+                    const gaugeHtml = `<svg width="88" height="64" viewBox="10 10 100 62" style="display:block;overflow:visible">
+                        <defs>
+                            <radialGradient id="bg2_${b.idx}" cx="50%" cy="90%" r="75%">
+                                <stop offset="0%" stop-color="#1e3a5f" stop-opacity="0.95"/>
+                                <stop offset="100%" stop-color="#05050f" stop-opacity="1"/>
+                            </radialGradient>
+                            <clipPath id="clip2_${b.idx}">
+                                <rect x="0" y="0" width="120" height="${cy}"/>
+                            </clipPath>
+                        </defs>
+                        <ellipse cx="${cx}" cy="${cy}" rx="52" ry="50" fill="url(#bg2_${b.idx})" clip-path="url(#clip2_${b.idx})"/>
+                        <g clip-path="url(#clip2_${b.idx})">
+                            ${trackSvg}
+                            ${fillTracks}
+                            <circle cx="${cx}" cy="${cy}" r="${r2}" fill="#080d1a" stroke="#1e293b" stroke-width="1.5"/>
+                            <line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+                            <circle cx="${cx}" cy="${cy}" r="3.5" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                            <!-- WR% tại đỉnh bán nguyệt -->
+                            <text x="${cx}" y="${cy - r2 + 12}" text-anchor="middle" font-size="10" font-weight="900" fill="${barCol}" font-family="monospace">${b.wr.toFixed(0)}%</text>
+                        </g>
+                        <line x1="14" y1="${cy}" x2="106" y2="${cy}" stroke="#1e293b" stroke-width="1.5"/>
+                        <text x="14" y="${cy + 13}" font-size="9" font-weight="900" fill="#f59e0b" font-family="monospace">0</text>
+                        <text x="90" y="${cy + 13}" font-size="9" font-weight="900" fill="#f59e0b" font-family="monospace">100</text>
+                    </svg>`;
 
                     return `<div style="background:${barBg};border:1px solid ${barCol}22;border-left:3px solid ${barCol};border-radius:12px;padding:12px 16px;transition:all 0.2s">
                         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px">
                             <!-- Label -->
                             <div style="min-width:80px">
-                                <div style="font-weight:900;font-size:13px;font-family:monospace">C\u1ee5m ${b.idx}</div>
+                                <div style="font-weight:900;font-size:13px;font-family:monospace">Cụm ${b.idx}</div>
                                 <div style="font-size:10px;color:#71717a;font-family:monospace">${b.range}</div>
                             </div>
                             <!-- [W][L][BE] boxes -->
@@ -2647,10 +2773,9 @@ window.addEventListener('unhandledrejection', function(e) {
                                 <span style="color:#ef4444">${b.losses}L</span>
                                 <span style="color:#94a3b8">${b.bes}BE</span>
                             </div>
-                            <!-- Progress bar -->
-                            <div style="display:flex;align-items:center;gap:6px">
-                                <span style="font-family:monospace;font-size:15px;color:${barCol};letter-spacing:-1.5px;font-weight:900">${barStr}</span>
-                                <span style="font-weight:900;font-size:15px;color:${barCol}">${b.wr.toFixed(0)}%</span>
+                            <!-- SVG Semicircle Gauge -->
+                            <div style="display:flex;align-items:center;gap:4px">
+                                ${gaugeHtml}
                             </div>
                             <!-- Trend -->
                             <div style="display:flex;align-items:center;gap:6px">
@@ -2664,34 +2789,45 @@ window.addEventListener('unhandledrejection', function(e) {
 
             // ---- TREND LINE CHART ----
             const isDark = document.documentElement.classList.contains('dark');
-            const tc = isDark?'#a1a1aa':'#71717a', gc = isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)';
+            const tc = isDark ? '#a1a1aa' : '#71717a', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
             const ctx = document.getElementById('block10Chart');
             if (!ctx) return;
-            if (block10ChartInst) { block10ChartInst.destroy(); block10ChartInst=null; }
+            if (block10ChartInst) { block10ChartInst.destroy(); block10ChartInst = null; }
             block10ChartInst = new Chart(ctx, {
                 type: 'line',
-                data: { labels: blocks.map(b=>'C'+b.idx),
+                data: {
+                    labels: blocks.map(b => 'C' + b.idx),
                     datasets: [
-                        { label:'WR%', data:blocks.map(b=>+b.wr.toFixed(1)),
-                          borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.07)',
-                          borderWidth:2.5, fill:true, tension:0.4,
-                          pointBackgroundColor:blocks.map(b=>b.wr>=60?'#10b981':b.wr>=40?'#f59e0b':'#ef4444'),
-                          pointRadius:6, pointHoverRadius:9 },
-                        { label:'60% threshold', data:blocks.map(()=>60),
-                          borderColor:'rgba(16,185,129,0.3)', borderWidth:1, borderDash:[4,4],
-                          pointRadius:0, fill:false }
+                        {
+                            label: 'WR%', data: blocks.map(b => +b.wr.toFixed(1)),
+                            borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.07)',
+                            borderWidth: 2.5, fill: true, tension: 0.4,
+                            pointBackgroundColor: blocks.map(b => b.wr >= 60 ? '#10b981' : b.wr >= 40 ? '#f59e0b' : '#ef4444'),
+                            pointRadius: 6, pointHoverRadius: 9
+                        },
+                        {
+                            label: '60% threshold', data: blocks.map(() => 60),
+                            borderColor: 'rgba(16,185,129,0.3)', borderWidth: 1, borderDash: [4, 4],
+                            pointRadius: 0, fill: false
+                        }
                     ]
                 },
-                options: { responsive:true, maintainAspectRatio:false,
-                    plugins: { legend:{display:false},
-                        tooltip:{ callbacks:{ label:c2=>{
-                            const b=blocks[c2.dataIndex];
-                            return b?['WR: '+b.wr.toFixed(0)+'%',b.wins+'W '+b.losses+'L '+b.bes+'BE','Net: '+(b.netR>=0?'+':'')+b.netR.toFixed(2)+'R']:[];
-                        }}}
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: c2 => {
+                                    const b = blocks[c2.dataIndex];
+                                    return b ? ['WR: ' + b.wr.toFixed(0) + '%', b.wins + 'W ' + b.losses + 'L ' + b.bes + 'BE', 'Net: ' + (b.netR >= 0 ? '+' : '') + b.netR.toFixed(2) + 'R'] : [];
+                                }
+                            }
+                        }
                     },
-                    scales:{
-                        x:{ticks:{color:tc,font:{size:10,family:'JetBrains Mono,monospace'}},grid:{color:gc}},
-                        y:{min:0,max:100,ticks:{color:tc,callback:v=>v+'%'},grid:{color:gc}}
+                    scales: {
+                        x: { ticks: { color: tc, font: { size: 10, family: 'JetBrains Mono,monospace' } }, grid: { color: gc } },
+                        y: { min: 0, max: 100, ticks: { color: tc, callback: v => v + '%' }, grid: { color: gc } }
                     }
                 }
             });
@@ -2699,18 +2835,18 @@ window.addEventListener('unhandledrejection', function(e) {
             // ---- ADVICE ----
             const advEl = document.getElementById('block10-advice');
             if (advEl && blocks.length > 0) {
-                const last = blocks[blocks.length-1];
-                const avg  = blocks.reduce((s,b)=>s+b.wr,0)/blocks.length;
-                let msg='';
-                if(last.wr>=70) msg='Cum '+last.idx+' xuat sac '+last.wr.toFixed(0)+'% WR - duy tri tu duy nay!';
-                else if(last.wr<=30) msg='Cum '+last.idx+' yeu '+last.wr.toFixed(0)+'% WR - dung lai review tam ly.';
-                else if(last.trend==='up') msg='Cum '+last.idx+' dang cai thien (+'+(last.wr-last.prevWR).toFixed(0)+'%) - tiep tuc!';
-                else if(last.trend==='down') msg='Cum '+last.idx+' tut giam ('+(last.wr-last.prevWR).toFixed(0)+'%) - nen review lai.';
-                else msg='Phong do on dinh qua '+blocks.length+' cum (WR TB: '+avg.toFixed(0)+'%).';
+                const last = blocks[blocks.length - 1];
+                const avg = blocks.reduce((s, b) => s + b.wr, 0) / blocks.length;
+                let msg = '';
+                if (last.wr >= 70) msg = 'Cum ' + last.idx + ' xuat sac ' + last.wr.toFixed(0) + '% WR - duy tri tu duy nay!';
+                else if (last.wr <= 30) msg = 'Cum ' + last.idx + ' yeu ' + last.wr.toFixed(0) + '% WR - dung lai review tam ly.';
+                else if (last.trend === 'up') msg = 'Cum ' + last.idx + ' dang cai thien (+' + (last.wr - last.prevWR).toFixed(0) + '%) - tiep tuc!';
+                else if (last.trend === 'down') msg = 'Cum ' + last.idx + ' tut giam (' + (last.wr - last.prevWR).toFixed(0) + '%) - nen review lai.';
+                else msg = 'Phong do on dinh qua ' + blocks.length + ' cum (WR TB: ' + avg.toFixed(0) + '%).';
                 advEl.textContent = msg;
             }
         }
-</script>
+    </script>
 
 
     <!-- BÁO CÁO AUTOMATION -->
@@ -2720,10 +2856,11 @@ window.addEventListener('unhandledrejection', function(e) {
             <h2 class="text-3xl font-black text-zinc-900 dark:text-white flex items-center gap-3 text-center">
                 <i class="fa-solid fa-file-invoice text-indigo-500"></i> Báo Cáo Hiệu Suất
             </h2>
-            
+
             <!-- 2. Lọc (Bộ lọc và Nút Tải) -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md">
-                <select id="primary-date-filter" onchange="updatePrimaryReport()" class="w-full sm:flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl px-4 py-3 font-bold cursor-pointer focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition hover:bg-zinc-50 dark:hover:bg-zinc-700/80 shadow-sm text-center appearance-none">
+                <select id="primary-date-filter" onchange="updatePrimaryReport()"
+                    class="w-full sm:flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl px-4 py-3 font-bold cursor-pointer focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition hover:bg-zinc-50 dark:hover:bg-zinc-700/80 shadow-sm text-center appearance-none">
                     <option value="all">🗓️ Toàn thời gian</option>
                     <option value="today">🔥 Hôm nay</option>
                     <option value="yesterday">↩️ Hôm qua</option>
@@ -2731,38 +2868,53 @@ window.addEventListener('unhandledrejection', function(e) {
                     <option value="this-month">📊 Tháng này</option>
                     <option value="last-month">⏪ Tháng trước</option>
                 </select>
-                <button onclick="downloadReport()" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 text-sm">
+                <button onclick="downloadReport()"
+                    class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-download"></i> Tải Ảnh Báo Cáo
                 </button>
             </div>
         </div>
 
         <!-- 3. Kết quả (Thống kê Card) -->
-        <div id="report-card" class="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
+        <div id="report-card"
+            class="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
             <!-- Decorative Blur -->
-            <div class="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/20 blur-[100px] rounded-full pointer-events-none"></div>
-            <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+            <div
+                class="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/20 blur-[100px] rounded-full pointer-events-none">
+            </div>
+            <div
+                class="absolute -bottom-32 -left-32 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none">
+            </div>
 
             <div class="relative z-10">
                 <div class="text-center mb-10 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-                    <h3 class="text-3xl font-black text-zinc-900 dark:text-white mb-2 tracking-tight">SMC TRADING JOURNAL PRO</h3>
-                    <p class="text-zinc-500 dark:text-zinc-400 font-medium" id="rep-period">Kỳ báo cáo: Toàn thời gian</p>
+                    <h3 class="text-3xl font-black text-zinc-900 dark:text-white mb-2 tracking-tight">SMC TRADING
+                        JOURNAL PRO</h3>
+                    <p class="text-zinc-500 dark:text-zinc-400 font-medium" id="rep-period">Kỳ báo cáo: Toàn thời gian
+                    </p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                     <!-- Stat 1 -->
-                    <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
-                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Tổng Số Lệnh</div>
+                    <div
+                        class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
+                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">
+                            Tổng Số Lệnh</div>
                         <div class="text-5xl font-black text-zinc-900 dark:text-white" id="rep-total-trades">0</div>
                     </div>
                     <!-- Stat 2 -->
-                    <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
-                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Lợi Nhuận Ròng</div>
+                    <div
+                        class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
+                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">
+                            Lợi Nhuận Ròng</div>
                         <div class="text-5xl font-black text-green-500" id="rep-net-r">+0 Pip</div>
                     </div>
                     <!-- Stat 3 -->
-                    <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center relative overflow-hidden">
-                        <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2 relative z-10">Tỷ Lệ Thắng</div>
+                    <div
+                        class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center relative overflow-hidden">
+                        <div
+                            class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2 relative z-10">
+                            Tỷ Lệ Thắng</div>
                         <div class="text-5xl font-black text-blue-500 relative z-10" id="rep-wr">0%</div>
                         <div class="absolute bottom-0 left-0 h-1 w-full bg-zinc-200 dark:bg-zinc-700">
                             <div id="rep-wr-bar" class="h-full bg-blue-500" style="width: 0%"></div>
@@ -2772,24 +2924,32 @@ window.addEventListener('unhandledrejection', function(e) {
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
                     <!-- Best Trade -->
-                    <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-6 border border-emerald-100 dark:border-emerald-900/30 flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex flex-shrink-0 items-center justify-center text-emerald-600 dark:text-emerald-400 text-xl shadow-inner">
+                    <div
+                        class="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-6 border border-emerald-100 dark:border-emerald-900/30 flex items-start gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex flex-shrink-0 items-center justify-center text-emerald-600 dark:text-emerald-400 text-xl shadow-inner">
                             <i class="fa-solid fa-crown"></i>
                         </div>
                         <div class="flex-1">
-                            <div class="text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-widest mb-1.5 opacity-80">Lệnh Tốt Nhất</div>
+                            <div
+                                class="text-emerald-800 dark:text-emerald-300 text-xs font-black uppercase tracking-widest mb-1.5 opacity-80">
+                                Lệnh Tốt Nhất</div>
                             <div id="rep-best-trade" class="text-zinc-700 dark:text-zinc-300">
                                 <span class="text-sm italic opacity-60">Chưa có dữ liệu</span>
                             </div>
                         </div>
                     </div>
                     <!-- Worst Trade -->
-                    <div class="bg-rose-50 dark:bg-rose-900/10 rounded-2xl p-6 border border-rose-100 dark:border-rose-900/30 flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-800/50 flex flex-shrink-0 items-center justify-center text-rose-600 dark:text-rose-400 text-xl shadow-inner">
+                    <div
+                        class="bg-rose-50 dark:bg-rose-900/10 rounded-2xl p-6 border border-rose-100 dark:border-rose-900/30 flex items-start gap-4">
+                        <div
+                            class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-800/50 flex flex-shrink-0 items-center justify-center text-rose-600 dark:text-rose-400 text-xl shadow-inner">
                             <i class="fa-solid fa-skull"></i>
                         </div>
                         <div class="flex-1">
-                            <div class="text-rose-800 dark:text-rose-300 text-xs font-black uppercase tracking-widest mb-1.5 opacity-80">Lệnh Tệ Nhất</div>
+                            <div
+                                class="text-rose-800 dark:text-rose-300 text-xs font-black uppercase tracking-widest mb-1.5 opacity-80">
+                                Lệnh Tệ Nhất</div>
                             <div id="rep-worst-trade" class="text-zinc-700 dark:text-zinc-300">
                                 <span class="text-sm italic opacity-60">Chưa có dữ liệu</span>
                             </div>
@@ -2802,13 +2962,15 @@ window.addEventListener('unhandledrejection', function(e) {
                         <i class="fa-solid fa-robot text-8xl text-indigo-500"></i>
                     </div>
                     <div class="flex items-start gap-5 relative z-10">
-                        <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex-shrink-0 flex items-center justify-center shadow-lg shadow-indigo-600/20 transform -rotate-3">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-indigo-600 flex-shrink-0 flex items-center justify-center shadow-lg shadow-indigo-600/20 transform -rotate-3">
                             <i class="fa-solid fa-robot text-2xl text-white"></i>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-2">
                                 <h4 class="font-black text-white text-sm tracking-widest uppercase">AI Advisor</h4>
-                                <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold rounded-full border border-indigo-500/20">BETA</span>
+                                <span
+                                    class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-bold rounded-full border border-indigo-500/20">BETA</span>
                             </div>
                             <p class="text-zinc-300 text-sm leading-relaxed" id="rep-ai-comment">Đang phân tích...</p>
                         </div>
@@ -2824,30 +2986,47 @@ window.addEventListener('unhandledrejection', function(e) {
             if (!block10Data || block10Data.length === 0) return;
             const fDate = document.getElementById('primary-date-filter').value || 'all';
             const now = new Date();
-            
+
             let filtered = block10Data.filter(d => {
                 if (fDate === 'all') return true;
-                
-                let dDate = new Date(d.time || d.thoigian);
-                if (isNaN(dDate.getTime())) {
-                    const s = String(d.time || d.thoigian || '');
-                    const parts = s.split(' ')[0].split('/');
-                    if(parts.length===3) dDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+
+                // Parse ngày — ưu tiên detect DD/MM/YYYY (định dạng Google Sheet VN)
+                const rawTime = String(d.time || d.thoigian || '');
+                let dDate;
+                const ddmmMatch = rawTime.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+                if (ddmmMatch) {
+                    // Dùng new Date(y, m, d, h, min, s) — không phụ thuộc ISO string
+                    dDate = new Date(
+                        parseInt(ddmmMatch[3]),      // year
+                        parseInt(ddmmMatch[2]) - 1,  // month (0-indexed)
+                        parseInt(ddmmMatch[1]),       // day
+                        parseInt(ddmmMatch[4] || 0), // hour
+                        parseInt(ddmmMatch[5] || 0), // minute
+                        parseInt(ddmmMatch[6] || 0)  // second
+                    );
+                } else {
+                    dDate = new Date(rawTime);
                 }
-                if (isNaN(dDate.getTime())) return true;
-                
+                if (isNaN(dDate.getTime())) return false; // parse thất bại → loại bỏ
+
                 const startOf = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
                 const dStart = startOf(dDate);
                 const todayStart = startOf(now);
-                
+
                 if (fDate === 'today' && dStart.getTime() !== todayStart.getTime()) return false;
                 if (fDate === 'yesterday') {
                     const yest = new Date(todayStart); yest.setDate(yest.getDate() - 1);
                     if (dStart.getTime() !== yest.getTime()) return false;
                 }
                 if (fDate === 'this-week') {
-                    const weekStart = new Date(todayStart); weekStart.setDate(todayStart.getDate() - todayStart.getDay() + (todayStart.getDay()===0?-6:1));
-                    if (dStart < weekStart) return false;
+                    const dayOfWeek = todayStart.getDay(); // 0=CN,1=T2,...6=T7
+                    const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                    const weekStart = new Date(todayStart);
+                    weekStart.setDate(todayStart.getDate() + diffToMon);
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekStart.getDate() + 6);
+                    weekEnd.setHours(23, 59, 59, 999);
+                    if (dDate < weekStart || dDate > weekEnd) return false;
                 }
                 if (fDate === 'this-month' && (dDate.getMonth() !== now.getMonth() || dDate.getFullYear() !== now.getFullYear())) return false;
                 if (fDate === 'last-month') {
@@ -2856,13 +3035,13 @@ window.addEventListener('unhandledrejection', function(e) {
                 }
                 return true;
             });
-            
+
             const periodEl = document.getElementById('rep-period');
             if (periodEl) {
                 const pText = { 'all': 'Toàn thời gian (30 lệnh gần nhất)', 'today': 'Hôm nay', 'yesterday': 'Hôm qua', 'this-week': 'Tuần này', 'this-month': 'Tháng này', 'last-month': 'Tháng trước' };
                 periodEl.innerText = 'Kỳ báo cáo: ' + (pText[fDate] || 'Tuỳ chỉnh');
             }
-            
+
             renderReport(filtered);
         }
 
@@ -2911,18 +3090,18 @@ window.addEventListener('unhandledrejection', function(e) {
             netEl.innerText = (netPips > 0 ? '+' : '') + netPips.toFixed(0) + ' Pip';
             netEl.className = `text-5xl font-black ${netPips >= 0 ? 'text-green-500' : 'text-rose-500'}`;
 
-            if(bestTrade && maxPip >= 0) {
+            if (bestTrade && maxPip >= 0) {
                 document.getElementById('rep-best-trade').innerHTML = `
                     <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2 leading-none">+${maxPip} <span class="text-lg font-bold">Pip</span></div>
                     <div class="text-sm font-medium opacity-80 mb-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${bestTrade.time || bestTrade.thoigian || ''}</div>
-                    <div class="text-sm font-bold opacity-90"><i class="fa-solid fa-tag mr-1"></i> ${bestTrade.pair||bestTrade.trade||''} &bull; ${bestTrade.pattern||bestTrade.setup||''}</div>
+                    <div class="text-sm font-bold opacity-90"><i class="fa-solid fa-tag mr-1"></i> ${bestTrade.pair || bestTrade.trade || ''} &bull; ${bestTrade.pattern || bestTrade.setup || ''}</div>
                 `;
             }
-            if(worstTrade && minPip < 0) {
+            if (worstTrade && minPip < 0) {
                 document.getElementById('rep-worst-trade').innerHTML = `
                     <div class="text-3xl font-black text-rose-600 dark:text-rose-400 mb-2 leading-none">${minPip} <span class="text-lg font-bold">Pip</span></div>
                     <div class="text-sm font-medium opacity-80 mb-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${worstTrade.time || worstTrade.thoigian || ''}</div>
-                    <div class="text-sm font-bold opacity-90"><i class="fa-solid fa-tag mr-1"></i> ${worstTrade.pair||worstTrade.trade||''} &bull; ${worstTrade.pattern||worstTrade.setup||''}</div>
+                    <div class="text-sm font-bold opacity-90"><i class="fa-solid fa-tag mr-1"></i> ${worstTrade.pair || worstTrade.trade || ''} &bull; ${worstTrade.pattern || worstTrade.setup || ''}</div>
                 `;
             } else if (!worstTrade || minPip >= 0) {
                 document.getElementById('rep-worst-trade').innerHTML = `<span class="text-sm italic opacity-60">Không có lệnh thua lỗ trong kỳ này! Tuyệt vời!</span>`;
@@ -2959,7 +3138,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
             setTimeout(() => {
                 html2canvas(card, {
-                    scale: 2, 
+                    scale: 2,
                     backgroundColor: isDark ? '#09090b' : '#ffffff',
                     logging: false,
                     useCORS: true
