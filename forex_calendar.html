@@ -719,6 +719,11 @@
         const CACHE_KEY = 'ff_calendar_cache';
         const CACHE_TTL = 30 * 60 * 1000; // 30 phút
 
+        function clearCache() {
+            try { localStorage.removeItem(CACHE_KEY); } catch (e) { }
+            loadData();
+        }
+
         const DAY_NAMES = { '0': 'CN', '1': 'T2', '2': 'T3', '3': 'T4', '4': 'T5', '5': 'T6', '6': 'T7' };
 
         function toggleTheme() {
