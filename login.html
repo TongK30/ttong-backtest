@@ -24,10 +24,9 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            position: relative;
         }
 
-        /* Animated background */
+        /* Animated background orbs */
         .bg-orbs {
             position: fixed;
             inset: 0;
@@ -39,39 +38,38 @@
             position: absolute;
             border-radius: 50%;
             filter: blur(80px);
-            opacity: 0.25;
-            animation: float 8s ease-in-out infinite;
+            opacity: 0.22;
+            animation: floatOrb 9s ease-in-out infinite;
         }
 
         .orb-1 {
-            width: 400px;
-            height: 400px;
+            width: 420px;
+            height: 420px;
             background: #3b82f6;
-            top: -100px;
-            left: -100px;
+            top: -120px;
+            left: -120px;
             animation-delay: 0s;
         }
 
         .orb-2 {
-            width: 350px;
-            height: 350px;
+            width: 360px;
+            height: 360px;
             background: #8b5cf6;
-            bottom: -80px;
-            right: -80px;
-            animation-delay: 2s;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 3s;
         }
 
         .orb-3 {
-            width: 250px;
-            height: 250px;
+            width: 260px;
+            height: 260px;
             background: #06b6d4;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: 4s;
+            top: 55%;
+            left: 55%;
+            animation-delay: 6s;
         }
 
-        @keyframes float {
+        @keyframes floatOrb {
 
             0%,
             100% {
@@ -79,23 +77,7 @@
             }
 
             50% {
-                transform: translate(20px, -20px);
-            }
-        }
-
-        .orb-3 {
-            animation: float3 10s ease-in-out infinite;
-        }
-
-        @keyframes float3 {
-
-            0%,
-            100% {
-                transform: translate(-50%, -50%);
-            }
-
-            50% {
-                transform: translate(-45%, -55%);
+                transform: translate(18px, -18px);
             }
         }
 
@@ -103,21 +85,21 @@
         .card {
             position: relative;
             z-index: 1;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(24px);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(28px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 48px 40px;
+            border-radius: 28px;
+            padding: 0 40px 44px;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
-            animation: slideUp 0.5s ease;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+            animation: slideUp 0.5s cubic-bezier(.22, 1, .36, 1);
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(24px);
+                transform: translateY(28px);
             }
 
             to {
@@ -126,64 +108,297 @@
             }
         }
 
-        /* Logo */
-        .logo {
+        /* ======= BEAR CHARACTER ======= */
+        .bear-wrap {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 32px;
             justify-content: center;
+            margin-bottom: 24px;
+            margin-top: -52px;
         }
 
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 14px;
+        .bear {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            filter: drop-shadow(0 12px 32px rgba(59, 130, 246, 0.35));
+        }
+
+        /* Body/face circle */
+        .bear__face {
+            width: 110px;
+            height: 110px;
+            background: radial-gradient(circle at 40% 35%, #78c5d5, #4aa8c0 60%, #2d8ea5);
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ears */
+        .bear__ear {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: #4aa8c0;
+            border-radius: 50%;
+            top: 2px;
+            border: 3px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .bear__ear--left {
+            left: 6px;
+        }
+
+        .bear__ear--right {
+            right: 6px;
+        }
+
+        .bear__ear::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #c8eaf0;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Fur top */
+        .bear__fur {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 40px;
+            background: #e8f6fa;
+            border-radius: 50%;
+            border-bottom: none;
+        }
+
+        /* Eyes */
+        .bear__eyes {
+            position: absolute;
+            top: 36px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            gap: 18px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        .logo-text h1 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #f1f5f9;
+        .bear__eye {
+            width: 14px;
+            height: 14px;
+            background: #1a2a3a;
+            border-radius: 50%;
+            position: relative;
+            animation: blink 4s infinite;
         }
 
-        .logo-text p {
-            font-size: 11px;
-            color: #64748b;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .bear__eye::after {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
         }
 
-        /* Divider */
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-            margin-bottom: 28px;
+        @keyframes blink {
+
+            0%,
+            96%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            98% {
+                transform: scaleY(0.1);
+            }
         }
 
-        h2 {
+        /* Nose */
+        .bear__nose {
+            position: absolute;
+            top: 52px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 8px;
+            background: #1a2a3a;
+            border-radius: 50% 50% 40% 40%;
+        }
+
+        /* Mouth */
+        .bear__mouth {
+            position: absolute;
+            top: 62px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 10px;
+            border-bottom: 3px solid #1a2a3a;
+            border-radius: 0 0 50% 50%;
+            transition: all 0.3s ease;
+        }
+
+        /* Hands — hide by default, slide up when covering */
+        .bear__hands {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+            transition: transform 0.45s cubic-bezier(.34, 1.56, .64, 1), opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .bear__hand {
+            width: 38px;
+            height: 52px;
+            background: radial-gradient(circle at 50% 30%, #78c5d5, #4aa8c0);
+            border-radius: 20px 20px 14px 14px;
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+        }
+
+        /* Fingers */
+        .bear__hand::before,
+        .bear__hand::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            width: 14px;
+            height: 18px;
+            background: #4aa8c0;
+            border-radius: 50% 50% 20% 20%;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .bear__hand--left::before {
+            left: 0px;
+        }
+
+        .bear__hand--left::after {
+            left: 14px;
+        }
+
+        .bear__hand--right::before {
+            left: 10px;
+        }
+
+        .bear__hand--right::after {
+            left: 24px;
+        }
+
+        /* PEEKING — hands up but eyes still show above fingers */
+        .bear--peek .bear__hands {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-72px);
+        }
+
+        .bear--peek .bear__eye {
+            animation: none;
+            transform: scaleY(0.6);
+        }
+
+        .bear--peek .bear__mouth {
+            width: 14px;
+            border-color: #2d4a5a;
+        }
+
+        /* COVERING — hands fully cover eyes */
+        .bear--cover .bear__hands {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-60px);
+        }
+
+        .bear--cover .bear__eyes {
+            opacity: 0;
+        }
+
+        .bear--cover .bear__mouth {
+            width: 10px;
+            top: 66px;
+            border-radius: 50%;
+            border-left: 3px solid #1a2a3a;
+            border-right: 3px solid #1a2a3a;
+            border-bottom: none;
+            height: 6px;
+        }
+
+        .bear--cover .bear__eye {
+            animation: none;
+        }
+
+        /* Card top spacer */
+        .card-head {
+            padding-top: 72px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .card-head h2 {
             font-size: 22px;
             font-weight: 800;
             color: #f1f5f9;
-            margin-bottom: 6px;
         }
 
-        .subtitle {
-            color: #64748b;
+        .card-head p {
             font-size: 13px;
-            margin-bottom: 28px;
+            color: #64748b;
+            margin-top: 4px;
         }
 
-        /* Form */
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+        }
+
+        .logo-text {
+            font-size: 14px;
+            font-weight: 800;
+            color: #f1f5f9;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: #475569;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+            margin: 20px 0;
+        }
+
+        /* Fields */
         .field {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .field label {
@@ -192,7 +407,7 @@
             font-weight: 700;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: .06em;
             margin-bottom: 6px;
         }
 
@@ -200,7 +415,7 @@
             position: relative;
         }
 
-        .input-wrap i {
+        .input-wrap i.ico-left {
             position: absolute;
             left: 14px;
             top: 50%;
@@ -208,7 +423,7 @@
             color: #475569;
             font-size: 14px;
             pointer-events: none;
-            transition: color 0.2s;
+            transition: color .2s;
         }
 
         .field input {
@@ -221,7 +436,7 @@
             font-size: 14px;
             font-family: 'Inter', sans-serif;
             outline: none;
-            transition: all 0.2s;
+            transition: all .2s;
         }
 
         .field input:focus {
@@ -230,8 +445,7 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
         }
 
-        .field input:focus~i,
-        .input-wrap:focus-within i {
+        .field input:focus+.ico-left {
             color: #3b82f6;
         }
 
@@ -239,7 +453,6 @@
             color: #334155;
         }
 
-        /* Toggle password */
         .toggle-pw {
             position: absolute;
             right: 14px;
@@ -251,7 +464,7 @@
             cursor: pointer;
             font-size: 14px;
             padding: 4px;
-            transition: color 0.2s;
+            transition: color .2s;
         }
 
         .toggle-pw:hover {
@@ -261,13 +474,13 @@
         /* Error */
         .error-box {
             display: none;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, .10);
+            border: 1px solid rgba(239, 68, 68, .25);
             border-radius: 10px;
             padding: 10px 14px;
             font-size: 13px;
             color: #fca5a5;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             align-items: center;
             gap: 8px;
         }
@@ -288,13 +501,13 @@
             font-weight: 700;
             font-family: 'Inter', sans-serif;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all .2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .btn-login:hover:not(:disabled) {
@@ -307,19 +520,18 @@
         }
 
         .btn-login:disabled {
-            opacity: 0.6;
+            opacity: .6;
             cursor: not-allowed;
             transform: none;
         }
 
-        /* Loading spinner */
         .spinner {
             width: 16px;
             height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, .3);
             border-top-color: white;
             border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+            animation: spin .6s linear infinite;
         }
 
         @keyframes spin {
@@ -328,25 +540,28 @@
             }
         }
 
-        /* Footer */
         .card-footer {
-            margin-top: 24px;
+            margin-top: 20px;
             text-align: center;
-            font-size: 12px;
-            color: #334155;
+            font-size: 11px;
+            color: #1e293b;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width:480px) {
             .card {
-                padding: 32px 24px;
-                margin: 16px;
+                padding: 0 20px 32px;
+                max-width: 100%;
+                border-radius: 0;
+                min-height: 100dvh;
+                justify-content: center;
+                display: flex;
+                flex-direction: column;
             }
         }
     </style>
 </head>
 
 <body>
-
     <div class="bg-orbs">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
@@ -354,18 +569,43 @@
     </div>
 
     <div class="card">
-        <div class="logo">
-            <div class="logo-icon">⚡</div>
-            <div class="logo-text">
-                <h1>Minh Trị Duy Tân</h1>
-                <p>Smart Money Concepts</p>
+        <!-- Bear mascot — sits on top edge of card -->
+        <div class="bear-wrap">
+            <div class="bear" id="bear">
+                <!-- Ears (behind face) -->
+                <div class="bear__ear bear__ear--left"></div>
+                <div class="bear__ear bear__ear--right"></div>
+                <!-- Face -->
+                <div class="bear__face">
+                    <div class="bear__fur"></div>
+                    <div class="bear__eyes">
+                        <div class="bear__eye"></div>
+                        <div class="bear__eye"></div>
+                    </div>
+                    <div class="bear__nose"></div>
+                    <div class="bear__mouth"></div>
+                    <!-- Hands (slide up over eyes) -->
+                    <div class="bear__hands">
+                        <div class="bear__hand bear__hand--left"></div>
+                        <div class="bear__hand bear__hand--right"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="divider"></div>
+        <div class="card-head">
+            <div class="logo-badge">
+                <div class="logo-icon">⚡</div>
+                <div>
+                    <div class="logo-text">Minh Trị Duy Tân</div>
+                    <div class="logo-sub">Smart Money Concepts</div>
+                </div>
+            </div>
+            <h2>Đăng nhập</h2>
+            <p>Vui lòng nhập thông tin để tiếp tục</p>
+        </div>
 
-        <h2>Đăng nhập</h2>
-        <p class="subtitle">Vui lòng nhập thông tin để tiếp tục</p>
+        <div class="divider"></div>
 
         <div class="error-box" id="errorBox">
             <i class="fa-solid fa-circle-exclamation"></i>
@@ -378,7 +618,7 @@
                 <div class="input-wrap">
                     <input type="text" id="username" placeholder="Nhập tên đăng nhập..." autocomplete="username"
                         required>
-                    <i class="fa-solid fa-user"></i>
+                    <i class="fa-solid fa-user ico-left"></i>
                 </div>
             </div>
 
@@ -387,8 +627,8 @@
                 <div class="input-wrap">
                     <input type="password" id="password" placeholder="Nhập mật khẩu..." autocomplete="current-password"
                         required>
-                    <i class="fa-solid fa-lock"></i>
-                    <button type="button" class="toggle-pw" onclick="togglePw()" id="togglePwBtn" tabindex="-1">
+                    <i class="fa-solid fa-lock ico-left"></i>
+                    <button type="button" class="toggle-pw" onclick="togglePw()" tabindex="-1">
                         <i class="fa-solid fa-eye" id="eyeIcon"></i>
                     </button>
                 </div>
@@ -406,7 +646,7 @@
         const API_PRIMARY = "https://script.google.com/macros/s/AKfycbxL8WrU5YfmRA77dD8TnoFXKCkr-VmE4ttZYVvjA_uS9nXF5qtdx5d7H7Hj0EKujvYlMA/exec";
         const API_SECONDARY = "https://script.google.com/macros/s/AKfycbz4wW8RLRipmtqbViIRXOxrdeV9SyPSmeaDE_4FM1OZt0ABxLET4Ja90P7rZKzCsAFvgw/exec";
         const SESSION_KEY = 'smc_auth';
-        const SESSION_TTL = 8 * 60 * 60 * 1000; // 8 tiếng
+        const SESSION_TTL = 8 * 60 * 60 * 1000;
 
         // Nếu đã đăng nhập → về trang chính
         (function () {
@@ -416,8 +656,7 @@
                     const s = JSON.parse(raw);
                     if (Date.now() < s.exp) {
                         const params = new URLSearchParams(window.location.search);
-                        const redirect = params.get('redirect') || './index.html';
-                        window.location.replace(redirect);
+                        window.location.replace(params.get('redirect') || './index.html');
                     } else {
                         localStorage.removeItem(SESSION_KEY);
                     }
@@ -425,18 +664,49 @@
             } catch { }
         })();
 
+        /* ===== BEAR ANIMATION ===== */
+        const bear = document.getElementById('bear');
+        const pwInput = document.getElementById('password');
+
+        pwInput.addEventListener('focus', () => {
+            if (pwInput.type === 'password') coverEyes();
+        });
+        pwInput.addEventListener('blur', () => {
+            openEyes();
+        });
+        pwInput.addEventListener('input', () => {
+            if (pwInput.type === 'password') coverEyes();
+            else peekEyes();
+        });
+
+        function coverEyes() {
+            bear.classList.remove('bear--peek');
+            bear.classList.add('bear--cover');
+        }
+        function peekEyes() {
+            bear.classList.remove('bear--cover');
+            bear.classList.add('bear--peek');
+        }
+        function openEyes() {
+            bear.classList.remove('bear--cover', 'bear--peek');
+        }
+
+        /* ===== PASSWORD TOGGLE ===== */
         function togglePw() {
             const input = document.getElementById('password');
             const icon = document.getElementById('eyeIcon');
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.className = 'fa-solid fa-eye-slash';
+                if (document.activeElement === input) peekEyes();
             } else {
                 input.type = 'password';
                 icon.className = 'fa-solid fa-eye';
+                if (document.activeElement === input) coverEyes();
             }
         }
 
+        /* ===== UI HELPERS ===== */
         function showError(msg) {
             const box = document.getElementById('errorBox');
             document.getElementById('errorMsg').textContent = msg;
@@ -444,11 +714,9 @@
             document.getElementById('password').value = '';
             document.getElementById('password').focus();
         }
-
         function hideError() {
             document.getElementById('errorBox').classList.remove('show');
         }
-
         function setLoading(on) {
             const btn = document.getElementById('btnLogin');
             btn.disabled = on;
@@ -457,7 +725,6 @@
                 : '<i class="fa-solid fa-right-to-bracket"></i> Đăng nhập';
         }
 
-        // Tìm giá trị từ row theo nhiều tên cột có thể
         function getField(row, ...keys) {
             for (const k of Object.keys(row)) {
                 const kNorm = k.toLowerCase().trim().replace(/\s+/g, '');
@@ -489,55 +756,31 @@
         async function handleLogin(e) {
             e.preventDefault();
             hideError();
-
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                showError('Vui lòng nhập đầy đủ thông tin.');
-                return;
-            }
+            if (!username || !password) { showError('Vui lòng nhập đầy đủ thông tin.'); return; }
 
             setLoading(true);
             try {
                 const accounts = await fetchAccounts();
-
-                // Tìm user khớp (thử nhiều tên cột phổ biến)
                 const USER_KEYS = ['username', 'user', 'ten', 'name', 'taikhoan', 'account', 'email'];
                 const PASS_KEYS = ['password', 'pass', 'matkhau', 'mk', 'pwd', 'secret'];
-
                 const matched = accounts.find(row => {
                     const u = getField(row, ...USER_KEYS);
                     const p = getField(row, ...PASS_KEYS);
                     return u.toLowerCase() === username.toLowerCase() && p === password;
                 });
-
-                if (!matched) {
-                    showError('Tên đăng nhập hoặc mật khẩu không đúng.');
-                    setLoading(false);
-                    return;
-                }
-
-                // Lưu session
-                const session = {
-                    user: getField(matched, ...USER_KEYS),
-                    exp: Date.now() + SESSION_TTL,
-                    t: Date.now()
-                };
+                if (!matched) { showError('Tên đăng nhập hoặc mật khẩu không đúng.'); setLoading(false); return; }
+                const session = { user: getField(matched, ...USER_KEYS), exp: Date.now() + SESSION_TTL, t: Date.now() };
                 localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-
-                // Redirect
                 const params = new URLSearchParams(window.location.search);
-                const redirect = params.get('redirect') || './index.html';
-                window.location.replace(redirect);
-
+                window.location.replace(params.get('redirect') || './index.html');
             } catch (err) {
                 showError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
                 setLoading(false);
             }
         }
 
-        // Ẩn lỗi khi user bắt đầu gõ
         document.getElementById('username').addEventListener('input', hideError);
         document.getElementById('password').addEventListener('input', hideError);
     </script>
