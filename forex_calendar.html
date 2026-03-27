@@ -853,12 +853,6 @@
             <div class="loading-wrap"><div class="spinner"></div><span>Đang tải dữ liệu từ ForexFactory...</span></div>`;
 
             try {
-                document.body.classList.add("exporting");
-                // Tạm ẩn highlight ngày hôm nay khi in
-                document.querySelectorAll(".today-hl").forEach(el => el.classList.add("_export_hide"));
-                document.querySelectorAll(".today-hl").forEach(el => { el.classList.remove("today-hl"); });
-                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.add("_was_today_row"));
-                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.remove("today-row-hl"));
                 const xml = await fetchWithProxy(FF_URL);
                 parseXML(xml);
                 populateDateFilter();
@@ -887,12 +881,6 @@
                 return { display: timeStr, date: dateStr };
             }
             try {
-                document.body.classList.add("exporting");
-                // Tạm ẩn highlight ngày hôm nay khi in
-                document.querySelectorAll(".today-hl").forEach(el => el.classList.add("_export_hide"));
-                document.querySelectorAll(".today-hl").forEach(el => { el.classList.remove("today-hl"); });
-                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.add("_was_today_row"));
-                document.querySelectorAll(".today-row-hl").forEach(el => el.classList.remove("today-row-hl"));
                 const m = timeStr.match(/(\d+):(\d+)(am|pm)/i);
                 if (!m) return { display: timeStr, date: dateStr };
 
