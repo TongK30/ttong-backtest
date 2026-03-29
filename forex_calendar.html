@@ -587,9 +587,18 @@
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
+
+        /* --- Tablet --- */
+        @media (max-width: 900px) {
             .top-bar {
                 padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .top-bar-right {
+                flex-wrap: wrap;
+                justify-content: flex-end;
             }
 
             .filter-bar {
@@ -601,8 +610,253 @@
             }
 
             thead th:nth-child(5),
-            tbody td:nth-child(5) {
+            tbody td:nth-child(5),
+            thead th:nth-child(6),
+            tbody td:nth-child(6) {
                 display: none;
+            }
+        }
+
+        /* --- Mobile --- */
+        @media (max-width: 600px) {
+            .top-bar {
+                padding: 10px 12px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .top-bar h1 {
+                font-size: 16px;
+                text-align: center;
+            }
+
+            /* Nav links row */
+            .top-bar>div:nth-child(2) {
+                justify-content: center !important;
+                flex-wrap: wrap !important;
+                gap: 4px !important;
+            }
+
+            .top-bar>div:nth-child(2) a {
+                font-size: 11px !important;
+                padding: 4px 8px !important;
+            }
+
+            .top-bar>div:nth-child(2)>div:last-child {
+                display: none !important;
+            }
+
+            .top-bar-right {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .btn-refresh {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .btn-theme {
+                padding: 6px 8px;
+                font-size: 14px;
+            }
+
+            .status-txt {
+                font-size: 10px;
+            }
+
+            /* Filter bar */
+            .filter-bar {
+                padding: 10px 12px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-group label {
+                min-width: 55px;
+            }
+
+            .filter-bar select,
+            .filter-bar input[type="date"] {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .filter-bar input[type="text"] {
+                width: 100% !important;
+            }
+
+            .impact-btns {
+                flex: 1;
+            }
+
+            .imp-btn {
+                flex: 1;
+                text-align: center;
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
+            .stats-bar {
+                margin-left: 0;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            /* Main content */
+            .main {
+                padding: 8px;
+            }
+
+            .table-card {
+                border-radius: 8px;
+            }
+
+            .day-header {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .day-header.today-hl::after {
+                font-size: 8px;
+                right: 8px;
+                padding: 1px 6px;
+            }
+
+            /* Table → Card Layout */
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody tr {
+                padding: 10px 12px;
+                margin-bottom: 1px;
+                position: relative;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 4px 10px;
+                align-items: center;
+            }
+
+            tbody td {
+                padding: 0;
+                border: none;
+                font-size: 13px;
+            }
+
+            /* Giờ (col 1) */
+            tbody td:nth-child(1) {
+                grid-row: 1;
+                grid-column: 1;
+            }
+
+            /* Tiền tệ (col 2) */
+            tbody td:nth-child(2) {
+                grid-row: 1;
+                grid-column: 2;
+                text-align: left;
+            }
+
+            /* Tên tin (col 3) */
+            tbody td:nth-child(3) {
+                grid-row: 2;
+                grid-column: 1 / -1;
+                font-weight: 600;
+                font-size: 13px;
+                padding-top: 2px;
+            }
+
+            /* Impact (col 4) */
+            tbody td:nth-child(4) {
+                grid-row: 3;
+                grid-column: 1 / -1;
+                padding-top: 4px;
+            }
+
+            /* Forecast (col 5) */
+            tbody td:nth-child(5) {
+                display: inline-block !important;
+                grid-row: 3;
+                grid-column: 1;
+            }
+
+            tbody td:nth-child(5)::before {
+                content: "F: ";
+                font-size: 10px;
+                color: var(--sub);
+                font-weight: 700;
+            }
+
+            /* Previous (col 6) */
+            tbody td:nth-child(6) {
+                display: inline-block !important;
+                grid-row: 3;
+                grid-column: 2;
+            }
+
+            tbody td:nth-child(6)::before {
+                content: "P: ";
+                font-size: 10px;
+                color: var(--sub);
+                font-weight: 700;
+            }
+
+            /* Impact + Forecast + Previous on same row */
+            tbody td:nth-child(4),
+            tbody td:nth-child(5),
+            tbody td:nth-child(6) {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 4px;
+            }
+
+            /* Reflow row 3 as flex */
+            tbody tr {
+                grid-template-rows: auto auto auto;
+            }
+
+            /* Day header row */
+            tbody tr:has(.day-header),
+            tr:has(td[colspan]) {
+                display: block;
+                padding: 0;
+                margin: 0;
+            }
+
+            tr:has(td[colspan]) td {
+                display: block;
+            }
+
+            /* Loading & empty */
+            .loading-wrap {
+                padding: 40px 20px;
+            }
+
+            .empty-box {
+                padding: 30px 16px;
+            }
+
+            .error-box {
+                margin: 12px;
+                padding: 12px 14px;
+                font-size: 12px;
             }
         }
     </style>
