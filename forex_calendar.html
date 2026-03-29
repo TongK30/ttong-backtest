@@ -833,15 +833,14 @@
             }
 
             /* Day header row */
-            tbody tr:has(.day-header),
-            tr:has(td[colspan]) {
-                display: block;
-                padding: 0;
-                margin: 0;
+            .day-row {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
 
-            tr:has(td[colspan]) td {
-                display: block;
+            .day-row td {
+                display: block !important;
             }
 
             /* Loading & empty */
@@ -1340,7 +1339,7 @@
                 return new Date(+pa[2], +pa[0] - 1, +pa[1]) - new Date(+pb[2], +pb[0] - 1, +pb[1]);
             }).forEach(date => {
                 const isToday = (date === todayVN);
-                html += `<tr><td colspan="6" style="padding:0">
+                html += `<tr class="day-row"><td colspan="6" style="padding:0">
                 <div class="day-header${isToday ? ' today-hl' : ''}">📅 ${fmtDate(date)} <span class="count-badge">${grouped[date].length}</span></div>
             </td></tr>`;
                 grouped[date].forEach(ev => {
