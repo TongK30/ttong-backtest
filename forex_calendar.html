@@ -748,10 +748,9 @@
                 padding: 10px 12px;
                 margin-bottom: 1px;
                 position: relative;
-                display: grid;
-                grid-template-columns: auto 1fr;
-                grid-template-rows: auto auto auto;
-                gap: 4px 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px 8px;
                 align-items: center;
             }
 
@@ -763,21 +762,18 @@
 
             /* Giờ (col 1) */
             tbody td:nth-child(1) {
-                grid-row: 1;
-                grid-column: 1;
+                order: 1;
             }
 
             /* Tiền tệ (col 2) */
             tbody td:nth-child(2) {
-                grid-row: 1;
-                grid-column: 2;
-                text-align: left;
+                order: 2;
             }
 
             /* Tên tin (col 3) */
             tbody td:nth-child(3) {
-                grid-row: 2;
-                grid-column: 1 / -1;
+                order: 3;
+                width: 100%;
                 font-weight: 600;
                 font-size: 13px;
                 padding-top: 2px;
@@ -785,20 +781,21 @@
 
             /* Impact (col 4) */
             tbody td:nth-child(4) {
-                grid-row: 3;
-                grid-column: 1 / -1;
+                order: 4;
                 padding-top: 4px;
             }
 
             /* Forecast (col 5) */
             tbody td:nth-child(5) {
-                display: inline-block !important;
-                grid-row: 3;
-                grid-column: 1;
+                display: inline-flex !important;
+                order: 5;
+                align-items: center;
+                gap: 3px;
+                padding-top: 4px;
             }
 
             tbody td:nth-child(5)::before {
-                content: "F: ";
+                content: "F:";
                 font-size: 10px;
                 color: var(--sub);
                 font-weight: 700;
@@ -806,30 +803,18 @@
 
             /* Previous (col 6) */
             tbody td:nth-child(6) {
-                display: inline-block !important;
-                grid-row: 3;
-                grid-column: 2;
+                display: inline-flex !important;
+                order: 6;
+                align-items: center;
+                gap: 3px;
+                padding-top: 4px;
             }
 
             tbody td:nth-child(6)::before {
-                content: "P: ";
+                content: "P:";
                 font-size: 10px;
                 color: var(--sub);
                 font-weight: 700;
-            }
-
-            /* Impact + Forecast + Previous on same row */
-            tbody td:nth-child(4),
-            tbody td:nth-child(5),
-            tbody td:nth-child(6) {
-                display: inline-flex !important;
-                align-items: center;
-                gap: 4px;
-            }
-
-            /* Reflow row 3 as flex */
-            tbody tr {
-                grid-template-rows: auto auto auto;
             }
 
             /* Day header row */
