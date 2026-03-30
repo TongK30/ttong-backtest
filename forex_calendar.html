@@ -947,11 +947,11 @@
         let activeImpacts = new Set(['High', 'Medium']);
 
         const PROXY_URLS = [
-            'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
             'https://api.codetabs.com/v1/proxy?quest=',
+            'https://api.allorigins.win/raw?url=',
             'https://thingproxy.freeboard.io/fetch/',
-            'https://proxy.cors.sh/',
+            'https://api.allorigins.win/get?url=' // Fallback JSON
         ];
         const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.xml';
         const CACHE_KEY = 'ff_calendar_cache';
@@ -1063,13 +1063,26 @@
             // 3. Thử từng proxy
             for (const proxy of PROXY_URLS) {
                 try {
-                    const r = await fetch(proxy + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
+                    const r = await fetch(proxy + encodeURIComponent(url), { signal: AbortSignal.timeout(12000) });
                     if (r.ok) {
-                        const text = await r.text();
-                        try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: text })); } catch (e) { }
-                        return text;
+                        let text = "";
+                        if (proxy.includes('/get?url=')) {
+                            // allorigins JSON endpoint
+                            const json = await r.json();
+                            text = json.contents;
+                        } else {
+                            text = await r.text();
+                        }
+
+                        // Kiểm tra coi nội dung tải về có phải XML xịn không
+                        if (text && text.includes('<event>')) {
+                            try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: text })); } catch (e) { }
+                            return text;
+                        }
                     }
-                } catch (e) { }
+                } catch (e) {
+                    console.warn('Proxy failed:', proxy, e.message);
+                }
             }
 
             // 4. Dùng cache cũ nếu tất cả fail
@@ -1081,7 +1094,7 @@
                 }
             } catch (e) { }
 
-            throw new Error('Tất cả ' + PROXY_URLS.length + ' proxy đều thất bại. Thử lại sau vài phút hoặc xóa cache.');
+            throw new Error('Github Pages chặn proxy hoặc Proxy quá tải. Hãy tải lại trang hoặc chờ vài phút.');
         }
 
         async function loadData() {
