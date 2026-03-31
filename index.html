@@ -1373,6 +1373,7 @@
             // Mapping for API 1 (Primary - index copy.html logic)
             // Thay đổi các key để khớp 100% với tên Label (Tiêu đề Cột) trên file Google Sheets của User
             const payload1 = {
+                id: raw.trade_id,     // Pass ID to guarantee unique row identifying
                 time: raw.thoigian.replace("T", " "), // Map cột "time"
                 trade: raw.pair,      // Cột "trade"
                 phien: raw.phien,     // Cột "phien"
@@ -1635,6 +1636,8 @@
             // Công thức = Tổng số trade (length) - currentModalIdx + 1
             const calculatedRowIndex = globalData.length - currentModalIdx + 1;
             document.getElementById('edit_row_index').value = d.row_index || calculatedRowIndex;
+            // Gán thêm ID tĩnh của Google Sheet để tra cứu 100% không trượt
+            document.getElementById('trade_id').value = d.id || "";
 
             switchTab('form');
         }
@@ -1646,6 +1649,7 @@
             document.getElementById('save_to_secondary').checked = false;
             toggleBookFlip(document.getElementById('save_to_secondary'));
             document.getElementById('edit_row_index').value = "";
+            document.getElementById('trade_id').value = "";
 
             document.getElementById('btnSubmitText').innerText = "LƯU DỮ LIỆU";
             document.getElementById('btnSubmit').classList.replace('from-orange-500', 'from-blue-500');
