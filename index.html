@@ -1454,6 +1454,10 @@
                 });
                 cancelEdit();
                 resetTime();
+
+                // Tải lại dữ liệu ngay sau khi submit
+                reloadData();
+
             } catch (error) {
                 console.error("Submission error:", error);
                 Swal.fire('Lỗi', 'Không thể đồng bộ dữ liệu. Vui lòng kiểm tra kết nối.', 'error');
@@ -1617,10 +1621,11 @@
             document.getElementById('btnSubmit').classList.replace('to-cyan-500', 'to-red-500');
             document.getElementById('btnCancelEdit').classList.remove('hidden');
 
-            // Calculate Row Index: Data từ GAS xuống thường là drow (index array + 2 nếu không wrap).
-            // Ta lưu tạm chính row index = idx từ array, tùy logic GAS của user xử lý "update" thế nào.
-            // Truyền d.row_index nếu BE có trả về, ngược lại truyền chỉ mục array
-            document.getElementById('edit_row_index').value = d.row_index || (currentModalIdx + 2);
+            // Tính VỊ TRÍ DÒNG CHÍNH XÁC. Vì dữ liệu lấy từ API có thể bị đảo ngược (mới nhất ở đầu)
+            // thì index 0 của mảng tương ứng với dòng dưới cùng của Google Sheets.
+            // Công thức = Tổng số trade (length) - currentModalIdx + 1
+            const calculatedRowIndex = globalData.length - currentModalIdx + 1;
+            document.getElementById('edit_row_index').value = d.row_index || calculatedRowIndex;
 
             switchTab('form');
         }
