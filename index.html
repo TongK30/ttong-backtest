@@ -1371,22 +1371,23 @@
             btn.disabled = true;
 
             // Mapping for API 1 (Primary - index copy.html logic)
+            // Thay đổi các key để khớp 100% với tên Label (Tiêu đề Cột) trên file Google Sheets của User
             const payload1 = {
-                thoigian: raw.thoigian.replace("T", " "),
-                trade: raw.pair,
-                phien: raw.phien,
-                entry: raw.setup,
-                d1: raw.img_d1,
-                h4: raw.img_h4,
-                h1: raw.img_h1,
-                m15: raw.img_m15,
-                thucte: raw.img_actual,
-                cam_nhan: raw.cam_nhan,
-                CainhinHTFvsLTF: raw.htf_vs_ltf,
-                ketqua: raw.ket_qua_primary,
-                pip: raw.pip,
-                gong_lenh: raw.gong_lenh, // Time Held
-                ghi_chu: `${raw.dien_bien} ${raw.ket_luan}`.trim() // Merge notes simply
+                time: raw.thoigian.replace("T", " "), // Map cột "time"
+                trade: raw.pair,      // Cột "trade"
+                phien: raw.phien,     // Cột "phien"
+                entry: raw.setup,     // Cột "entry"
+                d1: raw.img_d1,       // Cột "d1"
+                h4: raw.img_h4,       // Cột "h4"
+                h1: raw.img_h1,       // Cột "h1"
+                m15: raw.img_m15,     // Cột "m15"
+                thucte: raw.img_actual, // Cột "thucte"
+                cam_nhan: raw.cam_nhan, // Cột "cam_nhan"
+                goc_nhin: raw.htf_vs_ltf, // Map cột "goc_nhin"
+                ketqua: raw.ket_qua_primary, // Cột "ketqua"
+                pip: raw.pip,         // Cột "pip"
+                gong_lenh: raw.gong_lenh, // Cột "gong_lenh"
+                ghi_chu: `${raw.dien_bien}\n\n${raw.ket_luan}`.trim() // Cột "ghi_chu"
             };
 
             // Mapping for API 2 (Secondary - mau-hinh copy.html logic)
@@ -1476,12 +1477,14 @@
             // ... the rest is already in openModal...
             document.getElementById('modal-time').innerText = d.time;
 
-            let progression = d.gong_lenh || d.note || "--";
-            let lesson = d.ghi_chu || d.conclusion || d.ket_luan || "--";
-            if (d.ket_luan) {
-                progression = d.ghi_chu || d.gong_lenh || "--";
-                lesson = d.ket_luan || "--";
-            }
+            let ghiChuFull = d.ghi_chu || d.note || "--";
+            let parts = ghiChuFull.split("\n\n");
+
+            let progression = parts[0] || "--";
+            let lesson = d.ket_luan || (parts.length > 1 ? parts[1] : "--");
+
+            if (progression === "--" && d.gong_lenh) progression = d.gong_lenh;
+
             document.getElementById('modal-cam-nhan').innerText = d.cam_nhan || "--";
             document.getElementById('modal-dien-bien').innerText = progression;
             document.getElementById('modal-lesson').innerText = lesson;
@@ -1583,7 +1586,7 @@
             form.querySelector('[name="img_actual"]').value = d.thucte || d.entryImg || d.image_link || "";
 
             form.querySelector('[name="cam_nhan"]').value = d.cam_nhan || "";
-            form.querySelector('[name="htf_vs_ltf"]').value = d.CainhinHTFvsLTF || "";
+            form.querySelector('[name="htf_vs_ltf"]').value = d.goc_nhin || d.CainhinHTFvsLTF || "";
 
             const kqPrimary = form.querySelector('[name="ket_qua_primary"]');
             if (kqPrimary && d.ketqua) {
@@ -1593,6 +1596,12 @@
 
             form.querySelector('[name="pip"]').value = d.pip || "";
             form.querySelector('[name="gong_lenh"]').value = d.gong_lenh || d.note || "";
+
+            // Tách ghi_chu thành dien_bien và ket_luan nếu có
+            let ghiChuFull = d.ghi_chu || "";
+            let [dienBienStr, ...ketLuanArr] = ghiChuFull.split("\n\n");
+            let ketLuanStr = ketLuanArr.join("\n\n");
+            form.querySelector('[name="dien_bien"]').value = dienBienStr || ghiChuFull;
 
             // Secondary Info
             if (d.ket_luan || d.rr_ratio || (d.hasVol && d.hasVol !== "")) {
@@ -1605,7 +1614,7 @@
                     updateResultUI(kqSec);
                 }
                 form.querySelector('[name="rr_ratio"]').value = d.rr_ratio || parseFloat(d.rr || 0) || "";
-                form.querySelector('[name="ket_luan"]').value = d.ket_luan || d.lesson || "";
+                form.querySelector('[name="ket_luan"]').value = ketLuanStr || d.ket_luan || d.lesson || "";
                 document.getElementById('co_vol').checked = (d.co_vol === "Có" || d.hasVol === "Có");
             } else {
                 document.getElementById('save_to_secondary').checked = false;
