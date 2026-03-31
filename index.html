@@ -1526,10 +1526,33 @@
             // Điền vào form
             const form = document.getElementById('unifiedForm');
 
-            // Xử lý thời gian (phải đổi khoảng trắng thành T nếu iOS/Android format chuẩn)
+            // Xử lý thời gian cho đúng chuẩn datetime-local (YYYY-MM-DDThh:mm)
             let timeVal = d.time || d.thoigian || "";
-            if (timeVal.includes(" ")) timeVal = timeVal.replace(" ", "T");
-            if (timeVal.length > 16) timeVal = timeVal.slice(0, 16); // format yyyy-MM-ddThh:mm
+            if (timeVal) {
+                try {
+                    if (timeVal.includes("/")) {
+                        // Thường là dd/MM/yyyy HH:mm:ss
+                        let parts = timeVal.split(" ");
+                        let dPart = parts[0];
+                        let tPart = parts[1] || "00:00";
+                        let dateParts = dPart.split("/");
+
+                        // Nếu format là dd/MM/yyyy
+                        if (dateParts.length === 3) {
+                            let day = dateParts[0].padStart(2, '0');
+                            let month = dateParts[1].padStart(2, '0');
+                            let year = dateParts[2];
+                            // Cắt giây nếu có (chiều dài tPart > 5)
+                            timeVal = `${year}-${month}-${day}T${tPart.substring(0, 5)}`;
+                        }
+                    } else if (timeVal.includes(" ")) {
+                        // yyyy-MM-dd HH:mm:ss
+                        timeVal = timeVal.replace(" ", "T").substring(0, 16);
+                    } else {
+                        timeVal = timeVal.substring(0, 16);
+                    }
+                } catch (e) { console.error("Parse time error", e); }
+            }
             form.querySelector('[name="thoigian"]').value = timeVal;
 
             form.querySelector('[name="pair"]').value = d.trade || d.pair || d.dong_tien || "";
