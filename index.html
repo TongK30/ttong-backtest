@@ -289,6 +289,7 @@
     <script>
         const API_PRIMARY = "https://script.google.com/macros/s/AKfycbz-49U_LeCndCd1zR63A14eUEubPBJQ5ClWS75D4_Bi7_uERKXk3IERKXAPT5V0mRkW/exec";
         const API_SECONDARY = "https://script.google.com/macros/s/AKfycbz4wW8RLRipmtqbViIRXOxrdeV9SyPSmeaDE_4FM1OZt0ABxLET4Ja90P7rZKzCsAFvgw/exec";
+        const API_HISTORY = "https://script.google.com/macros/s/AKfycbxWHvcoL-hZKMegzxufVcwhsuXvWNUCRFb30udSKM7XGJHEOAU4H7XPZ7-49p8eqdhxmQ/exec";
     </script>
 
     <header
@@ -466,10 +467,32 @@
         </a>
     </div>
 
-    <div class="flex-1 overflow-y-auto relative pb-20 md:pb-0">
+    <div id="main-scroll-area" class="flex-1 overflow-y-auto relative pb-20 md:pb-0">
         <div class="max-w-5xl mx-auto p-4 pb-24 min-h-full">
             <div id="view-form" class="fade-in">
                 <form id="unifiedForm" onsubmit="submitUnifiedTrade(event)" class="space-y-6 max-w-4xl mx-auto">
+
+                    <!-- Banner chế độ sửa (hiện khi edit) -->
+                    <div id="edit-banner"
+                        class="hidden items-center justify-between gap-3 px-4 py-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-2xl">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+                                <i class="fa-solid fa-pen-to-square text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <div
+                                    class="text-xs font-black text-orange-700 dark:text-orange-400 uppercase tracking-wider">
+                                    CHẾĐỘ CHỈNH SỬA</div>
+                                <div id="edit-banner-info"
+                                    class="text-[10px] text-orange-500 dark:text-orange-500 font-semibold">Đang sửa
+                                    lệnh...</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="cancelEdit()"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-[10px] font-bold hover:bg-slate-200 transition-all">
+                            <i class="fa-solid fa-rotate-left"></i> Hủy sửa
+                        </button>
+                    </div>
 
                     <!-- Section 1: Thông tin cơ bản -->
                     <div class="section-card">
@@ -599,7 +622,11 @@
                                         Chính</label>
                                     <select name="ket_qua_primary" id="ket_qua_primary" onchange="updateResultUI(this)"
                                         class="input-custom font-bold text-xs text-blue-600 bg-blue-50 border-blue-200">
-                                        <option value="Đang chạy" selected>⏳ Đang chạy</option>
+                                        <option value="Đang chạy">⏳ Đang chạy</option>
+                                        <option value="Win">✅ Win</option>
+                                        <option value="Loss">❌ Loss</option>
+                                        <option value="BE">⚪ Hòa (BE)</option>
+                                        <option value="Một phần">🟡 Một phần</option>
                                     </select>
                                 </div>
 
@@ -708,6 +735,7 @@
                     </button>
                     <!-- Biến lưu index của dòng đang sửa -->
                     <input type="hidden" name="edit_row_index" id="edit_row_index" value="">
+                    <input type="hidden" name="trade_id" id="trade_id" value="">
                 </form>
             </div>
 
@@ -731,7 +759,8 @@
                                     <th class="px-4 py-3">Cặp tiền</th>
                                     <th class="px-4 py-3">Setup</th>
                                     <th class="px-4 py-3 text-center">Kết quả</th>
-                                    <th class="px-4 py-3 text-center">RR / Pip</th>
+                                    <th class="px-4 py-3 text-center">Pip</th>
+                                    <th class="px-4 py-3 text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody id="history-table-body"
@@ -861,8 +890,8 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <button id="btnEditTrade" onclick="editCurrentTrade()"
-                        class="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-pen"></i> Sửa lệnh
+                        class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md shadow-orange-500/30 active:scale-95">
+                        <i class="fa-solid fa-pen-to-square"></i> Sửa toàn bộ
                     </button>
                     <button onclick="closeModal()"
                         class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition flex items-center justify-center text-slate-600 dark:text-slate-300"><i
@@ -899,6 +928,52 @@
                         <p id="modal-lesson" class="text-xs leading-relaxed font-bold">--</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Edit Modal -->
+    <div id="quickEditModal"
+        class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div
+                class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-750">
+                <div>
+                    <h3 class="font-bold text-sm text-zinc-900 dark:text-white" id="qe-title">Sửa nhanh</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" id="qe-subtitle"></p>
+                </div>
+                <button onclick="closeQuickEdit()"
+                    class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition flex items-center justify-center text-slate-600 dark:text-slate-300">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <input type="hidden" id="qe-id">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Kết quả</label>
+                    <input type="text" id="qe-ketqua" class="input-custom font-bold" placeholder="Win / Loss / BE...">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Số Pip</label>
+                    <input type="text" id="qe-pip" class="input-custom font-mono" placeholder="200">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">TG Gồng lệnh</label>
+                    <input type="text" id="qe-gong" class="input-custom" placeholder="2h 30m">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Ghi chú</label>
+                    <textarea id="qe-ghichu" rows="2" class="input-custom" placeholder="Ghi chú thêm..."></textarea>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase text-slate-400 ml-1">Ảnh thực tế</label>
+                    <input type="url" id="qe-thucte" class="input-custom text-xs" placeholder="Link ảnh...">
+                </div>
+                <button onclick="submitQuickEdit()"
+                    class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> CẬP NHẬT
+                </button>
             </div>
         </div>
     </div>
@@ -975,15 +1050,15 @@
         function populateSelect(id, items) {
             const s = document.getElementById(id);
             if (!s) return;
-            // Keep the first option (Đang chạy)
-            const first = s.options[0];
-            s.innerHTML = "";
-            s.appendChild(first);
+            // Thêm option mới (không trùng) vào cuối, KHÔNG xóa options đã có
+            const existing = new Set(Array.from(s.options).map(o => o.value));
             items.forEach(it => {
-                const o = document.createElement('option');
-                o.value = it;
-                o.textContent = it;
-                s.appendChild(o);
+                if (!existing.has(it)) {
+                    const o = document.createElement('option');
+                    o.value = it;
+                    o.textContent = it;
+                    s.appendChild(o);
+                }
             });
         }
 
@@ -1001,18 +1076,19 @@
 
         let globalData = [];
         let myChart = null;
+        let currentModalImages = [];
 
         function reloadData() {
             const icon = document.getElementById('icon-reload');
             icon.classList.add('fa-spin');
 
-            fetch(API_PRIMARY + "?mode=history")
+            fetch(API_HISTORY + "?mode=history")
                 .then(r => r.json())
                 .then(data => {
                     globalData = data;
                     renderHistoryTable();
-                    if (document.getElementById('tab-stats').classList.contains('active')) renderStats();
-                    if (document.getElementById('tab-playbook').classList.contains('active')) renderPlaybook();
+                    renderStats();
+                    renderPlaybook();
                 })
                 .finally(() => {
                     setTimeout(() => icon.classList.remove('fa-spin'), 600);
@@ -1026,37 +1102,142 @@
 
             let html = '';
             globalData.forEach((item, idx) => {
-                const res = determineResult(item);
-                const rr = parseFloat(item.rr_ratio || item.rr || 0);
-                const pipVal = parseFloat(item.pip) || 0;
+                const res = item.ketqua || 'Đang chạy';
+                const pipVal = item.pip ? item.pip + 'P' : '--';
 
-                let badgeCls = "bg-slate-100 text-slate-400";
-                if (res.includes("Win")) badgeCls = "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400";
-                else if (res.includes("Loss")) badgeCls = "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400";
-                else if (res.includes("BE")) badgeCls = "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400";
-                else if (res.includes("Đang chạy")) badgeCls = "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
+                let badgeCls = "bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-400";
+                if (res.includes("Win") || res.includes("Full") || res.includes("chốt")) badgeCls = "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+                else if (res.includes("Loss") || res.includes("Stoploss") || res.includes("sai")) badgeCls = "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+                else if (res.includes("BE") || res.includes("Lỡ") || res.includes("Hòa")) badgeCls = "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+                else if (res.includes("Đang chạy")) badgeCls = "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+
+                const pipCls = res.includes('Win') ? 'text-green-600 dark:text-green-400'
+                    : res.includes('Loss') ? 'text-red-500 dark:text-red-400'
+                        : 'text-zinc-900 dark:text-white';
+
+                const setupDisplay = (item.entry || '--').length > 30
+                    ? (item.entry || '').substring(0, 30) + '…'
+                    : (item.entry || '--');
+
+                const hasImg = !!(item.d1 || item.h4 || item.h1 || item.m15 || item.thucte);
 
                 html += `
-                    <tr onclick="openModal(${idx})" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors cursor-pointer">
-                        <td class="px-4 py-4">
-                            <div class="font-bold text-xs text-zinc-900 dark:text-white">${item.time.split(' ')[1] || ''}</div>
-                            <div class="text-[10px] text-slate-400">${item.time.split(' ')[0] || ''}</div>
+                     <tr class="hover:bg-indigo-50/40 dark:hover:bg-slate-700/30 transition-colors group">
+                        <td class="px-4 py-3 cursor-pointer" onclick="openModal(${idx})">
+                            <div class="font-bold text-xs text-zinc-900 dark:text-white">${(item.time || '').split(' ')[1] || ''}</div>
+                            <div class="text-[10px] text-slate-400">${(item.time || '').split(' ')[0] || ''}</div>
                         </td>
-                        <td class="px-4 py-4 font-black text-blue-600 dark:text-blue-400 text-xs uppercase">${item.trade || item.pair || item.dong_tien || item.moneyFlow || ''}</td>
-                        <td class="px-4 py-4">
-                            <div class="font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase">${item.entry || item.setup || item.pattern || item.mau_hinh || ''}</div>
-                            ${(item.co_vol === 'Có' || item.hasVol === 'Có') ? '<span class="text-[9px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 px-1 rounded border border-indigo-100 dark:border-indigo-800">VOL</span>' : ''}
+                        <td class="px-4 py-3 font-black text-blue-600 dark:text-blue-400 text-xs uppercase cursor-pointer" onclick="openModal(${idx})">
+                            ${item.trade || ''}
+                            ${hasImg ? '<i class="fa-solid fa-image text-[9px] text-slate-300 ml-1"></i>' : ''}
                         </td>
-                        <td class="px-4 py-4 text-center">
+                        <td class="px-4 py-3 cursor-pointer" onclick="openModal(${idx})">
+                            <div class="text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase" title="${item.entry || ''}">${setupDisplay}</div>
+                            ${item.phien ? '<div class="text-[9px] text-slate-300 dark:text-slate-600">' + item.phien + '</div>' : ''}
+                        </td>
+                        <td class="px-4 py-3 text-center">
                             <span class="px-2 py-1 rounded-md text-[9px] font-black uppercase ${badgeCls}">${res}</span>
                         </td>
-                        <td class="px-4 py-4 text-center font-mono font-bold text-xs text-zinc-900 dark:text-white">
-                            ${rr}R / ${pipVal}P
+                        <td class="px-4 py-3 text-center font-mono font-bold text-xs ${pipCls}">${pipVal}</td>
+                        <td class="px-4 py-3 text-center">
+                            <button onclick="doEdit(${idx})"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[10px] font-bold transition-all shadow-sm shadow-orange-500/30 hover:shadow-orange-500/50 active:scale-95"
+                                title="Chỉnh sửa toàn bộ lệnh này">
+                                <i class="fa-solid fa-pen-to-square"></i> Sửa
+                            </button>
                         </td>
                     </tr>
                 `;
             });
             tbody.innerHTML = html;
+        }
+
+        // Hàm wrapper để tránh vấn đề với event.stopPropagation() trong template literal
+        function doEdit(idx) { editFromHistory(idx); }
+
+        function editFromHistory(idx) {
+            currentModalIdx = idx;
+            editCurrentTrade();
+        }
+
+        let qeIdx = -1;
+        function openQuickEdit(idx) {
+            qeIdx = idx;
+            const d = globalData[idx];
+            document.getElementById('qe-title').innerText = `Sửa nhanh: ${d.trade || ''}`;
+            document.getElementById('qe-subtitle').innerText = `#${d.id} - ${d.time || ''}`;
+            document.getElementById('qe-id').value = d.id || '';
+            document.getElementById('qe-ketqua').value = d.ketqua || '';
+            document.getElementById('qe-pip').value = d.pip || '';
+            document.getElementById('qe-gong').value = d.gong_lenh || '';
+            document.getElementById('qe-ghichu').value = d.ghi_chu || '';
+            document.getElementById('qe-thucte').value = d.thucte || '';
+            document.getElementById('quickEditModal').classList.remove('hidden');
+        }
+
+        function closeQuickEdit() {
+            document.getElementById('quickEditModal').classList.add('hidden');
+        }
+
+        async function submitQuickEdit() {
+            const btn = document.querySelector('#quickEditModal button[onclick="submitQuickEdit()"]');
+            const id = document.getElementById('qe-id').value;
+            const ketqua = document.getElementById('qe-ketqua').value;
+            const pip = document.getElementById('qe-pip').value;
+            const gong = document.getElementById('qe-gong').value;
+            const ghichu = document.getElementById('qe-ghichu').value;
+            const thucte = document.getElementById('qe-thucte').value;
+
+            if (!id) { Swal.fire('Lỗi', 'Không tìm thấy ID lệnh', 'error'); return; }
+
+            const payload = {
+                action: 'update',
+                id: parseInt(id),
+                ketqua,
+                pip,
+                gong_lenh: gong,
+                ghi_chu: ghichu,
+                thucte
+            };
+
+            const origHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+            btn.disabled = true;
+
+            try {
+                await fetch(API_HISTORY, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
+                });
+
+                // Update local data immediately
+                if (qeIdx >= 0 && globalData[qeIdx]) {
+                    globalData[qeIdx].ketqua = ketqua;
+                    globalData[qeIdx].pip = pip;
+                    globalData[qeIdx].gong_lenh = gong;
+                    globalData[qeIdx].ghi_chu = ghichu;
+                    globalData[qeIdx].thucte = thucte;
+                    renderHistoryTable();
+                }
+
+                closeQuickEdit();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đã cập nhật!',
+                    text: `Lệnh #${id} đã được cập nhật thành công.`,
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+
+                setTimeout(() => reloadData(), 2500);
+            } catch (err) {
+                console.error('Quick edit error:', err);
+                Swal.fire('Lỗi', 'Không thể cập nhật. Kiểm tra kết nối.', 'error');
+            } finally {
+                btn.innerHTML = origHTML;
+                btn.disabled = false;
+            }
         }
 
         const thumbs = document.getElementById('modal-thumbnails');
@@ -1277,7 +1458,9 @@
         // --- IMAGE PREVIEW & ZOOM ---
         function previewImg(input) {
             const container = input.parentElement.querySelector('.preview-container');
+            if (!container) return; // không có preview-container -> bỏ qua
             const img = container.querySelector('img');
+            if (!img) return;
             const url = input.value.trim();
 
             if (url && (url.startsWith('http') || url.startsWith('https'))) {
@@ -1375,6 +1558,7 @@
             const payload1 = {
                 id: raw.trade_id,     // Pass ID to guarantee unique row identifying
                 time: raw.thoigian.replace("T", " "), // Map cột "time"
+                thoigian: raw.thoigian.replace("T", " "), // alias cho addTradingData
                 trade: raw.pair,      // Cột "trade"
                 phien: raw.phien,     // Cột "phien"
                 entry: raw.setup,     // Cột "entry"
@@ -1385,6 +1569,7 @@
                 thucte: raw.img_actual, // Cột "thucte"
                 cam_nhan: raw.cam_nhan, // Cột "cam_nhan"
                 goc_nhin: raw.htf_vs_ltf, // Map cột "goc_nhin"
+                CainhinHTFvsLTF: raw.htf_vs_ltf, // alias cho addTradingData (cột J)
                 ketqua: raw.ket_qua_primary, // Cột "ketqua"
                 pip: raw.pip,         // Cột "pip"
                 gong_lenh: raw.gong_lenh, // Cột "gong_lenh"
@@ -1406,9 +1591,11 @@
             };
 
             // Xử lý index nếu đang sửa
-            if (raw.edit_row_index) {
+            const isEditing = !!(raw.edit_row_index || raw.trade_id);
+            if (isEditing) {
                 payload1.action = "update";
-                payload1.row_index = raw.edit_row_index; // Google Sheets row starts from 1, logic backend sẽ xử lý
+                payload1.id = parseInt(raw.trade_id) || 0;
+                payload1.row_num = parseInt(raw.edit_row_index) || 0; // Số dòng thực tế
                 payload2.action = "update";
                 payload2.row_index = raw.edit_row_index;
             }
@@ -1430,9 +1617,15 @@
 
             try {
                 // Conditional submission
-                const promises = [
-                    fetch(API_PRIMARY, { method: "POST", mode: "no-cors", body: JSON.stringify(payload1) })
-                ];
+                const promises = [];
+
+                if (isEditing) {
+                    // Khi SỬA: gửi về API_HISTORY
+                    promises.push(fetch(API_HISTORY, { method: "POST", mode: "no-cors", body: JSON.stringify(payload1) }));
+                } else {
+                    // Khi THÊM MỚI: cũng gửi về API_HISTORY (sheet HTF)
+                    promises.push(fetch(API_HISTORY, { method: "POST", mode: "no-cors", body: JSON.stringify({ ...payload1, action: "add" }) }));
+                }
 
                 if (document.getElementById('save_to_secondary').checked) {
                     promises.push(fetch(API_SECONDARY, { method: "POST", mode: "no-cors", body: JSON.stringify(payload2) }));
@@ -1523,55 +1716,61 @@
 
         function editCurrentTrade() {
             if (currentModalIdx === -1) return;
-            // Tắt modal
             closeModal();
-            // Lấy data dòng hiện tại (Reverse vì Equity loop nhưng globalData có thể là chronologic?)
-            // Lưu ý: Row Index của Google Sheets (cột thực tế) 
-            // Nếu data trả về theo chiều xuôi: row_index = currentModalIdx + 2 (1 là header)
-            // Nếu data là mới nhất trước: row_index = globalData.length - currentModalIdx + 1
+
             const d = globalData[currentModalIdx];
 
-            // Điền vào form
+            // ===== HÀM HELPER: set value cho <select> ===
+            function setSelect(name, val) {
+                const sel = document.querySelector(`[name="${name}"]`);
+                if (!sel || !val) return;
+                // Thử match chính xác trước
+                for (let o of sel.options) {
+                    if (o.value === val) { sel.value = val; updateResultUI(sel); return; }
+                }
+                // Thử match một phần (không phân biệt hoa thường)
+                const v = val.toLowerCase();
+                for (let o of sel.options) {
+                    if (o.value.toLowerCase().includes(v) || v.includes(o.value.toLowerCase())) {
+                        sel.value = o.value;
+                        updateResultUI(sel);
+                        return;
+                    }
+                }
+                // Không tìm thấy → thêm option mới
+                const newOpt = document.createElement('option');
+                newOpt.value = val;
+                newOpt.textContent = val;
+                sel.appendChild(newOpt);
+                sel.value = val;
+                updateResultUI(sel);
+            }
+
             const form = document.getElementById('unifiedForm');
 
-            // Xử lý thời gian cho đúng chuẩn datetime-local (YYYY-MM-DDThh:mm)
+            // --- Xử lý thời gian ---
             let timeVal = d.time || d.thoigian || "";
             if (timeVal) {
                 try {
                     if (timeVal.includes("/")) {
-                        // Thường là dd/MM/yyyy HH:mm:ss
-                        let parts = timeVal.split(" ");
-                        let dPart = parts[0];
-                        let tPart = parts[1] || "00:00";
-                        let dateParts = dPart.split("/");
-
-                        // Nếu format là dd/MM/yyyy
-                        if (dateParts.length === 3) {
-                            let day = dateParts[0].padStart(2, '0');
-                            let month = dateParts[1].padStart(2, '0');
-                            let year = dateParts[2];
-                            // Cắt giây nếu có (chiều dài tPart > 5)
-                            timeVal = `${year}-${month}-${day}T${tPart.substring(0, 5)}`;
-                        }
+                        let [dPart, tPart = "00:00"] = timeVal.split(" ");
+                        let [day, month, year] = dPart.split("/");
+                        timeVal = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${tPart.substring(0, 5)}`;
                     } else if (timeVal.includes(" ")) {
-                        // yyyy-MM-dd HH:mm:ss
                         timeVal = timeVal.replace(" ", "T").substring(0, 16);
                     } else {
                         timeVal = timeVal.substring(0, 16);
                     }
-                } catch (e) { console.error("Parse time error", e); }
+                } catch (e) { }
             }
             form.querySelector('[name="thoigian"]').value = timeVal;
+            form.querySelector('[name="pair"]').value = d.trade || d.pair || "";
 
-            form.querySelector('[name="pair"]').value = d.trade || d.pair || d.dong_tien || "";
+            setSelect('phien', d.phien);
 
-            // Select dropdown values
-            let phienSelect = form.querySelector('[name="phien"]');
-            if (phienSelect && d.phien) Array.from(phienSelect.options).forEach(o => { if (o.value === d.phien) o.selected = true; });
-
-            // Setups (chỉ điền setup đầu tiên vào ô chính, xóa các ô clone đi)
-            const setupVal = d.entry || d.setup || d.mau_hinh || d.pattern || "";
-            const setups = setupVal.split(",").map(s => s.trim());
+            // --- Setups ---
+            const setupVal = d.entry || d.setup || "";
+            const setups = setupVal.split(",").map(s => s.trim()).filter(Boolean);
             document.querySelectorAll('.entry-row:not(:first-child)').forEach(el => el.remove());
             form.querySelector('.entry-input').value = setups[0] || "";
             for (let i = 1; i < setups.length; i++) {
@@ -1580,66 +1779,68 @@
                 allInputs[allInputs.length - 1].value = setups[i];
             }
 
+            // --- Ảnh ---
             form.querySelector('[name="img_d1"]').value = d.d1 || "";
             form.querySelector('[name="img_h4"]').value = d.h4 || "";
             form.querySelector('[name="img_h1"]').value = d.h1 || d.htf || "";
             form.querySelector('[name="img_m15"]').value = d.m15 || d.ltf || "";
-            form.querySelector('[name="img_actual"]').value = d.thucte || d.entryImg || d.image_link || "";
+            form.querySelector('[name="img_actual"]').value = d.thucte || d.image_link || "";
+            // Preview ảnh chỉ trong form chính (tránh láy input[type=url] của modal khác)
+            document.querySelectorAll('#unifiedForm input[type="url"]').forEach(el => previewImg(el));
 
+            // --- Text areas ---
             form.querySelector('[name="cam_nhan"]').value = d.cam_nhan || "";
-            form.querySelector('[name="htf_vs_ltf"]').value = d.goc_nhin || d.CainhinHTFvsLTF || "";
+            form.querySelector('[name="htf_vs_ltf"]').value = d.goc_nhin || "";
 
-            const kqPrimary = form.querySelector('[name="ket_qua_primary"]');
-            if (kqPrimary && d.ketqua) {
-                Array.from(kqPrimary.options).forEach(o => { if (o.value === d.ketqua) o.selected = true; });
-                updateResultUI(kqPrimary);
-            }
+            // --- Kết quả Primary ---
+            setSelect('ket_qua_primary', d.ketqua || d.ket_qua || "");
 
+            // --- Pip, gồng lệnh ---
             form.querySelector('[name="pip"]').value = d.pip || "";
-            form.querySelector('[name="gong_lenh"]').value = d.gong_lenh || d.note || "";
+            form.querySelector('[name="gong_lenh"]').value = d.gong_lenh || "";
 
-            // Tách ghi_chu thành dien_bien và ket_luan nếu có
+            // --- Ghi chú → dien_bien ---
             let ghiChuFull = d.ghi_chu || "";
-            let [dienBienStr, ...ketLuanArr] = ghiChuFull.split("\n\n");
-            let ketLuanStr = ketLuanArr.join("\n\n");
-            form.querySelector('[name="dien_bien"]').value = dienBienStr || ghiChuFull;
+            let [dienBien, ...rest] = ghiChuFull.split("\n\n");
+            form.querySelector('[name="dien_bien"]').value = dienBien || ghiChuFull;
 
-            // Secondary Info
-            if (d.ket_luan || d.rr_ratio || (d.hasVol && d.hasVol !== "")) {
-                document.getElementById('save_to_secondary').checked = true;
-                toggleBookFlip(document.getElementById('save_to_secondary'));
-
-                const kqSec = form.querySelector('[name="ket_qua_secondary"]');
-                if (kqSec && d.ket_qua) {
-                    Array.from(kqSec.options).forEach(o => { if (o.value === d.ket_qua) o.selected = true; });
-                    updateResultUI(kqSec);
-                }
-                form.querySelector('[name="rr_ratio"]').value = d.rr_ratio || parseFloat(d.rr || 0) || "";
-                form.querySelector('[name="ket_luan"]').value = ketLuanStr || d.ket_luan || d.lesson || "";
+            // --- Secondary ---
+            const hasSec = !!(d.ket_luan || d.rr_ratio || d.rr);
+            document.getElementById('save_to_secondary').checked = hasSec;
+            toggleBookFlip(document.getElementById('save_to_secondary'));
+            if (hasSec) {
+                setSelect('ket_qua_secondary', d.ket_qua || "");
+                form.querySelector('[name="rr_ratio"]').value = d.rr_ratio || d.rr || "";
+                form.querySelector('[name="ket_luan"]').value = rest.join("\n\n") || d.ket_luan || "";
                 document.getElementById('co_vol').checked = (d.co_vol === "Có" || d.hasVol === "Có");
-            } else {
-                document.getElementById('save_to_secondary').checked = false;
-                toggleBookFlip(document.getElementById('save_to_secondary'));
             }
 
-            // Preview image for URLs
-            document.querySelectorAll('input[type="url"]').forEach(el => previewImg(el));
+            // --- Chuyển sang mode CẬP NHẬT ---
+            document.getElementById('edit_row_index').value = d.row_num || d.row_index || "";
+            document.getElementById('trade_id').value = d.id || "";
 
-            // Set state to Update mode
             document.getElementById('btnSubmitText').innerText = "CẬP NHẬT LỆNH NÀY";
             document.getElementById('btnSubmit').classList.replace('from-blue-500', 'from-orange-500');
             document.getElementById('btnSubmit').classList.replace('to-cyan-500', 'to-red-500');
             document.getElementById('btnCancelEdit').classList.remove('hidden');
 
-            // Tính VỊ TRÍ DÒNG CHÍNH XÁC. Vì dữ liệu lấy từ API có thể bị đảo ngược (mới nhất ở đầu)
-            // thì index 0 của mảng tương ứng với dòng dưới cùng của Google Sheets.
-            // Công thức = Tổng số trade (length) - currentModalIdx + 1
-            const calculatedRowIndex = globalData.length - currentModalIdx + 1;
-            document.getElementById('edit_row_index').value = d.row_index || calculatedRowIndex;
-            // Gán thêm ID tĩnh của Google Sheet để tra cứu 100% không trượt
-            document.getElementById('trade_id').value = d.id || "";
+            // --- Hiện banner chế độ sửa ---
+            const banner = document.getElementById('edit-banner');
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+            document.getElementById('edit-banner-info').innerText =
+                `Lệnh #${d.id || '?'} — ${d.trade || ''} — ${(d.time || '').split(' ')[0] || ''}`;
 
+            // Chuyển tab → sau đó scroll về đầu đúng container
             switchTab('form');
+            requestAnimationFrame(() => {
+                const scroller = document.getElementById('main-scroll-area');
+                if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
+                // Highlight banner để user thấy ngay
+                banner.style.transition = 'box-shadow 0.3s';
+                banner.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.4)';
+                setTimeout(() => banner.style.boxShadow = '', 1500);
+            });
         }
 
         function cancelEdit() {
@@ -1650,6 +1851,11 @@
             toggleBookFlip(document.getElementById('save_to_secondary'));
             document.getElementById('edit_row_index').value = "";
             document.getElementById('trade_id').value = "";
+
+            // Ẩn banner chế độ sửa
+            const banner = document.getElementById('edit-banner');
+            banner.classList.add('hidden');
+            banner.classList.remove('flex');
 
             document.getElementById('btnSubmitText').innerText = "LƯU DỮ LIỆU";
             document.getElementById('btnSubmit').classList.replace('from-orange-500', 'from-blue-500');

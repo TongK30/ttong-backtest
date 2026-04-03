@@ -11,6 +11,8 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class', /* Kích hoạt chế độ Dark Mode bằng class */
@@ -311,6 +313,14 @@
                 <option value="NewYork">Phiên Mỹ (16h-24h)</option>
             </select>
 
+            <select id="result-filter" onchange="debouncedRender()"
+                class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm outline-none">
+                <option value="all">Mọi Kết quả</option>
+                <option value="win">Thắng (Win)</option>
+                <option value="loss">Thua (Loss)</option>
+                <option value="be">Hòa (BE)</option>
+            </select>
+
 
 
             <label
@@ -322,6 +332,41 @@
                 <span class="ms-2 text-sm font-medium text-zinc-700 dark:text-zinc-300"><i
                         class="fa-solid fa-eye-slash mr-1"></i> Blind Review</span>
             </label>
+
+            <!-- Export Button -->
+            <div class="relative ml-2" id="export-wrapper">
+                <button onclick="toggleExportMenu()" id="btn-export"
+                    class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-all">
+                    <i class="fa-solid fa-download"></i> Xuất báo cáo
+                </button>
+                <div id="export-menu"
+                    class="hidden absolute right-0 top-full mt-2 w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-[fadeIn_0.15s_ease-out]">
+                    <button onclick="exportDashboardPNG()"
+                        class="flex items-center gap-3 w-full px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-blue-50 dark:hover:bg-zinc-800 transition-colors text-left">
+                        <i class="fa-solid fa-image text-blue-500 w-5 text-center"></i>
+                        <div>
+                            <div class="font-bold">Xuất ảnh PNG</div>
+                            <div class="text-[11px] text-zinc-400">Chụp dashboard thành ảnh</div>
+                        </div>
+                    </button>
+                    <button onclick="exportDashboardPDF()"
+                        class="flex items-center gap-3 w-full px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-purple-50 dark:hover:bg-zinc-800 transition-colors text-left border-t border-zinc-100 dark:border-zinc-800">
+                        <i class="fa-solid fa-file-pdf text-purple-500 w-5 text-center"></i>
+                        <div>
+                            <div class="font-bold">Xuất PDF báo cáo</div>
+                            <div class="text-[11px] text-zinc-400">File PDF chất lượng cao</div>
+                        </div>
+                    </button>
+                    <button onclick="exportChartsPNG()"
+                        class="flex items-center gap-3 w-full px-4 py-3 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-green-50 dark:hover:bg-zinc-800 transition-colors text-left border-t border-zinc-100 dark:border-zinc-800">
+                        <i class="fa-solid fa-chart-pie text-green-500 w-5 text-center"></i>
+                        <div>
+                            <div class="font-bold">Chỉ xuất biểu đồ</div>
+                            <div class="text-[11px] text-zinc-400">Chụp riêng phần chart</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20"></div>
@@ -678,19 +723,30 @@
                     <div
                         class="lg:w-2/3 bg-zinc-50 dark:bg-[#18181b] flex flex-col border-r border-zinc-200 dark:border-zinc-800">
                         <div class="relative flex-1 min-h-[400px] flex items-center justify-center p-4 group">
-                            <img id="m-display-img" src=""
-                                class="max-h-full max-w-full object-contain rounded-lg shadow-sm transition-transform duration-300"
-                                onclick="window.open(this.src, '_blank')">
+                            <!-- Image display -->
+                            <div id="m-img-container">
+                                <img id="m-display-img" src=""
+                                    class="max-h-full max-w-full object-contain rounded-lg shadow-sm transition-transform duration-300"
+                                    onclick="window.open(this.src, '_blank')">
 
-                            <div id="m-no-img" class="hidden flex flex-col items-center justify-center text-zinc-400">
-                                <i class="fa-regular fa-image text-5xl mb-4 opacity-50"></i>
-                                <span class="text-sm">Không có ảnh</span>
+                                <div id="m-no-img"
+                                    class="hidden flex flex-col items-center justify-center text-zinc-400">
+                                    <i class="fa-regular fa-image text-5xl mb-4 opacity-50"></i>
+                                    <span class="text-sm">Không có ảnh</span>
+                                </div>
+
+                                <a id="m-link-img" href="#" target="_blank"
+                                    class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white px-3 py-1.5 rounded-full text-xs backdrop-blur-md transition-opacity opacity-0 group-hover:opacity-100">
+                                    <i class="fa-solid fa-expand mr-1"></i> Phóng to
+                                </a>
                             </div>
 
-                            <a id="m-link-img" href="#" target="_blank"
-                                class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white px-3 py-1.5 rounded-full text-xs backdrop-blur-md transition-opacity opacity-0 group-hover:opacity-100">
-                                <i class="fa-solid fa-expand mr-1"></i> Phóng to
-                            </a>
+                            <!-- TradingView Live Chart container -->
+                            <div id="tv-chart-container"
+                                class="hidden absolute inset-0 z-20 bg-zinc-50 dark:bg-[#18181b]"
+                                style="min-height:400px;">
+                                <div id="tv-widget-wrapper" style="width:100%;height:100%;"></div>
+                            </div>
                         </div>
 
                         <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0f0f12]">
@@ -705,6 +761,11 @@
                                     class="img-tab px-4 py-2 rounded-lg text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all border border-transparent">M15</button>
                                 <button onclick="switchImage('entry')" id="tab-entry"
                                     class="img-tab px-4 py-2 rounded-lg text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all border border-transparent">ENTRY</button>
+                                <div class="w-px h-6 bg-zinc-200 dark:bg-zinc-700 mx-1 self-center"></div>
+                                <button onclick="switchToLiveChart()" id="tab-live"
+                                    class="img-tab px-4 py-2 rounded-lg text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all border border-transparent flex items-center gap-1.5">
+                                    <i class="fa-solid fa-chart-line text-green-500"></i> Live
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1147,11 +1208,11 @@
             container.innerHTML = '';
 
             // 1. Thu thập giá trị filter
-            const fMoney = document.getElementById('money-filter').value;
-            const fWeekday = document.getElementById('weekday-filter').value;
-            const fSession = document.getElementById('session-filter').value;
-            const fDate = document.getElementById('date-filter').value;
-            const fResult = document.getElementById('result-filter').value;
+            const fMoney = document.getElementById('money-filter') ? document.getElementById('money-filter').value : 'all';
+            const fWeekday = document.getElementById('weekday-filter') ? document.getElementById('weekday-filter').value : 'all';
+            const fSession = document.getElementById('session-filter') ? document.getElementById('session-filter').value : 'all';
+            const fDate = document.getElementById('date-filter') ? document.getElementById('date-filter').value : 'all';
+            const fResult = document.getElementById('result-filter') ? document.getElementById('result-filter').value : 'all';
 
             // 2. Lọc dữ liệu tổng
             const now = new Date();
@@ -1168,8 +1229,18 @@
                 }
 
                 // Filter Date & Time
-                const dDate = new Date(d.time);
-                if (isNaN(dDate.getTime())) return true; // Cứ cho qua nếu ko parse được date
+                let dDate;
+                if (typeof d.time === 'string' && d.time.includes('/')) {
+                    const parts = d.time.split(/[\/ :]/);
+                    if (parts.length >= 3) {
+                        dDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]), Number(parts[3]) || 0, Number(parts[4]) || 0, Number(parts[5]) || 0);
+                    }
+                }
+                if (!dDate || isNaN(dDate.getTime())) dDate = new Date(d.time || '');
+                if (isNaN(dDate.getTime())) {
+                    if (fDate !== 'all') return false; // Không xác định được ngày thì loại khỏi các bộ lọc thời gian
+                    dDate = new Date(0); // Fallback để không lỗi các filter sau
+                }
 
                 // Filter Weekday
                 if (fWeekday !== 'all') {
@@ -1266,8 +1337,9 @@
                 else if (pips < 0) badgeClass = 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800';
 
                 let imgDisplay = '';
-                if (t.image) {
-                    imgDisplay = `<img src="${t.image}" alt="Trade Setup" class="w-full h-full object-cover">`;
+                const imgSrc = t.imgEntry || t.imgM15 || t.imgH1 || t.imgH4 || t.imgD1 || '';
+                if (imgSrc && imgSrc.length > 5) {
+                    imgDisplay = `<img src="${imgSrc}" alt="Trade Setup" class="w-full h-full object-cover">`;
                 } else {
                     imgDisplay = `<div class="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 flex-col text-zinc-400 text-xs"><i class="fa-regular fa-image text-3xl mb-2 opacity-50"></i>No Image</div>`;
                 }
@@ -1395,12 +1467,10 @@
         // Hàm render riêng KHÔNG reset blockState
         function renderWithoutReset() {
             const container = document.getElementById('dashboard-grid');
+            if (!container) return;
             container.innerHTML = '';
 
-            // Lọc theo Money trước
-            const filterMoney = document.getElementById('money-filter').value;
-            let data = globalData;
-            if (filterMoney !== 'all') data = globalData.filter(d => String(d.money).trim() === filterMoney);
+            let data = lastFilteredData && lastFilteredData.length > 0 ? lastFilteredData : globalData;
 
             if (currentView === 'dashboard') {
                 container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20";
@@ -1538,6 +1608,12 @@
             });
         }
         function switchImage(type) {
+            // Hide TradingView chart, show image container
+            const tvContainer = document.getElementById('tv-chart-container');
+            const imgContainer = document.getElementById('m-img-container');
+            if (tvContainer) tvContainer.classList.add('hidden');
+            if (imgContainer) imgContainer.classList.remove('hidden');
+
             // Reset style tất cả các nút về mặc định
             document.querySelectorAll('.img-tab').forEach(btn => {
                 btn.className = "img-tab px-4 py-2 rounded-lg text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all border border-transparent cursor-pointer";
@@ -1566,12 +1642,262 @@
                 imgEl.classList.remove('hidden');
                 noImgEl.classList.add('hidden');
                 linkEl.href = src;
-                linkEl.classList.remove('opacity-0'); // Cho phép hiện nút phóng to
+                linkEl.classList.remove('opacity-0');
             } else {
                 imgEl.classList.add('hidden');
                 noImgEl.classList.remove('hidden');
                 linkEl.classList.add('opacity-0');
             }
+        }
+
+        // --- TRADINGVIEW LIVE CHART ---
+        let tvWidgetLoaded = false;
+
+        function mapToTVSymbol(pair) {
+            if (!pair) return 'OANDA:XAUUSD';
+            const p = pair.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+            // Gold
+            if (p.includes('XAU') || p.includes('GOLD')) return 'OANDA:XAUUSD';
+            // Major Forex pairs
+            if (p === 'EURUSD') return 'OANDA:EURUSD';
+            if (p === 'GBPUSD') return 'OANDA:GBPUSD';
+            if (p === 'USDJPY') return 'OANDA:USDJPY';
+            if (p === 'USDCHF') return 'OANDA:USDCHF';
+            if (p === 'AUDUSD') return 'OANDA:AUDUSD';
+            if (p === 'NZDUSD') return 'OANDA:NZDUSD';
+            if (p === 'USDCAD') return 'OANDA:USDCAD';
+            // Cross pairs
+            if (p === 'GBPJPY') return 'OANDA:GBPJPY';
+            if (p === 'EURJPY') return 'OANDA:EURJPY';
+            if (p === 'EURGBP') return 'OANDA:EURGBP';
+            if (p === 'AUDJPY') return 'OANDA:AUDJPY';
+            if (p === 'CADJPY') return 'OANDA:CADJPY';
+            if (p === 'CHFJPY') return 'OANDA:CHFJPY';
+            if (p === 'EURAUD') return 'OANDA:EURAUD';
+            if (p === 'GBPAUD') return 'OANDA:GBPAUD';
+            if (p === 'EURNZD') return 'OANDA:EURNZD';
+            if (p === 'GBPNZD') return 'OANDA:GBPNZD';
+            if (p === 'GBPCAD') return 'OANDA:GBPCAD';
+            if (p === 'EURCAD') return 'OANDA:EURCAD';
+            if (p === 'AUDNZD') return 'OANDA:AUDNZD';
+            if (p === 'AUDCAD') return 'OANDA:AUDCAD';
+            if (p === 'NZDCAD') return 'OANDA:NZDCAD';
+            if (p === 'NZDJPY') return 'OANDA:NZDJPY';
+            // Crypto
+            if (p.includes('BTC')) return 'BINANCE:BTCUSDT';
+            if (p.includes('ETH')) return 'BINANCE:ETHUSDT';
+            // Silver
+            if (p.includes('XAG') || p.includes('SILVER')) return 'OANDA:XAGUSD';
+            // Oil
+            if (p.includes('OIL') || p.includes('WTI') || p.includes('CL')) return 'TVC:USOIL';
+            // Indices
+            if (p.includes('NAS') || p.includes('NDX') || p.includes('US100')) return 'FOREXCOM:NSXUSD';
+            if (p.includes('SPX') || p.includes('SP500') || p.includes('US500')) return 'FOREXCOM:SPXUSD';
+            if (p.includes('DXY') || p.includes('DOLLAR')) return 'TVC:DXY';
+            // Fallback: try OANDA prefix
+            return 'OANDA:' + p;
+        }
+
+        function switchToLiveChart() {
+            const tvContainer = document.getElementById('tv-chart-container');
+            const imgContainer = document.getElementById('m-img-container');
+            const wrapper = document.getElementById('tv-widget-wrapper');
+
+            // Hide image, show chart
+            if (imgContainer) imgContainer.classList.add('hidden');
+            tvContainer.classList.remove('hidden');
+
+            // Reset all tab styles
+            document.querySelectorAll('.img-tab').forEach(btn => {
+                btn.className = "img-tab px-4 py-2 rounded-lg text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all border border-transparent cursor-pointer";
+            });
+
+            // Activate Live tab with green style
+            const liveTab = document.getElementById('tab-live');
+            if (liveTab) {
+                liveTab.className = "img-tab px-4 py-2 rounded-lg text-xs font-bold bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 shadow-sm cursor-default flex items-center gap-1.5";
+            }
+
+            // Load TradingView chart via iframe embed
+            const symbol = mapToTVSymbol(currentTrade.money);
+            const isDark = document.documentElement.classList.contains('dark');
+            const theme = isDark ? 'dark' : 'light';
+
+            wrapper.innerHTML = `<iframe 
+                src="https://s.tradingview.com/widgetembed/?frameElementId=tv-widget-wrapper&symbol=${encodeURIComponent(symbol)}&interval=60&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=${isDark ? '18181b' : 'f8fafc'}&studies=MASimple%40tv-basicstudies&theme=${theme}&style=1&timezone=Asia%2FHo_Chi_Minh&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=vi_VN&utm_source=localhost&utm_medium=widget_new&utm_campaign=chart"
+                style="width:100%;height:100%;border:none;border-radius:8px;"
+                allowtransparency="true"
+                frameborder="0"
+                allowfullscreen>
+            </iframe>`;
+        }
+
+        // --- EXPORT BÁO CÁO ---
+        function toggleExportMenu() {
+            const menu = document.getElementById('export-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Đóng menu khi click ngoài
+        document.addEventListener('click', function (e) {
+            const wrapper = document.getElementById('export-wrapper');
+            const menu = document.getElementById('export-menu');
+            if (wrapper && menu && !wrapper.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        function getExportFileName(ext) {
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            const timeFilter = document.getElementById('date-filter');
+            const pairFilter = document.getElementById('money-filter');
+            const timeName = timeFilter ? timeFilter.options[timeFilter.selectedIndex]?.text || '' : '';
+            const pairName = pairFilter ? pairFilter.value || 'ALL' : 'ALL';
+            return `SMC_Report_${pairName}_${timeName.replace(/\s/g, '_')}_${dateStr}.${ext}`;
+        }
+
+        function showExportToast(msg) {
+            // Tạo toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 z-[9999] flex items-center gap-3 bg-green-600 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-bold animate-[fadeIn_0.3s_ease-out]';
+            toast.innerHTML = `<i class="fa-solid fa-check-circle text-lg"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        async function exportDashboardPNG() {
+            document.getElementById('export-menu').classList.add('hidden');
+            const btn = document.getElementById('btn-export');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xuất...';
+            btn.disabled = true;
+
+            try {
+                const el = document.getElementById('dashboard-grid');
+                const isDark = document.documentElement.classList.contains('dark');
+                const canvas = await html2canvas(el, {
+                    backgroundColor: isDark ? '#09090b' : '#f4f4f5',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false
+                });
+                const link = document.createElement('a');
+                link.download = getExportFileName('png');
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showExportToast('Đã xuất ảnh PNG thành công!');
+            } catch (err) {
+                console.error('Export PNG failed:', err);
+                alert('Lỗi khi xuất ảnh: ' + err.message);
+            }
+
+            btn.innerHTML = '<i class="fa-solid fa-download"></i> Xuất báo cáo';
+            btn.disabled = false;
+        }
+
+        async function exportDashboardPDF() {
+            document.getElementById('export-menu').classList.add('hidden');
+            const btn = document.getElementById('btn-export');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xuất...';
+            btn.disabled = true;
+
+            try {
+                const el = document.getElementById('dashboard-grid');
+                const isDark = document.documentElement.classList.contains('dark');
+                const canvas = await html2canvas(el, {
+                    backgroundColor: isDark ? '#09090b' : '#f4f4f5',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('l', 'mm', 'a4');
+                const pdfW = pdf.internal.pageSize.getWidth() - 20;
+                const pdfH = (canvas.height / canvas.width) * pdfW;
+
+                // Nếu nội dung dài hơn 1 trang, chia thành nhiều trang
+                const pageH = pdf.internal.pageSize.getHeight() - 20;
+                if (pdfH <= pageH) {
+                    pdf.addImage(imgData, 'PNG', 10, 10, pdfW, pdfH);
+                } else {
+                    let y = 0;
+                    const totalPages = Math.ceil(pdfH / pageH);
+                    for (let i = 0; i < totalPages; i++) {
+                        if (i > 0) pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 10, 10 - (i * pageH), pdfW, pdfH);
+                    }
+                }
+
+                pdf.save(getExportFileName('pdf'));
+                showExportToast('Đã xuất PDF thành công!');
+            } catch (err) {
+                console.error('Export PDF failed:', err);
+                alert('Lỗi khi xuất PDF: ' + err.message);
+            }
+
+            btn.innerHTML = '<i class="fa-solid fa-download"></i> Xuất báo cáo';
+            btn.disabled = false;
+        }
+
+        async function exportChartsPNG() {
+            document.getElementById('export-menu').classList.add('hidden');
+            const btn = document.getElementById('btn-export');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xuất...';
+            btn.disabled = true;
+
+            try {
+                // Tìm tất cả các block chứa canvas chart
+                const grid = document.getElementById('dashboard-grid');
+                const chartBlocks = grid.querySelectorAll('canvas');
+                if (chartBlocks.length === 0) {
+                    alert('Không tìm thấy biểu đồ nào!');
+                    btn.innerHTML = '<i class="fa-solid fa-download"></i> Xuất báo cáo';
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Tạo container tạm chứa tất cả chart parents
+                const tempDiv = document.createElement('div');
+                tempDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:16px;padding:24px;background:#09090b;border-radius:12px;';
+                chartBlocks.forEach(c => {
+                    const parent = c.closest('.rounded-2xl') || c.parentElement;
+                    if (parent) {
+                        const clone = parent.cloneNode(true);
+                        clone.style.width = '500px';
+                        tempDiv.appendChild(clone);
+                    }
+                });
+                document.body.appendChild(tempDiv);
+
+                const canvas = await html2canvas(tempDiv, {
+                    backgroundColor: '#09090b',
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+                tempDiv.remove();
+
+                const link = document.createElement('a');
+                link.download = getExportFileName('png').replace('Report', 'Charts');
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showExportToast('Đã xuất biểu đồ thành công!');
+            } catch (err) {
+                console.error('Export Charts failed:', err);
+                alert('Lỗi khi xuất biểu đồ: ' + err.message);
+            }
+
+            btn.innerHTML = '<i class="fa-solid fa-download"></i> Xuất báo cáo';
+            btn.disabled = false;
         }
         // --- LOGIC BỘ LỌC MỚI (Helper) ---
 
@@ -1617,46 +1943,6 @@
             document.getElementById('m-blind-overlay').classList.add('hidden');
         }
 
-        // --- FILTER & RENDER LOGIC (UPDATED) ---
-        function resetAndRender() {
-            blockState = {};
-            const container = document.getElementById('dashboard-grid');
-            container.innerHTML = '';
-
-            // Lấy giá trị từ 3 bộ lọc
-            const fMoney = document.getElementById('money-filter').value;
-            const fWeekday = document.getElementById('weekday-filter').value;
-            const fSession = document.getElementById('session-filter').value;
-
-            let data = globalData.filter(item => {
-                // 1. Lọc Money
-                if (fMoney !== 'all' && String(item.money).trim() !== fMoney) return false;
-
-                // 2. Lọc Thứ (Weekday) - Cần trường 'date' hoặc 'time' đầy đủ trong Sheet
-                // Lưu ý: Đảm bảo cột Thời gian trong Sheet của bạn là đầy đủ (VD: 2024-05-20 14:30)
-                if (fWeekday !== 'all') {
-                    const wd = getWeekday(item.time); // Giả sử item.time chứa ngày
-                    if (wd !== fWeekday) return false;
-                }
-
-                // 3. Lọc Phiên (Session)
-                if (fSession !== 'all') {
-                    const ses = getSession(item.time);
-                    if (ses !== fSession) return false;
-                }
-
-                return true;
-            });
-
-            // Logic render theo View (giữ nguyên logic cũ)
-            if (currentView === 'dashboard') {
-                container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20";
-                renderDashboard(data, container);
-            } else {
-                container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20";
-                renderPlaybook(data, container, currentView);
-            }
-        }
 
         // --- OPEN MODAL (UPDATED FOR BLIND MODE) ---
         function openModal(trade) {
