@@ -277,10 +277,14 @@
                     class="px-6 py-2 rounded-lg text-sm font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
                     <i class="fa-solid fa-skull-crossbones mr-2 text-red-500"></i>Playbook Loss
                 </button>
+                <button onclick="openNotesModal()" id="nav-notes"
+                    class="px-6 py-2 rounded-lg text-sm font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
+                    <i class="fa-solid fa-book-open mr-2 text-amber-500"></i>Notes
+                </button>
             </div>
         </div>
         <div class="max-w-6xl mx-auto px-4 mb-6 flex flex-wrap gap-3 items-center justify-center">
-            <select id="date-filter" onchange="debouncedRender()"
+            <select id="date-filter" onchange="onDateFilterChange()"
                 class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm outline-none">
                 <option value="all">Mọi thời điểm</option>
                 <option value="today">Hôm nay</option>
@@ -288,7 +292,25 @@
                 <option value="this-week">Tuần này</option>
                 <option value="this-month">Tháng này</option>
                 <option value="last-month">Tháng trước</option>
+                <option value="custom">📅 Tuỳ chọn ngày...</option>
             </select>
+
+            <!-- Date Range Picker (hidden by default) -->
+            <div id="date-range-picker" class="hidden flex items-center gap-2 animate-[fadeIn_0.2s_ease-out]">
+                <div
+                    class="flex items-center gap-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1 shadow-sm">
+                    <i class="fa-regular fa-calendar text-blue-500 text-xs"></i>
+                    <input type="date" id="date-from" onchange="debouncedRender()"
+                        class="bg-transparent text-zinc-700 dark:text-zinc-300 text-sm outline-none border-none w-[120px] font-medium">
+                </div>
+                <span class="text-zinc-400 text-xs font-bold">→</span>
+                <div
+                    class="flex items-center gap-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-1 shadow-sm">
+                    <i class="fa-regular fa-calendar-check text-green-500 text-xs"></i>
+                    <input type="date" id="date-to" onchange="debouncedRender()"
+                        class="bg-transparent text-zinc-700 dark:text-zinc-300 text-sm outline-none border-none w-[120px] font-medium">
+                </div>
+            </div>
 
             <select id="money-filter" onchange="debouncedRender()"
                 class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm outline-none font-bold">
@@ -449,6 +471,25 @@
         </div>
     </div>
     <!-- </div> -->
+
+    <!-- Heatmap Section -->
+    <div id="heatmap-section" class="max-w-6xl mx-auto px-4 mb-20">
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3
+                        class="font-bold text-zinc-700 dark:text-zinc-200 text-lg uppercase tracking-wider flex items-center">
+                        <i class="fa-solid fa-fire mr-2 text-orange-500"></i>Trading Heatmap
+                    </h3>
+                    <p class="text-xs text-zinc-500 mt-1">Thời điểm nào bạn trade tốt nhất?</p>
+                </div>
+            </div>
+            <div id="heatmap-grid" class="overflow-x-auto"></div>
+            <div id="heatmap-insight"
+                class="mt-4 text-center text-sm font-mono text-zinc-400 italic border-t border-zinc-100 dark:border-zinc-800 pt-4">
+            </div>
+        </div>
+    </div>
     <div id="relative-symbol" class="max-w-6xl mx-auto px-4 mb-20">
         <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
             <div class="flex items-center justify-between mb-6">
@@ -1201,6 +1242,26 @@
             }
         }
 
+        function onDateFilterChange() {
+            const val = document.getElementById('date-filter').value;
+            const picker = document.getElementById('date-range-picker');
+            if (val === 'custom') {
+                picker.classList.remove('hidden');
+                const now = new Date();
+                const fromInput = document.getElementById('date-from');
+                const toInput = document.getElementById('date-to');
+                if (!fromInput.value) {
+                    fromInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+                }
+                if (!toInput.value) {
+                    toInput.value = now.toISOString().slice(0, 10);
+                }
+            } else {
+                picker.classList.add('hidden');
+            }
+            debouncedRender();
+        }
+
         function resetAndRender() {
             blockState = {};
             const container = document.getElementById('dashboard-grid');
@@ -1281,6 +1342,20 @@
                     } else if (fDate === 'last-month') {
                         const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
                         if (dDate.getMonth() !== lastMonth.getMonth() || dDate.getFullYear() !== lastMonth.getFullYear()) return false;
+                    } else if (fDate === 'custom') {
+                        const fromInput = document.getElementById('date-from');
+                        const toInput = document.getElementById('date-to');
+                        const fromVal = fromInput ? fromInput.value : '';
+                        const toVal = toInput ? toInput.value : '';
+                        if (fromVal) {
+                            const fromDate = startOf(new Date(fromVal));
+                            if (dStart < fromDate) return false;
+                        }
+                        if (toVal) {
+                            const toDate = new Date(toVal);
+                            toDate.setHours(23, 59, 59, 999);
+                            if (dDate > toDate) return false;
+                        }
                     }
                 }
 
@@ -1290,6 +1365,7 @@
             // 3. Cập nhật Stats dựa trên data đã lọc
             lastFilteredData = filtered;
             renderSummaryStats(filtered);
+            try { updateFloatingStats(filtered); } catch (e) { }
             setTimeout(function (d) { try { renderHoursChart(d); } catch (e) { } try { renderAISummary(d); } catch (e) { } try { if (typeof block10Data !== 'undefined') renderBlock10Chart(block10Data); else renderBlock10Chart(globalData); } catch (e) { } }.bind(null, filtered), 50);
             try { renderInsights(filtered); } catch (e) { console.error("[Insights]", e); document.getElementById("no-insights").classList.remove("hidden"); document.getElementById("no-insights").textContent = "Debug Insights Error: " + e.message; }
 
@@ -1307,6 +1383,7 @@
                 renderPatternChart(filtered);
                 try { renderDurationChart(filtered); } catch (e) { console.error('[Dur]', e); }
                 try { renderDurationDistChart(filtered); } catch (e) { console.error('[DurDist]', e); }
+                try { renderHeatmap(filtered); } catch (e) { console.error('[Heatmap]', e); }
             } else {
                 container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20";
                 renderPlaybook(filtered, container, currentView);
@@ -3448,7 +3525,328 @@
                 });
             }, 300);
         }
+        // --- NOTES MODAL ---
+        let notesPageSize = 10;
+        let notesShown = 10;
+        let notesCachedData = [];
+        let notesAllData = [];
+        let notesFilter = 'all';
+
+        function openNotesModal() {
+            const data = lastFilteredData && lastFilteredData.length > 0 ? lastFilteredData : globalData;
+            notesAllData = [...data].reverse().filter(t => {
+                const note = (t.dien_bien || '') + (t.bai_hoc || '') + (t.cam_nhan || '') + (t.ghi_chu || '');
+                return note.trim().length > 3;
+            });
+            notesFilter = 'all';
+            applyNotesFilter();
+            document.getElementById('notes-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            // Reset filter pill styles
+            ['nf-all', 'nf-win', 'nf-loss'].forEach(id => {
+                document.getElementById(id).className = id === 'nf-all'
+                    ? 'px-3 py-1 rounded-md text-[10px] font-bold bg-zinc-700 text-white transition-all'
+                    : 'px-3 py-1 rounded-md text-[10px] font-bold text-zinc-500 hover:text-zinc-300 transition-all';
+            });
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notes-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function filterNotes(type) {
+            notesFilter = type;
+            applyNotesFilter();
+            // Style pills
+            const styles = {
+                all: { active: 'bg-zinc-700 text-white', inactive: 'text-zinc-500' },
+                win: { active: 'bg-green-600/20 text-green-400', inactive: 'text-zinc-500' },
+                loss: { active: 'bg-red-600/20 text-red-400', inactive: 'text-zinc-500' }
+            };
+            ['all', 'win', 'loss'].forEach(f => {
+                const el = document.getElementById('nf-' + f);
+                const isActive = f === type;
+                el.className = `px-3 py-1 rounded-md text-[10px] font-bold transition-all ${isActive ? styles[f].active : styles[f].inactive}`;
+            });
+        }
+
+        function applyNotesFilter() {
+            if (notesFilter === 'win') {
+                notesCachedData = notesAllData.filter(t => parseFloat(t.pips) > 10);
+            } else if (notesFilter === 'loss') {
+                notesCachedData = notesAllData.filter(t => parseFloat(t.pips) < 0);
+            } else {
+                notesCachedData = [...notesAllData];
+            }
+            notesShown = notesPageSize;
+            renderNotesBatch();
+        }
+
+        function renderNotesBatch() {
+            const list = document.getElementById('notes-modal-list');
+            const wrap = document.getElementById('notes-modal-loadmore');
+            const counter = document.getElementById('notes-modal-counter');
+            if (!list) return;
+
+            if (notesCachedData.length === 0) {
+                list.innerHTML = `<div class="text-center text-zinc-500 py-16 italic font-medium"><i class="fa-regular fa-note-sticky text-4xl mb-3 opacity-30 block"></i>Không có ghi chú ${notesFilter !== 'all' ? (notesFilter === 'win' ? 'Win' : 'Loss') : ''} nào.</div>`;
+                wrap.innerHTML = '';
+                if (counter) counter.textContent = '0 ghi chú';
+                return;
+            }
+
+            const slice = notesCachedData.slice(0, notesShown);
+            let html = '<div class="absolute left-[15px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-500 via-zinc-700 to-transparent"></div>';
+
+            slice.forEach((t, i) => {
+                const pips = parseFloat(t.pips) || 0;
+                let dotColor = 'bg-zinc-500'; let badge = 'BE'; let badgeCls = 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400';
+                if (pips > 10) { dotColor = 'bg-green-500'; badge = 'WIN'; badgeCls = 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'; }
+                else if (pips < 0) { dotColor = 'bg-red-500'; badge = 'LOSS'; badgeCls = 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'; }
+
+                const note = t.dien_bien || t.ghi_chu || '';
+                const lesson = t.bai_hoc || '';
+                const feeling = t.cam_nhan || '';
+                const imgSrc = t.imgEntry || t.imgM15 || t.imgH1 || t.imgH4 || t.imgD1 || '';
+                const safeJson = JSON.stringify(t).replace(/'/g, "&#39;").replace(/\"/g, "&quot;");
+
+                html += `
+                <div class="relative mb-5 animate-[fadeIn_0.3s_ease-out]" style="animation-delay:${Math.min(i, 10) * 40}ms">
+                    <div class="absolute -left-[25px] top-1.5 w-5 h-5 rounded-full ${dotColor} border-4 border-zinc-950 shadow-lg z-10"></div>
+                    <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 cursor-pointer hover:bg-zinc-800/80 hover:border-zinc-700 transition-all group" onclick='closeNotesModal(); setTimeout(function(){ openModal(${safeJson}); }, 200)'>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-[11px] font-mono text-zinc-500">${t.time || '--'}</span>
+                                <span class="text-[11px] font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">${t.money || ''}</span>
+                                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded ${badgeCls}">${badge} ${pips > 0 ? '+' : ''}${pips}R</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                ${imgSrc ? '<i class="fa-solid fa-image text-zinc-600 text-[10px]"></i>' : ''}
+                                <i class="fa-solid fa-chevron-right text-zinc-700 text-[10px] group-hover:text-zinc-400 transition-colors"></i>
+                            </div>
+                        </div>
+                        <div class="text-[10px] font-bold text-zinc-600 uppercase mb-1.5 tracking-wider">${t.pattern || ''}</div>
+                        ${note ? `<div class="text-[13px] text-zinc-300 leading-relaxed mb-1.5">${note.length > 150 ? note.substring(0, 150) + '…' : note}</div>` : ''}
+                        ${lesson ? `<div class="text-[12px] text-amber-400/80 bg-amber-500/5 border border-amber-900/20 rounded-lg px-3 py-2 mt-2"><i class="fa-solid fa-lightbulb text-amber-500 mr-1.5 text-[10px]"></i>${lesson.length > 120 ? lesson.substring(0, 120) + '…' : lesson}</div>` : ''}
+                        ${feeling ? `<div class="text-[11px] text-zinc-600 mt-1.5 italic"><i class="fa-regular fa-face-smile mr-1"></i>${feeling}</div>` : ''}
+                    </div>
+                </div>`;
+            });
+
+            list.innerHTML = html;
+
+            // Counter
+            if (counter) counter.textContent = `${slice.length} / ${notesCachedData.length} ghi chú`;
+
+            // Load more
+            if (notesShown < notesCachedData.length) {
+                const remaining = notesCachedData.length - notesShown;
+                wrap.innerHTML = `<button onclick="loadMoreNotes()" class="inline-flex items-center gap-2 px-5 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 rounded-xl text-xs font-bold transition-all border border-zinc-700">
+                    <i class="fa-solid fa-angles-down"></i> Xem thêm ${Math.min(notesPageSize, remaining)} <span class="text-zinc-600">(còn ${remaining})</span>
+                </button>`;
+            } else {
+                wrap.innerHTML = notesCachedData.length > 0 ? `<div class="text-[10px] text-zinc-700 font-medium py-2"><i class="fa-solid fa-check-circle text-green-700 mr-1"></i>Đã hiển thị tất cả</div>` : '';
+            }
+
+            // Scroll to top on filter change
+            const body = document.getElementById('notes-modal-body');
+            if (body) body.scrollTop = 0;
+        }
+
+        function loadMoreNotes() {
+            notesShown += notesPageSize;
+            renderNotesBatch();
+        }
+
+        // --- HEATMAP: Ngày × Phiên ---
+        function renderHeatmap(data) {
+            const grid = document.getElementById('heatmap-grid');
+            const insightEl = document.getElementById('heatmap-insight');
+            if (!grid) return;
+
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+            const dayLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6'];
+            const sessions = ['Asia', 'London', 'NewYork'];
+            const sessionLabels = ['🌅 Á (Tokyo)', '🏛️ Âu (London)', '🗽 Mỹ (New York)'];
+            const sessionIcons = ['text-amber-500', 'text-blue-500', 'text-indigo-500'];
+
+            // Build matrix
+            const matrix = {};
+            sessions.forEach(s => { days.forEach(d => { matrix[s + '_' + d] = { win: 0, loss: 0, total: 0, totalR: 0 }; }); });
+
+            const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            data.forEach(t => {
+                let dDate;
+                if (typeof t.time === 'string' && t.time.includes('/')) {
+                    const parts = t.time.split(/[\/ :]/);
+                    if (parts.length >= 3) dDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]), Number(parts[3]) || 0, Number(parts[4]) || 0);
+                }
+                if (!dDate || isNaN(dDate.getTime())) dDate = new Date(t.time || '');
+                if (isNaN(dDate.getTime())) return;
+
+                const dayName = dayMap[dDate.getDay()];
+                if (!days.includes(dayName)) return; // Skip weekend
+
+                const session = getSessionFromDate(dDate);
+                const key = session + '_' + dayName;
+                const pips = parseFloat(t.pips) || 0;
+
+                matrix[key].total++;
+                matrix[key].totalR += pips;
+                if (pips > 10) matrix[key].win++;
+                else if (pips < 0) matrix[key].loss++;
+            });
+
+            // Color logic
+            function getColor(wr, total) {
+                if (total === 0) return { bg: 'bg-zinc-100 dark:bg-zinc-800/50', text: 'text-zinc-400', border: 'border-zinc-200 dark:border-zinc-800' };
+                if (wr >= 70) return { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' };
+                if (wr >= 55) return { bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/20' };
+                if (wr >= 45) return { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20' };
+                if (wr >= 30) return { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/20' };
+                return { bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/30' };
+            }
+
+            // Build HTML
+            let html = '<div class="grid grid-cols-6 gap-1.5 min-w-[500px]">';
+
+            // Header row
+            html += '<div class="rounded-lg p-2"></div>';
+            dayLabels.forEach(d => {
+                html += `<div class="text-center text-[10px] font-black uppercase tracking-wider text-zinc-500 py-2">${d}</div>`;
+            });
+
+            // Tracking best/worst
+            let best = null, worst = null;
+
+            // Data rows
+            sessions.forEach((s, si) => {
+                html += `<div class="flex items-center justify-end pr-2 text-[10px] font-bold ${sessionIcons[si]} whitespace-nowrap">${sessionLabels[si]}</div>`;
+
+                days.forEach((d, di) => {
+                    const cell = matrix[s + '_' + d];
+                    const wr = cell.total > 0 ? Math.round((cell.win / cell.total) * 100) : -1;
+                    const c = getColor(wr, cell.total);
+
+                    // Track best/worst
+                    if (cell.total >= 2) {
+                        if (!best || wr > best.wr) best = { wr, day: dayLabels[di], session: sessionLabels[si], total: cell.total, win: cell.win };
+                        if (!worst || wr < worst.wr) worst = { wr, day: dayLabels[di], session: sessionLabels[si], total: cell.total, win: cell.win };
+                    }
+
+                    if (cell.total === 0) {
+                        html += `<div class="rounded-xl ${c.bg} border ${c.border} p-2.5 text-center min-h-[60px] flex flex-col items-center justify-center">
+                            <div class="text-[10px] text-zinc-600">--</div>
+                        </div>`;
+                    } else {
+                        const avgR = (cell.totalR / cell.total).toFixed(1);
+                        html += `<div class="rounded-xl ${c.bg} border ${c.border} p-2.5 text-center min-h-[60px] flex flex-col items-center justify-center cursor-default hover:scale-105 transition-transform" title="${dayLabels[di]}, ${sessionLabels[si]}: ${cell.win}W/${cell.loss}L, Avg ${avgR}R">
+                            <div class="text-base font-black ${c.text}">${wr}%</div>
+                            <div class="text-[9px] font-bold text-zinc-500 mt-0.5">${cell.win}W/${cell.loss}L</div>
+                            <div class="text-[8px] text-zinc-600">${cell.total} lệnh</div>
+                        </div>`;
+                    }
+                });
+            });
+
+            html += '</div>';
+
+            // Legend
+            html += `<div class="flex items-center justify-center gap-3 mt-4 text-[9px] font-bold text-zinc-500">
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-500/30 inline-block"></span> ≥70%</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-500/20 inline-block"></span> 55-69%</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-500/20 inline-block"></span> 45-54%</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-orange-500/20 inline-block"></span> 30-44%</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500/20 inline-block"></span> <30%</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-zinc-800 inline-block"></span> N/A</span>
+            </div>`;
+
+            grid.innerHTML = html;
+
+            // Insight
+            if (best && worst && best !== worst) {
+                insightEl.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Bạn trade tốt nhất <strong class="text-emerald-400">${best.day} ${best.session}</strong> (${best.wr}%, ${best.win}/${best.total}) và cần cải thiện <strong class="text-red-400">${worst.day} ${worst.session}</strong> (${worst.wr}%, ${worst.win}/${worst.total})`;
+            } else if (best) {
+                insightEl.innerHTML = `<i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Zone tốt nhất: <strong class="text-emerald-400">${best.day} ${best.session}</strong> (${best.wr}%)`;
+            } else {
+                insightEl.textContent = 'Chưa đủ dữ liệu để phân tích (cần ≥2 lệnh mỗi ô).';
+            }
+        }
     </script>
+
+    <!-- Notes Modal -->
+    <div id="notes-modal" class="fixed inset-0 z-[90] hidden">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeNotesModal()"></div>
+        <div class="relative z-10 flex flex-col h-full max-w-2xl mx-auto">
+            <!-- Header -->
+            <div
+                class="flex items-center justify-between px-6 py-4 bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-800 mt-4 mx-4 rounded-t-2xl">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-book-open text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-black text-white">Trading Notes</h2>
+                        <div id="notes-modal-counter"
+                            class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">0 ghi chú</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex bg-zinc-800 rounded-lg p-0.5 gap-0.5">
+                        <button onclick="filterNotes('all')" id="nf-all"
+                            class="px-3 py-1 rounded-md text-[10px] font-bold bg-zinc-700 text-white transition-all">Tất
+                            cả</button>
+                        <button onclick="filterNotes('win')" id="nf-win"
+                            class="px-3 py-1 rounded-md text-[10px] font-bold text-zinc-500 hover:text-green-400 transition-all">Win</button>
+                        <button onclick="filterNotes('loss')" id="nf-loss"
+                            class="px-3 py-1 rounded-md text-[10px] font-bold text-zinc-500 hover:text-red-400 transition-all">Loss</button>
+                    </div>
+                    <button onclick="closeNotesModal()"
+                        class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Scrollable Body -->
+            <div id="notes-modal-body"
+                class="flex-1 overflow-y-auto px-6 py-6 mx-4 bg-zinc-950/95 backdrop-blur-xl custom-scrollbar">
+                <div id="notes-modal-list" class="relative pl-8">
+                    <div
+                        class="absolute left-[15px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-500 via-zinc-700 to-transparent">
+                    </div>
+                </div>
+                <div id="notes-modal-loadmore" class="text-center mt-6"></div>
+            </div>
+            <!-- Footer -->
+            <div
+                class="px-6 py-3 bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800 mb-4 mx-4 rounded-b-2xl text-center">
+                <span class="text-[10px] text-zinc-600 font-medium">Click vào ghi chú để xem chi tiết lệnh • Cuộn để xem
+                    thêm</span>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
+        }
+    </style>
 
 </body>
 
