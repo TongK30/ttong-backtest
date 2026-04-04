@@ -385,6 +385,10 @@
                         class="px-6 py-2 rounded-lg text-sm font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
                         <i class="fa-solid fa-book-open mr-2 text-amber-500"></i>Notes
                     </button>
+                    <button onclick="switchView('compare')" id="nav-compare"
+                        class="px-6 py-2 rounded-lg text-sm font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
+                        <i class="fa-solid fa-scale-balanced mr-2 text-violet-500"></i>So sánh
+                    </button>
                 </div>
             </div>
             <div class="max-w-6xl mx-auto px-4 mb-6 flex flex-wrap gap-3 items-center justify-center">
@@ -521,6 +525,183 @@
                     <span class="text-zinc-500 text-sm font-medium animate-pulse">Đang tải dữ liệu...</span>
                 </div>
             </div>
+
+            <!-- ⚖️ COMPARE VIEW SECTION -->
+            <div id="compare-section" class="hidden max-w-7xl mx-auto px-4 pb-20">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-scale-balanced text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-black text-zinc-800 dark:text-zinc-100">Split Screen Compare</h2>
+                            <p class="text-xs text-zinc-500">Chọn bộ lọc độc lập cho mỗi panel để so sánh</p>
+                        </div>
+                    </div>
+                    <button onclick="switchView('dashboard')"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm font-bold transition">
+                        <i class="fa-solid fa-xmark"></i> Đóng
+                    </button>
+                </div>
+
+                <!-- Two Panel Filters -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <!-- Panel A Filters -->
+                    <div
+                        class="bg-white dark:bg-zinc-900 rounded-2xl border border-violet-200 dark:border-violet-900/50 p-4 shadow-sm">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span
+                                class="w-6 h-6 rounded-lg bg-violet-600 text-white text-xs font-black flex items-center justify-center">A</span>
+                            <span class="text-sm font-bold text-violet-600 dark:text-violet-400">Panel A</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <select id="cmp-a-date" onchange="onCompareDateChange('a')"
+                                class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-2 outline-none">
+                                <option value="all">Mọi thời điểm</option>
+                                <option value="today">Hôm nay</option>
+                                <option value="yesterday">Hôm qua</option>
+                                <option value="this-week">Tuần này</option>
+                                <option value="this-month" selected>Tháng này</option>
+                                <option value="last-month">Tháng trước</option>
+                                <option value="custom">📅 Tuỳ chọn...</option>
+                            </select>
+                            <div id="cmp-a-date-range" class="hidden flex items-center gap-1">
+                                <input type="date" id="cmp-a-from" onchange="renderCompare()"
+                                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-1.5 outline-none">
+                                <span class="text-zinc-400 text-xs">→</span>
+                                <input type="date" id="cmp-a-to" onchange="renderCompare()"
+                                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-1.5 outline-none">
+                            </div>
+                            <select id="cmp-a-money" onchange="renderCompare()"
+                                class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-2 outline-none">
+                                <option value="all">Tất cả cặp tiền</option>
+                            </select>
+                            <select id="cmp-a-session" onchange="renderCompare()"
+                                class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-2 outline-none">
+                                <option value="all">Tất cả phiên</option>
+                                <option value="Asia">Phiên Á</option>
+                                <option value="London">Phiên Âu</option>
+                                <option value="NewYork">Phiên Mỹ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Panel B Filters -->
+                    <div
+                        class="bg-white dark:bg-zinc-900 rounded-2xl border border-fuchsia-200 dark:border-fuchsia-900/50 p-4 shadow-sm">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span
+                                class="w-6 h-6 rounded-lg bg-fuchsia-600 text-white text-xs font-black flex items-center justify-center">B</span>
+                            <span class="text-sm font-bold text-fuchsia-600 dark:text-fuchsia-400">Panel B</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <select id="cmp-b-date" onchange="onCompareDateChange('b')"
+                                class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-2 outline-none">
+                                <option value="all">Mọi thời điểm</option>
+                                <option value="today">Hôm nay</option>
+                                <option value="yesterday">Hôm qua</option>
+                                <option value="this-week">Tuần này</option>
+                                <option value="this-month">Tháng này</option>
+                                <option value="last-month" selected>Tháng trước</option>
+                                <option value="custom">📅 Tuỳ chọn...</option>
+                            </select>
+                            <div id="cmp-b-date-range" class="hidden flex items-center gap-1">
+                                <input type="date" id="cmp-b-from" onchange="renderCompare()"
+                                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-1.5 outline-none">
+                                <span class="text-zinc-400 text-xs">→</span>
+                                <input type="date" id="cmp-b-to" onchange="renderCompare()"
+                                    class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-1.5 outline-none">
+                            </div>
+                            <select id="cmp-b-money" onchange="renderCompare()"
+                                class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-2 outline-none">
+                                <option value="all">Tất cả cặp tiền</option>
+                            </select>
+                            <select id="cmp-b-session" onchange="renderCompare()"
+                                class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg p-2 outline-none">
+                                <option value="all">Tất cả phiên</option>
+                                <option value="Asia">Phiên Á</option>
+                                <option value="London">Phiên Âu</option>
+                                <option value="NewYork">Phiên Mỹ</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Delta Row -->
+                <div id="compare-delta-row" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6"></div>
+
+                <!-- Two Panel Results -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Panel A Results -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-6 h-6 rounded-lg bg-violet-600 text-white text-xs font-black flex items-center justify-center">A</span>
+                            <span class="font-bold text-zinc-700 dark:text-zinc-200 text-sm" id="cmp-a-label">Panel
+                                A</span>
+                        </div>
+                        <!-- Mini stats -->
+                        <div id="cmp-a-stats" class="grid grid-cols-3 gap-2"></div>
+                        <!-- Mini equity curve -->
+                        <div
+                            class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3"><i
+                                    class="fa-solid fa-chart-line mr-1 text-violet-500"></i>Equity Curve</div>
+                            <div class="relative h-40"><canvas id="cmp-a-equity"></canvas></div>
+                        </div>
+                        <!-- Mini trade blocks -->
+                        <div
+                            class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3"><i
+                                    class="fa-solid fa-grid-2 mr-1 text-violet-500"></i>Kết quả từng lệnh</div>
+                            <div id="cmp-a-blocks" class="flex flex-wrap gap-1.5"></div>
+                        </div>
+                        <!-- Win rate donut -->
+                        <div
+                            class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3"><i
+                                    class="fa-solid fa-chart-pie mr-1 text-violet-500"></i>Win / Loss / BE</div>
+                            <div class="relative h-36"><canvas id="cmp-a-donut"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Panel B Results -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="w-6 h-6 rounded-lg bg-fuchsia-600 text-white text-xs font-black flex items-center justify-center">B</span>
+                            <span class="font-bold text-zinc-700 dark:text-zinc-200 text-sm" id="cmp-b-label">Panel
+                                B</span>
+                        </div>
+                        <!-- Mini stats -->
+                        <div id="cmp-b-stats" class="grid grid-cols-3 gap-2"></div>
+                        <!-- Mini equity curve -->
+                        <div
+                            class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3"><i
+                                    class="fa-solid fa-chart-line mr-1 text-fuchsia-500"></i>Equity Curve</div>
+                            <div class="relative h-40"><canvas id="cmp-b-equity"></canvas></div>
+                        </div>
+                        <!-- Mini trade blocks -->
+                        <div
+                            class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3"><i
+                                    class="fa-solid fa-grid-2 mr-1 text-fuchsia-500"></i>Kết quả từng lệnh</div>
+                            <div id="cmp-b-blocks" class="flex flex-wrap gap-1.5"></div>
+                        </div>
+                        <!-- Win rate donut -->
+                        <div
+                            class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3"><i
+                                    class="fa-solid fa-chart-pie mr-1 text-fuchsia-500"></i>Win / Loss / BE</div>
+                            <div class="relative h-36"><canvas id="cmp-b-donut"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- <div id="stats-area" class="max-w-6xl mx-auto px-4 mb-8 grid grid-cols-1 md:grid-cols-1 gap-6"> -->
             <div id="stats-area" class="max-w-6xl mx-auto px-4 mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
 
@@ -1497,9 +1678,10 @@
                 currentView = viewName;
 
                 // Cập nhật style cho nút active
-                const buttons = ['nav-dashboard', 'nav-win', 'nav-loss'];
+                const buttons = ['nav-dashboard', 'nav-win', 'nav-loss', 'nav-compare'];
                 buttons.forEach(btnId => {
                     const btn = document.getElementById(btnId);
+                    if (!btn) return;
                     const isActive = btnId === 'nav-' + viewName;
                     if (isActive) {
                         btn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-blue-600 text-white shadow-md";
@@ -1508,8 +1690,290 @@
                     }
                 });
 
-                resetAndRender();
+                // Xu ly rieng cho Compare view
+                const compareSection = document.getElementById('compare-section');
+                const otherSectionIds = ['main-sections-wrapper', 'stats-area', 'analytics-area', 'heatmap-section', 'calendar-section', 'equity-section', 'leaderboard-section', 'relative-symbol', 'pattern-section', 'duration-section', 'hours-section', 'ai-summary-section'];
+
+                if (viewName === 'compare') {
+                    otherSectionIds.forEach(id => { const s = document.getElementById(id); if (s) s.classList.add('hidden'); });
+                    if (compareSection) compareSection.classList.remove('hidden');
+                    populateCompareMoney();
+                    renderCompare();
+                } else {
+                    otherSectionIds.forEach(id => { const s = document.getElementById(id); if (s) s.classList.remove('hidden'); });
+                    if (compareSection) compareSection.classList.add('hidden');
+                    resetAndRender();
+                }
             }
+            // ============================================================
+            //  ⚖️  COMPARE FUNCTIONS
+            // ============================================================
+
+            let cmpCharts = {};
+
+            function onCompareDateChange(panel) {
+                const sel = document.getElementById('cmp-' + panel + '-date');
+                const rangeDiv = document.getElementById('cmp-' + panel + '-date-range');
+                if (!sel || !rangeDiv) return;
+                if (sel.value === 'custom') {
+                    rangeDiv.classList.remove('hidden');
+                } else {
+                    rangeDiv.classList.add('hidden');
+                }
+                renderCompare();
+            }
+
+            function populateCompareMoney() {
+                if (!globalData || !globalData.length) return;
+                const pairs = [...new Set(globalData.map(d => String(d.money).trim()).filter(Boolean))];
+                ['cmp-a-money', 'cmp-b-money'].forEach(id => {
+                    const sel = document.getElementById(id);
+                    if (!sel) return;
+                    const cur = sel.value;
+                    sel.innerHTML = '<option value="all">Tất cả cặp tiền</option>';
+                    pairs.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p; opt.textContent = p;
+                        if (p === cur) opt.selected = true;
+                        sel.appendChild(opt);
+                    });
+                });
+            }
+
+            function filterForCompare(panel) {
+                const fDate = document.getElementById('cmp-' + panel + '-date')?.value || 'all';
+                const fMoney = document.getElementById('cmp-' + panel + '-money')?.value || 'all';
+                const fSession = document.getElementById('cmp-' + panel + '-session')?.value || 'all';
+                const fFrom = document.getElementById('cmp-' + panel + '-from')?.value || '';
+                const fTo = document.getElementById('cmp-' + panel + '-to')?.value || '';
+                const now = new Date();
+
+                return (globalData || []).filter(d => {
+                    if (fMoney !== 'all' && String(d.money).trim() !== fMoney) return false;
+                    if (fSession !== 'all' && getSessionFromDate(parseDateVal(d.time)) !== fSession) return false;
+
+                    const dDate = parseDateVal(d.time);
+                    if (!dDate || isNaN(dDate.getTime())) return fDate === 'all';
+
+                    if (fDate !== 'all') {
+                        const startOf = dt => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+                        const dStart = startOf(dDate);
+                        const todayStart = startOf(now);
+                        if (fDate === 'today' && dStart.getTime() !== todayStart.getTime()) return false;
+                        if (fDate === 'yesterday') {
+                            const yest = new Date(todayStart); yest.setDate(yest.getDate() - 1);
+                            if (dStart.getTime() !== yest.getTime()) return false;
+                        }
+                        if (fDate === 'this-week') {
+                            const dow = todayStart.getDay();
+                            const diff = dow === 0 ? -6 : 1 - dow;
+                            const ws = new Date(todayStart); ws.setDate(todayStart.getDate() + diff);
+                            const we = new Date(ws); we.setDate(ws.getDate() + 6); we.setHours(23, 59, 59, 999);
+                            if (dDate < ws || dDate > we) return false;
+                        }
+                        if (fDate === 'this-month' && (dDate.getMonth() !== now.getMonth() || dDate.getFullYear() !== now.getFullYear())) return false;
+                        if (fDate === 'last-month') {
+                            const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                            if (dDate.getMonth() !== lm.getMonth() || dDate.getFullYear() !== lm.getFullYear()) return false;
+                        }
+                        if (fDate === 'custom') {
+                            if (fFrom && startOf(dDate) < startOf(new Date(fFrom))) return false;
+                            if (fTo) { const te = new Date(fTo); te.setHours(23, 59, 59, 999); if (dDate > te) return false; }
+                        }
+                    }
+                    return true;
+                });
+            }
+
+            function parseDateVal(val) {
+                if (!val) return null;
+                if (typeof val === 'string' && val.includes('/')) {
+                    const parts = val.split(/[\/ :]/);
+                    if (parts.length >= 3) return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]), Number(parts[3]) || 0, Number(parts[4]) || 0, 0);
+                }
+                return new Date(val);
+            }
+
+            function calcStats(data) {
+                const winT = (typeof CONFIG !== 'undefined' ? CONFIG.WIN_THRESHOLD : 10);
+                let wins = 0, loss = 0, be = 0, netR = 0, grossW = 0, grossL = 0;
+                data.forEach(t => {
+                    const p = parseFloat(t.pips) || 0;
+                    netR += p;
+                    if (p > winT) { wins++; grossW += p; }
+                    else if (p < 0) { loss++; grossL += Math.abs(p); }
+                    else be++;
+                });
+                const total = data.length;
+                const wr = total > 0 ? (wins / total * 100) : 0;
+                const pf = grossL > 0 ? (grossW / grossL) : (grossW > 0 ? 999 : 0);
+                return { total, wins, loss, be, netR, wr, pf };
+            }
+
+            function getLabelForPanel(panel) {
+                const fDate = document.getElementById('cmp-' + panel + '-date')?.value || 'all';
+                const fMoney = document.getElementById('cmp-' + panel + '-money')?.value || 'all';
+                const labels = { all: 'Mọi thời điểm', today: 'Hôm nay', yesterday: 'Hôm qua', 'this-week': 'Tuần này', 'this-month': 'Tháng này', 'last-month': 'Tháng trước', custom: 'Tuỳ chọn' };
+                let lbl = labels[fDate] || fDate;
+                if (fMoney !== 'all') lbl += ' · ' + fMoney;
+                return lbl;
+            }
+
+            function renderCmpMiniStats(containerId, stats, color) {
+                const el = document.getElementById(containerId);
+                if (!el) return;
+                const items = [
+                    { label: 'Tổng lệnh', val: stats.total, fmt: v => v },
+                    { label: 'Win Rate', val: stats.wr, fmt: v => v.toFixed(1) + '%', good: v => v > 50 },
+                    { label: 'Net R', val: stats.netR, fmt: v => (v > 0 ? '+' : '') + v.toFixed(1) + 'R', good: v => v > 0 },
+                    { label: 'Win', val: stats.wins, fmt: v => v },
+                    { label: 'Loss', val: stats.loss, fmt: v => v },
+                    { label: 'Profit Factor', val: stats.pf, fmt: v => v >= 999 ? '∞' : v.toFixed(2), good: v => v > 1 },
+                ];
+                el.className = 'grid grid-cols-3 gap-2';
+                el.innerHTML = items.map(item => {
+                    const isGood = item.good ? item.good(item.val) : null;
+                    const valColor = isGood === null ? 'text-zinc-700 dark:text-zinc-200' : (isGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500');
+                    return `<div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 p-3 text-center shadow-sm">
+                        <div class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-1">${item.label}</div>
+                        <div class="text-base font-black font-mono ${valColor}">${item.fmt(item.val)}</div>
+                    </div>`;
+                }).join('');
+            }
+
+            function renderCmpEquity(canvasId, data, color) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                if (cmpCharts[canvasId]) { cmpCharts[canvasId].destroy(); }
+                const sorted = [...data].sort((a, b) => parseDateVal(a.time) - parseDateVal(b.time));
+                let cum = 0;
+                const points = sorted.map((t, i) => { cum += parseFloat(t.pips) || 0; return { x: i + 1, y: parseFloat(cum.toFixed(2)) }; });
+                if (!points.length) return;
+                const isDark = document.documentElement.classList.contains('dark');
+                const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                cmpCharts[canvasId] = new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            data: points, borderColor: color, borderWidth: 2,
+                            backgroundColor: color.replace(')', ',0.1)').replace('rgb', 'rgba'),
+                            fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false, parsing: false,
+                        scales: {
+                            x: { type: 'linear', grid: { color: gridColor }, ticks: { color: '#71717a', font: { size: 10 } } },
+                            y: { grid: { color: gridColor }, ticks: { color: '#71717a', font: { size: 10 }, callback: v => (v > 0 ? '+' : '') + v + 'R' } }
+                        },
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => (ctx.parsed.y > 0 ? '+' : '') + ctx.parsed.y + 'R' } } }
+                    }
+                });
+            }
+
+            function renderCmpBlocks(containerId, data) {
+                const el = document.getElementById(containerId);
+                if (!el) return;
+                const _winT = (typeof CONFIG !== 'undefined' ? CONFIG.WIN_THRESHOLD : 10);
+                const sorted = [...data].sort((a, b) => parseDateVal(a.time) - parseDateVal(b.time));
+                el.innerHTML = sorted.map(t => {
+                    const p = parseFloat(t.pips) || 0;
+                    let cls = 'grad-be';
+                    if (p > _winT) cls = 'grad-win';
+                    else if (p < 0) cls = 'grad-loss';
+                    const label = p > _winT ? 'W' : (p < 0 ? 'L' : 'BE');
+                    return `<div class="trade-box ${cls}" style="width:28px;height:28px;font-size:9px;" title="${parseFloat(p).toFixed(1)}R">${label}</div>`;
+                }).join('');
+            }
+
+            function renderCmpDonut(canvasId, stats) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                if (cmpCharts[canvasId]) { cmpCharts[canvasId].destroy(); }
+                cmpCharts[canvasId] = new Chart(canvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Win', 'Loss', 'BE'],
+                        datasets: [{
+                            data: [stats.wins, stats.loss, stats.be],
+                            backgroundColor: ['#10b981', '#ef4444', '#94a3b8'],
+                            borderWidth: 2, borderColor: document.documentElement.classList.contains('dark') ? '#18181b' : '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false, cutout: '65%',
+                        plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, color: '#71717a', boxWidth: 10, padding: 8 } }, tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed } } }
+                    }
+                });
+            }
+
+            function renderDeltaRow(sA, sB) {
+                const el = document.getElementById('compare-delta-row');
+                if (!el) return;
+                const metrics = [
+                    { label: 'Win Rate', vA: sA.wr, vB: sB.wr, fmt: v => v.toFixed(1) + '%', higherBetter: true },
+                    { label: 'Net R', vA: sA.netR, vB: sB.netR, fmt: v => (v > 0 ? '+' : '') + v.toFixed(1) + 'R', higherBetter: true },
+                    { label: 'Tổng lệnh', vA: sA.total, vB: sB.total, fmt: v => v, higherBetter: null },
+                    { label: 'Profit Factor', vA: sA.pf, vB: sB.pf, fmt: v => v >= 999 ? '∞' : v.toFixed(2), higherBetter: true },
+                ];
+                el.innerHTML = metrics.map(m => {
+                    const delta = m.vB - m.vA;
+                    const isPos = delta > 0;
+                    const isNeg = delta < 0;
+                    let deltaColor = 'text-zinc-500';
+                    if (m.higherBetter !== null) deltaColor = isPos ? 'text-emerald-500' : (isNeg ? 'text-red-500' : 'text-zinc-500');
+                    const deltaStr = m.higherBetter !== null && delta !== 0 ? (isPos ? '+' : '') + (typeof delta === 'number' && !Number.isInteger(delta) ? delta.toFixed(1) : delta) + (m.label === 'Win Rate' ? '%' : (m.label === 'Net R' ? 'R' : (m.label === 'Profit Factor' ? '' : ''))) : '=';
+                    const aWins = m.higherBetter && m.vA > m.vB;
+                    const bWins = m.higherBetter && m.vB > m.vA;
+                    return `<div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                        <div class="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-2">${m.label}</div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="font-black font-mono text-sm ${aWins ? 'text-violet-600 dark:text-violet-400' : 'text-zinc-600 dark:text-zinc-300'}">${m.fmt(m.vA)}</span>
+                            <span class="text-[11px] font-black ${deltaColor} bg-zinc-50 dark:bg-zinc-800 rounded-lg px-2 py-0.5">${deltaStr}</span>
+                            <span class="font-black font-mono text-sm ${bWins ? 'text-fuchsia-600 dark:text-fuchsia-400' : 'text-zinc-600 dark:text-zinc-300'}">${m.fmt(m.vB)}</span>
+                        </div>
+                        <div class="flex justify-between text-[9px] text-zinc-400 mt-1">
+                            <span>A</span><span>B</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            function renderCompare() {
+                if (!globalData || !globalData.length) return;
+                const dataA = filterForCompare('a');
+                const dataB = filterForCompare('b');
+                const sA = calcStats(dataA);
+                const sB = calcStats(dataB);
+
+                // Labels
+                const labelA = getLabelForPanel('a');
+                const labelB = getLabelForPanel('b');
+                const lblAEl = document.getElementById('cmp-a-label');
+                const lblBEl = document.getElementById('cmp-b-label');
+                if (lblAEl) lblAEl.textContent = labelA;
+                if (lblBEl) lblBEl.textContent = labelB;
+
+                // Stats
+                renderCmpMiniStats('cmp-a-stats', sA, 'violet');
+                renderCmpMiniStats('cmp-b-stats', sB, 'fuchsia');
+
+                // Equity
+                renderCmpEquity('cmp-a-equity', dataA, 'rgb(139,92,246)');
+                renderCmpEquity('cmp-b-equity', dataB, 'rgb(217,70,239)');
+
+                // Blocks
+                renderCmpBlocks('cmp-a-blocks', dataA);
+                renderCmpBlocks('cmp-b-blocks', dataB);
+
+                // Donuts
+                renderCmpDonut('cmp-a-donut', sA);
+                renderCmpDonut('cmp-b-donut', sB);
+
+                // Delta row
+                renderDeltaRow(sA, sB);
+            }
+
             function renderSummaryStats(data) {
                 // 1. Tính toán cơ bản
                 let total = data.length;
@@ -1911,7 +2375,7 @@
                     <div class="${cardClass} rounded-2xl p-6 transition duration-500 flex flex-col h-full animate-[fadeIn_0.5s_ease-out]">
                         <div class="flex justify-between items-start mb-5">
                             <div>
-                                <h3 class="font-bold text-zinc-900 dark:text-white text-lg truncate w-40" title="${key}">${key}</h3>
+                                <h3 class="font-bold text-zinc-900 dark:text-white text-lg break-words" title="${key}">${key}</h3>
                                 <div class="flex items-center gap-2 mt-3">
                                     <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5 border border-zinc-200 dark:border-zinc-700/50 shadow-inner">
                                         <button onclick="changeBlock('${safeKey}', -1)" ${isFirst ? 'disabled' : ''} class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent shadow-sm transition"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
