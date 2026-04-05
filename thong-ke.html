@@ -1607,33 +1607,100 @@
                 const loadingIcons = document.querySelectorAll('.loading-icon');
                 loadingIcons.forEach(icon => icon.classList.add('animate-spin'));
 
-                fetch(API_URL + "?mode=history")
-                    .then(r => r.json())
-                    .then(data => {
-                        globalData = data;
-                        populateMoneyFilter(data);
+                // 1. Try to load from Cache first (Stale-While-Revalidate)
+                let cachedHistory = null;
+                let cachedPrimary = null;
+                try {
+                    const cHistory = localStorage.getItem('tk-history-cache');
+                    const cPrimary = localStorage.getItem('tk-primary-cache');
+                    if (cHistory) cachedHistory = JSON.parse(cHistory);
+                    if (cPrimary) cachedPrimary = JSON.parse(cPrimary);
+                } catch (e) { }
 
-                        renderSummaryStats(data);
+                if (cachedHistory && cachedHistory.length > 0) {
+                    globalData = cachedHistory;
+                    populateMoneyFilter(cachedHistory);
+                    renderSummaryStats(cachedHistory);
+                    resetAndRender();
+
+                    if (cachedPrimary && cachedPrimary.length > 0) {
+                        block10Data = cachedPrimary;
+                        try { updatePrimaryReport(); } catch (e) { }
+                        try { renderBlock10Chart(cachedPrimary); } catch (e) { }
+                    } else {
+                        try { renderBlock10Chart(globalData); } catch (e) { }
+                    }
+
+                    // Render other charts initially
+                    setTimeout(() => {
+                        try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
+                        try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
+                        renderWeekdayChart(cachedHistory);
+                        renderWinRateChart(cachedHistory);
+                        renderShameChart(cachedHistory);
+                        renderSessionChart(cachedHistory);
+                        renderPatternChart(cachedHistory);
+                        renderSymbolChart(cachedHistory);
+                        renderDurationChart(cachedHistory);
+                        renderDurationDistChart(cachedHistory);
+                        renderInsights(cachedHistory);
+
+                        const initLoading = document.getElementById('initial-loading');
+                        if (initLoading) initLoading.classList.add('hidden');
+                        // DO NOT remove animate-spin yet, we are still fetching in background
+                    }, 50);
+                }
+
+                // 2. Fetch fresh data in background (Parallel)
+                Promise.all([
+                    fetch(API_URL + "?mode=history").then(r => r.json()).catch(err => { console.error("History API error", err); return null; }),
+                    fetch(API_PRIMARY_URL + "?mode=history").then(r => r.json()).catch(err => { console.error("Primary API error", err); return null; })
+                ]).then(([historyData, primaryData]) => {
+                    let shouldRerender = false;
+
+                    if (historyData && historyData.length > 0) {
+                        const newHash = JSON.stringify(historyData);
+                        const oldHash = cachedHistory ? JSON.stringify(cachedHistory) : "";
+                        if (newHash !== oldHash) {
+                            shouldRerender = true;
+                            globalData = historyData;
+                            localStorage.setItem('tk-history-cache', newHash);
+                        }
+                    }
+
+                    if (primaryData && primaryData.length > 0) {
+                        const newPHash = JSON.stringify(primaryData);
+                        const oldPHash = cachedPrimary ? JSON.stringify(cachedPrimary) : "";
+                        if (newPHash !== oldPHash) {
+                            shouldRerender = true;
+                            block10Data = primaryData;
+                            localStorage.setItem('tk-primary-cache', newPHash);
+                        }
+                    }
+
+                    // Proceed to re-render if we didn't have cache OR data has changed
+                    if (!cachedHistory || shouldRerender) {
+                        populateMoneyFilter(globalData);
+                        renderSummaryStats(globalData);
                         resetAndRender();
 
-                        // Render additional analytics sections
                         setTimeout(function () {
-                            try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { console.error("[Hours]", e); }
-                            try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { console.error("[AI]", e); }
-                            fetch(API_PRIMARY_URL + "?mode=history").then(r => r.json()).then(d => { block10Data = d; try { updatePrimaryReport(); } catch (e_rep) { } try { renderBlock10Chart(d); } catch (e2) { console.error("[Block10]", e2); } }).catch(() => { try { renderBlock10Chart(globalData); } catch (e3) { } });
-                        }, 800);
-
+                            try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
+                            try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
+                            try { updatePrimaryReport(); } catch (e) { }
+                            try { renderBlock10Chart(block10Data && block10Data.length ? block10Data : globalData); } catch (e) { }
+                        }, 500);
 
                         const chartTasks = [
-                            () => renderWeekdayChart(data),
-                            () => renderWinRateChart(data),
-                            () => renderShameChart(data),
-                            () => renderSessionChart(data),
-                            () => renderPatternChart(data),
-                            () => renderSymbolChart(data),
-                            () => renderDurationChart(data),
-                            () => renderDurationDistChart(data),
-                            () => renderInsights(data)
+                            () => renderWeekdayChart(globalData),
+                            () => renderWinRateChart(globalData),
+                            () => renderShameChart(globalData),
+                            () => renderSessionChart(globalData),
+                            () => renderPatternChart(globalData),
+                            () => renderSymbolChart(globalData),
+                            () => renderDurationChart(globalData),
+                            () => renderDurationDistChart(globalData),
+                            () => renderInsights(globalData)
                         ];
 
                         let i = 0;
@@ -1643,17 +1710,22 @@
                                 i++;
                                 setTimeout(runNextTask, 50);
                             } else {
-                                document.getElementById('initial-loading').classList.add('hidden');
+                                const initLoading = document.getElementById('initial-loading');
+                                if (initLoading) initLoading.classList.add('hidden');
                                 loadingIcons.forEach(icon => icon.classList.remove('animate-spin'));
                             }
                         }
                         setTimeout(runNextTask, 50);
-
-                    })
-                    .catch(e => {
-                        alert("Lỗi tải data: " + e);
+                    } else {
+                        // Just stop the spinner if data hasn't changed
+                        const initLoading = document.getElementById('initial-loading');
+                        if (initLoading) initLoading.classList.add('hidden');
                         loadingIcons.forEach(icon => icon.classList.remove('animate-spin'));
-                    });
+                    }
+                }).catch(e => {
+                    console.error("Background fetch failed", e);
+                    loadingIcons.forEach(icon => icon.classList.remove('animate-spin'));
+                });
             }
 
             function populateMoneyFilter(data) {
@@ -2375,7 +2447,7 @@
                     <div class="${cardClass} rounded-2xl p-6 transition duration-500 flex flex-col h-full animate-[fadeIn_0.5s_ease-out]">
                         <div class="flex justify-between items-start mb-5">
                             <div>
-                                <h3 class="font-bold text-zinc-900 dark:text-white text-lg break-words" title="${key}">${key}</h3>
+                                <h3 class="font-bold text-zinc-900 dark:text-white text-lg truncate w-40 hover:w-auto hover:whitespace-normal transition-all duration-200 cursor-default z-10 relative bg-white dark:bg-zinc-900" title="${key}">${key}</h3>
                                 <div class="flex items-center gap-2 mt-3">
                                     <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-lg p-0.5 border border-zinc-200 dark:border-zinc-700/50 shadow-inner">
                                         <button onclick="changeBlock('${safeKey}', -1)" ${isFirst ? 'disabled' : ''} class="w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent shadow-sm transition"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
