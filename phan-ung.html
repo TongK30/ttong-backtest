@@ -4,7 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Th?ng k� M?u h�nh Ph?n ?ng � Minh Tr? Duy T�n</title>
+    <title>Thống kê Mẫu hình Phản ứng – Minh Trị Duy Tân</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SMC Journal">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('[PWA] SW registered:', reg.scope))
+                .catch(err => console.warn('[PWA] SW failed:', err));
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -96,6 +109,7 @@
         table {
             border-collapse: collapse;
             width: 100%;
+            table-layout: auto;
         }
 
         tbody tr:hover {
@@ -326,16 +340,17 @@
             background: rgba(139, 92, 246, .13) !important;
         }
 
-        /* First TD c?a m?i row (n�t Chi ti?t) */
+        /* First TD của mỗi row (nút Chi tiết) */
         #detail-table tbody tr td:first-child {
             padding: 8px 10px;
         }
 
-        /* ?nh trong b?ng: bo c?nh d?p hon */
+        /* Ảnh trong bảng: bo cạnh đẹp hơn */
         #detail-table .td-img-wrap img {
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
             transition: transform .2s, box-shadow .2s;
+            min-width: 220px;
         }
 
         #detail-table .td-img-wrap img:hover {
@@ -346,14 +361,14 @@
 </head>
 
 <body class="bg-zinc-100 dark:bg-[#09090b] text-zinc-800 dark:text-zinc-200 transition-colors duration-300 p-4 md:p-8">
-    <script src="./auth.js"></script>
+
 
     <!-- API Config -->
     <script>
-        // Th? C? HAI API t? index.html
+        // Thử CẢ HAI API t? index.html
         const API_PRIMARY = "https://script.google.com/macros/s/AKfycbxL8WrU5YfmRA77dD8TnoFXKCkr-VmE4ttZYVvjA_uS9nXF5qtdx5d7H7Hj0EKujvYlMA/exec";
         const API_SECONDARY = "https://script.google.com/macros/s/AKfycbz4wW8RLRipmtqbViIRXOxrdeV9SyPSmeaDE_4FM1OZt0ABxLET4Ja90P7rZKzCsAFvgw/exec";
-        // T�n sheet trong GAS (processForm ghi v�o "phan_ung")
+        // Tên sheet trong GAS (processForm ghi vào "phan_ung")
         const SHEET_NAME = "phan_ung";
     </script>
 
@@ -367,20 +382,20 @@
                     <i class="fa-solid fa-diagram-project text-white text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight">M?u H�nh Ph?n ?ng
+                    <h1 class="text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Mẫu Hình Phản Ứng
                     </h1>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-mono">Minh Tr? Duy T�n � Sheet: <span
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-mono">Minh Trị Duy Tân – Sheet: <span
                             class="text-violet-500 font-bold">Phan_ung</span></p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
                 <a href="./thong-ke.html"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-zinc-500 dark:text-zinc-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                    <i class="fa-solid fa-chart-pie text-[10px]"></i> Th?ng k� ch�nh
+                    <i class="fa-solid fa-chart-pie text-[10px]"></i> Thống kê chình
                 </a>
                 <a href="./index.html"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-zinc-500 dark:text-zinc-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
-                    <i class="fa-solid fa-pen-to-square text-[10px]"></i> Nh?p li?u
+                    <i class="fa-solid fa-pen-to-square text-[10px]"></i> Nhập liệu
                 </a>
                 <a href="./forex_calendar.html"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-zinc-500 dark:text-zinc-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:text-yellow-600 dark:hover:text-yellow-400 transition">
@@ -392,9 +407,10 @@
                 </a>
                 <div class="w-px h-5 bg-zinc-200 dark:bg-zinc-700 mx-1"></div>
                 <button onclick="exportDashboard()" id="btn-export"
-                    class="glass-card flex items-center gap-1.5 px-3 py-2 rounded-xl text-emerald-500 hover:text-white hover:bg-emerald-600 transition text-xs font-bold shadow active:scale-95" title="Xu?t ?nh PNG">
+                    class="glass-card flex items-center gap-1.5 px-3 py-2 rounded-xl text-emerald-500 hover:text-white hover:bg-emerald-600 transition text-xs font-bold shadow active:scale-95"
+                    title="Xuất ảnh PNG">
                     <i class="fa-solid fa-image text-sm"></i>
-                    <span class="hidden sm:inline">Xu?t ?nh</span>
+                    <span class="hidden sm:inline">Xuất ảnh</span>
                 </button>
                 <button onclick="toggleTheme()"
                     class="glass-card w-9 h-9 rounded-xl text-yellow-500 hover:text-white hover:bg-yellow-500 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-700 transition flex items-center justify-center shadow active:scale-95">
@@ -410,7 +426,7 @@
         <!-- ===== LOADING STATE ===== -->
         <div id="loading-state" class="flex flex-col items-center justify-center py-32">
             <span class="loader mb-4"></span>
-            <span class="text-zinc-500 text-sm font-medium animate-pulse">�ang t?i d? li?u...</span>
+            <span class="text-zinc-500 text-sm font-medium animate-pulse">Đang tải dữ liệu...</span>
         </div>
 
         <!-- ===== ERROR STATE ===== -->
@@ -418,9 +434,9 @@
             <div
                 class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-2xl p-6 text-center">
                 <i class="fa-solid fa-circle-exclamation text-red-400 text-3xl mb-3"></i>
-                <p class="font-bold text-red-600 dark:text-red-400 mb-1">L?i t?i d? li?u</p>
+                <p class="font-bold text-red-600 dark:text-red-400 mb-1">Lỗi tải dữ liệu</p>
                 <p id="error-msg" class="text-sm text-zinc-500"></p>
-                <p class="text-xs text-zinc-400 mt-3">Ki?m tra tham s? <code
+                <p class="text-xs text-zinc-400 mt-3">Kiểm tra tham số <code
                         class="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">?sheet=Phan_ung</code> trong Google Apps
                     Script</p>
             </div>
@@ -432,36 +448,36 @@
             <!-- Filters -->
             <div
                 class="flex flex-wrap gap-3 items-center bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                <span class="text-xs font-bold uppercase text-zinc-400 tracking-wider">B? l?c</span>
+                <span class="text-xs font-bold uppercase text-zinc-400 tracking-wider">Bộ lọc</span>
                 <select id="filter-result" onchange="applyFilters()"
                     class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
-                    <option value="all">T?t c? k?t qu?</option>
-                    <option value="Win">? Win</option>
-                    <option value="Loss">? Loss</option>
-                    <option value="BE">? H�a (BE)</option>
+                    <option value="all">Tất cả kết quả</option>
+                    <option value="Win">✅ Win</option>
+                    <option value="Loss">❌ Loss</option>
+                    <option value="BE">⚖ Hòa (BE)</option>
                 </select>
                 <select id="filter-pattern" onchange="applyFilters()"
                     class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
-                    <option value="all">T?t c? m?u h�nh</option>
+                    <option value="all">Tất cả mẫu hình</option>
                 </select>
                 <select id="filter-money" onchange="applyFilters()"
                     class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
-                    <option value="all">T?t c? c?p ti?n</option>
+                    <option value="all">Tất cả cặp tiền</option>
                 </select>
                 <select id="filter-vol" onchange="applyFilters()"
                     class="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-violet-500">
                     <option value="all">All Volume</option>
-                    <option value="C�">C� Volume</option>
-                    <option value="Kh�ng">Kh�ng Volume</option>
+                    <option value="Có">Có Volume</option>
+                    <option value="Khứng">Khứng Volume</option>
                 </select>
-                <span class="ml-auto text-xs text-zinc-400 font-mono" id="filter-count">0 k?t qu?</span>
+                <span class="ml-auto text-xs text-zinc-400 font-mono" id="filter-count">0 kết quả</span>
             </div>
 
             <!-- Summary Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div
                     class="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">T?ng ph?n ?ng</div>
+                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Tổng phản ứng</div>
                     <div class="flex items-end justify-between">
                         <span id="s-total"
                             class="text-2xl font-black text-zinc-700 dark:text-zinc-200 font-mono">0</span>
@@ -470,7 +486,7 @@
                 </div>
                 <div
                     class="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">T? l? Win</div>
+                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Tỷ lệ Win</div>
                     <div class="flex items-end justify-between">
                         <span id="s-winrate" class="text-2xl font-black text-emerald-500 font-mono">0%</span>
                         <i class="fa-solid fa-trophy text-zinc-200 dark:text-zinc-700 text-3xl"></i>
@@ -486,7 +502,7 @@
                 </div>
                 <div
                     class="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">T?ng m?u h�nh</div>
+                    <div class="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">Tổng mẫu hình</div>
                     <div class="flex items-end justify-between">
                         <span id="s-patterns" class="text-2xl font-black text-violet-500 font-mono">0</span>
                         <i class="fa-solid fa-chess-board text-zinc-200 dark:text-zinc-700 text-3xl"></i>
@@ -496,7 +512,7 @@
 
             <!-- Charts Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Winrate by Pattern � NEW DESIGN -->
+                <!-- Winrate by Pattern – NEW DESIGN -->
                 <div
                     class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm md:col-span-2">
                     <div class="flex items-center justify-between mb-5">
@@ -506,7 +522,7 @@
                                 <i class="fa-solid fa-chess-board text-white text-xs"></i>
                             </div>
                             <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
-                                Winrate theo M?u H�nh</h3>
+                                Winrate theo Mẫu Hình</h3>
                         </div>
                         <div class="flex items-center gap-3 text-[10px] font-bold text-zinc-400">
                             <span class="flex items-center gap-1"><span
@@ -526,26 +542,26 @@
                 </div>
             </div>
 
-            <!-- H�ng: Ph�n b? + ?nh hu?ng Volume -->
+            <!-- Hứng: Phân bố + ảnh hưởng Volume -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Win rate by Volume -->
                 <div
                     class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <div class="flex items-center gap-2 mb-4">
                         <i class="fa-solid fa-wave-square text-amber-500"></i>
-                        <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">?nh
-                            hu?ng
-                            c?a Volume</h3>
+                        <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Ảnh
+                            hưởng
+                            của Volume</h3>
                     </div>
                     <div class="grid grid-cols-1 gap-4" id="vol-stats"></div>
                 </div>
 
-                <!-- Ph�n b? Win/Loss/BE -->
+                <!-- Phón b✅ Win/Loss/BE -->
                 <div
                     class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col">
                     <div class="flex items-center gap-2 mb-4">
                         <i class="fa-solid fa-chart-pie text-blue-500"></i>
-                        <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Ph�n b?
+                        <h3 class="font-bold text-sm uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Phân bố
                             Win / Loss / BE</h3>
                     </div>
                     <div class="relative flex-1 min-h-[180px] flex items-center justify-center">
@@ -557,39 +573,51 @@
 
             <!-- Detail Table (full-width) -->
             <div id="detail-table"
-                class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+                class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden"
+                style="overflow:visible">
                 <!-- Header bar -->
-                <div class="flex flex-wrap items-center gap-2.5 px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/40">
+                <div
+                    class="flex flex-wrap items-center gap-2.5 px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/40">
                     <div class="flex items-center gap-2 shrink-0">
-                        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow">
+                        <div
+                            class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow">
                             <i class="fa-solid fa-table-list text-white text-xs"></i>
                         </div>
-                        <span class="font-black text-sm text-zinc-700 dark:text-zinc-200 whitespace-nowrap">Danh s�ch chi ti?t</span>
-                        <span id="filter-count-badge" class="px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 text-[10px] font-black font-mono">0</span>
+                        <span class="font-black text-sm text-zinc-700 dark:text-zinc-200 whitespace-nowrap">Danh sách
+                            chi tiết</span>
+                        <span id="filter-count-badge"
+                            class="px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 text-[10px] font-black font-mono">0</span>
                     </div>
                     <select id="table-filter-money" onchange="applyFilters()"
                         class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-violet-500 cursor-pointer">
-                        <option value="all">T?t c? d�ng ti?n</option>
+                        <option value="all">Tất cả dòng tiền</option>
                     </select>
                     <div class="flex items-center gap-1">
-                        <button onclick="quickFilterResult('all')" id="qf-all" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition bg-violet-500/10 border-violet-500/30 text-violet-400">T?t c?</button>
-                        <button onclick="quickFilterResult('win')" id="qf-win" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-emerald-500/40 hover:text-emerald-400">Win</button>
-                        <button onclick="quickFilterResult('loss')" id="qf-loss" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-red-500/40 hover:text-red-400">Loss</button>
-                        <button onclick="quickFilterResult('be')" id="qf-be" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-zinc-500/40 hover:text-zinc-300">BE</button>
+                        <button onclick="quickFilterResult('all')" id="qf-all"
+                            class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition bg-violet-500/10 border-violet-500/30 text-violet-400">Tất
+                            cả</button>
+                        <button onclick="quickFilterResult('win')" id="qf-win"
+                            class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-emerald-500/40 hover:text-emerald-400">Win</button>
+                        <button onclick="quickFilterResult('loss')" id="qf-loss"
+                            class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-red-500/40 hover:text-red-400">Loss</button>
+                        <button onclick="quickFilterResult('be')" id="qf-be"
+                            class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-zinc-500/40 hover:text-zinc-300">BE</button>
                     </div>
                     <div class="flex items-center gap-2 ml-auto">
                         <div class="relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] pointer-events-none"></i>
-                            <input type="text" id="table-search" oninput="applyFilters()" placeholder="T�m ki?m..."
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] pointer-events-none"></i>
+                            <input type="text" id="table-search" oninput="applyFilters()" placeholder="Tìm kiếm..."
                                 class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-7 pr-3 py-1.5 text-xs outline-none w-36 focus:ring-2 focus:ring-violet-500 dark:text-zinc-200 transition">
                         </div>
-                        <button onclick="resetTableFilters()" class="text-[10px] text-zinc-400 hover:text-violet-400 transition font-bold flex items-center gap-1 whitespace-nowrap">
+                        <button onclick="resetTableFilters()"
+                            class="text-[10px] text-zinc-400 hover:text-violet-400 transition font-bold flex items-center gap-1 whitespace-nowrap">
                             <i class="fa-solid fa-rotate-left text-[9px]"></i> Reset
                         </button>
                     </div>
                 </div>
                 <!-- Scroll container -->
-                <div style="max-height:540px;overflow:auto;scrollbar-width:thin;scrollbar-color:#8b5cf6 #3f3f46">
+                <div style="max-height:70vh;overflow:auto;scrollbar-width:thin;scrollbar-color:#8b5cf6 #3f3f46">
                     <table>
                         <thead>
                             <tr id="table-head"></tr>
@@ -601,7 +629,7 @@
                 <div id="table-empty"
                     class="hidden flex flex-col items-center justify-center py-16 text-zinc-400 gap-2">
                     <i class="fa-regular fa-folder-open text-4xl opacity-40"></i>
-                    <p class="text-sm font-medium">Kh�ng c� d? li?u</p>
+                    <p class="text-sm font-medium">Không có dữ liệu</p>
                 </div>
             </div>
         </div>
@@ -610,21 +638,21 @@
     <script>
         let rawData = [];
         let filteredData = [];
-        let sortState = { key: null, asc: true }; // tr?ng th�i sort
+        let sortState = { key: null, asc: true }; // trạng thái sort
         let chartPattern = null, chartDonut = null;
 
-                // ===== EXPORT IMAGE =====
+        // ===== EXPORT IMAGE =====
         async function exportDashboard() {
             const btn = document.getElementById('btn-export');
             const origHtml = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-sm"></i>';
             btn.disabled = true;
 
-            // ?n b?ng chi ti?t v� scroll-to-top trong l�c ch?p
-            const tblEl  = document.getElementById('detail-table');
+            // Ẩn bảng chi tiết và scroll-to-top trong lúc chụp
+            const tblEl = document.getElementById('detail-table');
             const sttBtn = document.getElementById('scroll-top-btn');
             const tblOld = tblEl?.style.display;
-            if (tblEl)  tblEl.style.display  = 'none';
+            if (tblEl) tblEl.style.display = 'none';
             if (sttBtn) sttBtn.style.display = 'none';
 
             try {
@@ -636,13 +664,13 @@
                     logging: false,
                 });
                 const link = document.createElement('a');
-                const now  = new Date();
-                const ts   = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-                // Th�m footer "SMC Trading" b�n du?i
+                const now = new Date();
+                const ts = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+                // Thêm footer "SMC Trading" bên dưới
                 const isDark = document.documentElement.classList.contains('dark');
                 const footerH = 48;
                 const final = document.createElement('canvas');
-                final.width  = canvas.width;
+                final.width = canvas.width;
                 final.height = canvas.height + footerH * 2;
                 const ctx = final.getContext('2d');
                 ctx.fillStyle = isDark ? '#09090b' : '#f4f4f5';
@@ -656,21 +684,21 @@
                 ctx.font = 'bold 28px Inter, Segoe UI, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('? SMC Trading', final.width / 2, canvas.height + footerH);
+                ctx.fillText('⚡ SMC Trading', final.width / 2, canvas.height + footerH);
 
                 link.download = `phan-ung_dashboard_${ts}.png`;
                 link.href = final.toDataURL('image/png');
                 link.click();
-            } catch(e) {
-                alert('Xu?t ?nh th?t b?i: ' + e.message);
+            } catch (e) {
+                alert('Xuất ảnh thất bại: ' + e.message);
             } finally {
-                if (tblEl)  tblEl.style.display  = tblOld ?? '';
+                if (tblEl) tblEl.style.display = tblOld ?? '';
                 if (sttBtn) sttBtn.style.display = '';
                 btn.innerHTML = origHtml;
-                btn.disabled  = false;
+                btn.disabled = false;
             }
         }
-// ===== THEME =====
+        // ===== THEME =====
         function initTheme() {
             const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
             document.documentElement.classList.toggle('dark', isDark);
@@ -686,15 +714,33 @@
 
         // ===== LOAD DATA =====
         // C?t ?nh s? b? ?n trong b?ng
-        const IMG_COLS = ['HTF (?nh)', 'LTF (?nh)', 'H�nh ?nh (Ph?)'];
+        const IMG_COLS = ['HTF (Ảnh)', 'LTF (Ảnh)', 'Hình ảnh (Phụ)'];
 
         async function loadData() {
-            document.getElementById('loading-state').classList.remove('hidden');
-            document.getElementById('main-content').classList.add('hidden');
             document.getElementById('error-state').classList.add('hidden');
             document.getElementById('reload-icon').classList.add('animate-spin');
 
-            // Th? t?t c? t? h?p API + sheet name
+            // ===== 1. TẢI TỨC THÌ TỪ CACHE (Stale-While-Revalidate) =====
+            let cachedData = null;
+            try {
+                const cached = localStorage.getItem('tk-phanung-cache');
+                if (cached) cachedData = JSON.parse(cached);
+            } catch (e) { }
+
+            if (cachedData && cachedData.length > 0) {
+                console.log('[Phản ứng] ⚡ Instant load từ cache:', cachedData.length, 'items');
+                rawData = cachedData;
+                buildFilters(cachedData);
+                applyFilters();
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            } else {
+                // Không có cache → hiện loading
+                document.getElementById('loading-state').classList.remove('hidden');
+                document.getElementById('main-content').classList.add('hidden');
+            }
+
+            // ===== 2. FETCH MỚI NGẦM (Background Update) =====
             const endpoints = [
                 `${API_PRIMARY}?mode=api&sheet=phan_ung`,
                 `${API_SECONDARY}?mode=api&sheet=phan_ung`,
@@ -708,11 +754,11 @@
                 try {
                     const r = await fetch(url);
                     const json = await r.json();
-                    debugInfo.push(`? ${url.split('?')[0].slice(-20)} ? ${JSON.stringify(json).slice(0, 80)}`);
+                    debugInfo.push(`✓ ${url.split('?')[0].slice(-20)} → ${JSON.stringify(json).slice(0, 80)}`);
                     if (Array.isArray(json) && json.length > 0) { data = json; break; }
                     if (json?.data && Array.isArray(json.data) && json.data.length > 0) { data = json.data; break; }
                 } catch (e) {
-                    debugInfo.push(`? ${url.split('?')[0].slice(-20)} ? ${e.message}`);
+                    debugInfo.push(`✗ ${url.split('?')[0].slice(-20)} → ${e.message}`);
                     lastErr = e.message;
                 }
             }
@@ -720,21 +766,30 @@
             document.getElementById('reload-icon').classList.remove('animate-spin');
             document.getElementById('loading-state').classList.add('hidden');
 
-            if (!data || data.length === 0) {
+            if (data && data.length > 0) {
+                // So sánh xem data có thay đổi không
+                const newHash = JSON.stringify(data);
+                const oldHash = cachedData ? JSON.stringify(cachedData) : '';
+                if (newHash !== oldHash) {
+                    console.log('[Phản ứng] 🔄 Data mới từ API, re-render...');
+                    rawData = data;
+                    buildFilters(data);
+                    applyFilters();
+                    try { localStorage.setItem('tk-phanung-cache', newHash); } catch (e) { }
+                } else {
+                    console.log('[Phản ứng] ✅ Data không đổi, giữ cache');
+                }
+                document.getElementById('main-content').classList.remove('hidden');
+            } else if (!cachedData || cachedData.length === 0) {
+                // Không có cache VÀ API cũng fail → hiện lỗi
                 document.getElementById('error-state').classList.remove('hidden');
                 document.getElementById('error-msg').innerHTML =
-                    (lastErr || 'T?t c? endpoints tr? v? r?ng.') +
+                    (lastErr || 'Tất cả endpoints trả về rỗng.') +
                     `<br><br><b>Debug log:</b><pre style="text-align:left;font-size:10px;background:#1a1a1a;color:#aaa;padding:8px;border-radius:6px;overflow:auto;margin-top:6px">${debugInfo.join('\n')}</pre>`;
-                return;
             }
-
-            rawData = data;
-            buildFilters(data);
-            applyFilters();
-            document.getElementById('main-content').classList.remove('hidden');
         }
 
-        // Helper: t�m value theo keyword + normalize Unicode (NFC) tr�nh l?i NFC vs NFD
+        // Helper: tìm value theo keyword + normalize Unicode (NFC) trình l?i NFC vs NFD
         const n = s => String(s).normalize('NFC').toLowerCase().replace(/\s+/g, '');
         function getVal(row, ...keywords) {
             const keys = Object.keys(row);
@@ -744,23 +799,23 @@
             }
             return '';
         }
-        // So s�nh c� d?u an to�n
+        // So sánh có dấu an toàn
         const includes_n = (a, b) => n(a).includes(n(b));
 
         // ===== BUILD FILTERS =====
         function buildFilters(data) {
-            // M?u h�nh filter
-            const patterns = [...new Set(data.map(r => getVal(r, 'M?u h�nh', 'mauhinh', 'pattern', 'setup')).filter(Boolean))].sort();
+            // Mẫu hình filter
+            const patterns = [...new Set(data.map(r => getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup')).filter(Boolean))].sort();
             document.getElementById('filter-pattern').innerHTML =
-                '<option value="all">T?t c? m?u h�nh</option>' + patterns.map(p => `<option value="${p}">${p}</option>`).join('');
+                '<option value="all">Tất cả mẫu hình</option>' + patterns.map(p => `<option value="${p}">${p}</option>`).join('');
 
-            // D�ng ti?n filter
-            const moneys = [...new Set(data.map(r => getVal(r, 'D�ng ti?n', 'dongtien', 'money')).filter(Boolean))].sort();
+            // Dòng tiền filter
+            const moneys = [...new Set(data.map(r => getVal(r, 'Dòng tiền', 'dongtien', 'money')).filter(Boolean))].sort();
             document.getElementById('filter-money').innerHTML =
-                '<option value="all">T?t c? d�ng ti?n</option>' + moneys.map(m => `<option value="${m}">${m}</option>`).join('');
+                '<option value="all">Tất cả dòng tiền</option>' + moneys.map(m => `<option value="${m}">${m}</option>`).join('');
 
-            // Table header � c?t c� th? sort
-            const SORTABLE = ['K?t qu?', 'Th?i gian', 'D�ng ti?n', 'M?u h�nh', 'R:R', 'RR'];
+            // Table header – cột có thể sort
+            const SORTABLE = ['Kết quả', 'Thời gian', 'Dòng tiền', 'Mẫu hình', 'R:R', 'RR'];
             const keys = Object.keys(data[0] || {});
             const detailTh = `<th class="px-3 py-3 text-center text-zinc-400 whitespace-nowrap" style="width:28px">#</th>
                 <th class="px-3 py-3 text-left whitespace-nowrap text-violet-400"><i class="fa-solid fa-circle-info"></i></th>`;
@@ -779,7 +834,7 @@
             const tblMoneyEl = document.getElementById('table-filter-money');
             if (tblMoneyEl) {
                 const cur = tblMoneyEl.value;
-                tblMoneyEl.innerHTML = '<option value="all">T?t c? d�ng ti?n</option>'
+                tblMoneyEl.innerHTML = '<option value="all">Tất cả dòng tiền</option>'
                     + moneys.map(m => `<option value="${m}">${m}</option>`).join('');
                 if (moneys.includes(cur)) tblMoneyEl.value = cur;
             }
@@ -839,10 +894,10 @@
             const fQfResult = _qfResult || 'all';
 
             filteredData = rawData.filter(r => {
-                const result = getVal(r, 'K?t qu?', 'ketqua', 'result');
-                const pattern = getVal(r, 'M?u h�nh', 'mauhinh', 'pattern', 'setup');
-                const money = getVal(r, 'D�ng ti?n', 'dongtien', 'money');
-                const vol = getVal(r, 'C� Vol', 'covol', 'vol');
+                const result = getVal(r, 'Kết quả', 'ketqua', 'result');
+                const pattern = getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup');
+                const money = getVal(r, 'Dòng tiền', 'dongtien', 'money');
+                const vol = getVal(r, 'Có Vol', 'covol', 'vol');
                 if (fResult !== 'all' && !includes_n(result, fResult)) return false;
                 if (fPattern !== 'all' && n(pattern) !== n(fPattern)) return false;
                 if (fMoney !== 'all' && n(money) !== n(fMoney)) return false;
@@ -853,7 +908,7 @@
                 return true;
             });
 
-            document.getElementById('filter-count').textContent = `${filteredData.length} k?t qu?`;
+            document.getElementById('filter-count').textContent = `${filteredData.length} kết quả`;
             const badge = document.getElementById('filter-count-badge');
             if (badge) badge.textContent = filteredData.length;
             renderSummary(filteredData);
@@ -865,11 +920,11 @@
 
         // ===== SUMMARY =====
         function renderSummary(data) {
-            const wins = data.filter(r => getVal(r, 'K?t qu?', 'ketqua', 'result').toLowerCase().includes('win'));
+            const wins = data.filter(r => getVal(r, 'Kết quả', 'ketqua', 'result').toLowerCase().includes('win'));
             const wr = data.length ? Math.round(wins.length / data.length * 100) : 0;
             const winsRR = wins.filter(r => parseFloat(getVal(r, 'R:R', 'rr', 'RR')) > 0);
-            const avgRR = winsRR.length ? (winsRR.reduce((s, r) => s + parseFloat(getVal(r, 'R:R', 'rr', 'RR')), 0) / winsRR.length).toFixed(2) : '�';
-            const patterns = new Set(data.map(r => getVal(r, 'M?u h�nh', 'mauhinh', 'pattern', 'setup')).filter(Boolean));
+            const avgRR = winsRR.length ? (winsRR.reduce((s, r) => s + parseFloat(getVal(r, 'R:R', 'rr', 'RR')), 0) / winsRR.length).toFixed(2) : '–';
+            const patterns = new Set(data.map(r => getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup')).filter(Boolean));
 
             document.getElementById('s-total').textContent = data.length;
             document.getElementById('s-winrate').textContent = wr + '%';
@@ -884,8 +939,8 @@
         }
 
         function renderCharts(data) {
-            const getResult = r => getVal(r, 'K?t qu?', 'ketqua', 'result').trim();
-            const getPattern = r => getVal(r, 'M?u h�nh', 'mauhinh', 'pattern', 'setup') || 'Kh�ng r�';
+            const getResult = r => getVal(r, 'Kết quả', 'ketqua', 'result').trim();
+            const getPattern = r => getVal(r, 'Mẫu hình', 'mauhinh', 'pattern', 'setup') || 'Khứng rõ';
             const { grid, text } = getChartColors();
 
             // --- Pattern Map ---
@@ -950,7 +1005,7 @@
                                     const lbl = items[0].label;
                                     const pm = patternMap[lbl];
                                     const wr = Math.round(pm.win / pm.total * 100);
-                                    return [`T?ng: ${pm.total} l?nh`, `Winrate: ${wr}% � Click d? l?c`];
+                                    return [`Tổng: ${pm.total} lệnh`, `Winrate: ${wr}% – Click để lọc`];
                                 }
                             }
                         }
@@ -981,7 +1036,7 @@
                     id: 'inlineLabels',
                     afterDatasetsDraw(chart) {
                         const { ctx } = chart;
-                        // V? count tr�n m?i segment dataset (Win / Loss / BE)
+                        // Vẽ count trên mỗi segment dataset (Win / Loss / BE)
                         const datasetColors = ['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.92)', 'rgba(255,255,255,0.85)'];
                         [0, 1, 2].forEach(dsIdx => {
                             const meta = chart.getDatasetMeta(dsIdx);
@@ -989,7 +1044,7 @@
                                 const val = chart.data.datasets[dsIdx].data[i];
                                 if (!val) return;
                                 const barWidth = Math.abs(bar.x - bar.base);
-                                if (barWidth < 18) return; // qu� h?p, b? qua
+                                if (barWidth < 18) return; // quá hẹp, bỏ qua
                                 const cx = bar.base + barWidth / 2;
                                 const cy = bar.y;
                                 ctx.save();
@@ -1009,8 +1064,8 @@
                             const wr = Math.round(pm.win / pm.total * 100);
                             const bar = metaBE.data[i];
                             if (!bar) return;
-                            // x = cu?i bar (BE.x n?u c�, n?u kh�ng = Win bar cu?i)
-                            // T�m bar cu?i c�ng c� d? li?u
+                            // x = cuối bar (BE.x n?u có, n?u khứng = Win bar cu?i)
+                            // Tìm bar cu?i cóng có dữ liệu
                             let endX = bar.base; // fallback
                             for (let d = 2; d >= 0; d--) {
                                 const m = chart.getDatasetMeta(d);
@@ -1043,7 +1098,7 @@
             const el = document.getElementById('pattern-cards');
             if (!el) return;
             if (!patterns.length) { el.innerHTML = ''; return; }
-            // �?c filter hi?n t?i
+            // Đọc filter hiện tại
             const activePattern = document.getElementById('filter-pattern').value;
             el.innerHTML = patterns.map(p => {
                 const pm = patternMap[p];
@@ -1056,10 +1111,10 @@
                 return `
                 <div class="relative rounded-xl p-3 bg-zinc-800/50 border ${ringColor} ${activeCls} hover:bg-zinc-800 hover:ring-2 hover:ring-violet-500/50 transition cursor-pointer select-none"
                     onclick="filterByPattern('${p.replace(/'/g, "\\'")}')"
-                    title="Click d? l?c: ${p.replace(/"/g, '&quot;')}">
+                    title="Click để lọc: ${p.replace(/"/g, '&quot;')}">
                     <!-- Active indicator -->
                     ${isActive ? '<div class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-violet-400"></div>' : ''}
-                    <!-- Winrate l?n -->
+                    <!-- Winrate lớn -->
                     <div class="flex items-start justify-between mb-2">
                         <span class="text-[11px] font-bold text-zinc-300 leading-tight pr-3 truncate" title="${p}">${p}</span>
                         <span class="text-lg font-black font-mono ${wrColor} shrink-0 leading-none">${wr}%</span>
@@ -1073,29 +1128,29 @@
                         <span class="text-emerald-400">W ${pm.win}</span>
                         <span class="text-red-400">L ${pm.loss}</span>
                         <span class="text-zinc-500">BE ${pm.be}</span>
-                        <span class="ml-auto text-zinc-500 font-mono">${pm.total} l?nh</span>
+                        <span class="ml-auto text-zinc-500 font-mono">${pm.total} lệnh</span>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // ===== FILTER BY PATTERN (click t? chart/card) =====
+        // ===== FILTER BY PATTERN (click từ chart/card) =====
         function filterByPattern(pattern) {
             const sel = document.getElementById('filter-pattern');
             const current = sel.value;
-            // Toggle: click l?i c�ng pattern ? b? l?c
+            // Toggle: click l?i cóng pattern ? bỏ lọc
             const newVal = (current !== 'all' && n(current) === n(pattern)) ? 'all' : pattern;
-            // T�m d�ng option value (match normalize)
+            // Tìm dòng option value (match normalize)
             const opt = Array.from(sel.options).find(o => n(o.value) === n(newVal));
             sel.value = opt ? opt.value : 'all';
             applyFilters();
-            // Scroll mu?t d?n b?ng chi ti?t
+            // Scroll mu?t dẨn bảng chi tiết
             const tbl = document.getElementById('table-body');
             if (tbl) tbl.closest('.rounded-2xl')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function renderDonutChart(data) {
-            const getResult = r => getVal(r, 'K?t qu?', 'ketqua', 'result').trim();
+            const getResult = r => getVal(r, 'Kết quả', 'ketqua', 'result').trim();
             const wins = data.filter(r => getResult(r).toLowerCase().includes('win')).length;
             const losses = data.filter(r => getResult(r).toLowerCase().includes('loss')).length;
             const bes = data.length - wins - losses;
@@ -1120,9 +1175,9 @@
 
         // ===== VOLUME STATS =====
         function renderVolStats(data) {
-            const getRes = r => getVal(r, 'K?t qu?', 'ketqua', 'result').toLowerCase();
-            const withVol = data.filter(r => includes_n(getVal(r, 'C� Vol', 'covol', 'vol'), 'c�'));
-            const noVol = data.filter(r => !includes_n(getVal(r, 'C� Vol', 'covol', 'vol'), 'c�'));
+            const getRes = r => getVal(r, 'Kết quả', 'ketqua', 'result').toLowerCase();
+            const withVol = data.filter(r => includes_n(getVal(r, 'Có Vol', 'covol', 'vol'), 'có'));
+            const noVol = data.filter(r => !includes_n(getVal(r, 'Có Vol', 'covol', 'vol'), 'có'));
 
             const wc = arr => arr.filter(r => getRes(r).includes('win')).length;
             const lc = arr => arr.filter(r => getRes(r).includes('loss')).length;
@@ -1135,9 +1190,9 @@
             const deltaCls = delta > 0 ? 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30'
                 : delta < 0 ? 'text-red-400 bg-red-500/15 border-red-500/30'
                     : 'text-zinc-400 bg-zinc-500/15 border-zinc-500/30';
-            const deltaIcon = delta > 0 ? '?' : delta < 0 ? '?' : '=';
+            const deltaIcon = delta > 0 ? '↑' : delta < 0 ? '↓' : '=';
 
-            // Stacked bar segments (W/L/BE) cho m?i nh�m
+            // Stacked bar segments (W/L/BE) cho mỗi nhóm
             const makeBar = (arr, wr) => {
                 const total = arr.length || 1;
                 const wp = Math.round(wc(arr) / total * 100);
@@ -1156,32 +1211,32 @@
             <div class="flex flex-col gap-4">
                 <!-- Delta badge -->
                 <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-500">So s�nh Winrate</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-500">So sánh Winrate</span>
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-black font-mono ${deltaCls}">
-                        ${deltaIcon} ${deltaSign}${delta}% khi c� Vol
+                        ${deltaIcon} ${deltaSign}${delta}% khi có Vol
                     </span>
                 </div>
 
-                <!-- C� Volume -->
+                <!-- Có Volume -->
                 <div class="flex flex-col gap-1.5">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span class="flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
-                            <span class="text-zinc-300">C� Volume</span>
-                            <span class="text-zinc-500 font-mono">${withVol.length} l?nh</span>
+                            <span class="text-zinc-300">Có Volume</span>
+                            <span class="text-zinc-500 font-mono">${withVol.length} lệnh</span>
                         </span>
                         <span class="font-black font-mono text-sm ${wrW >= 60 ? 'text-emerald-400' : wrW >= 40 ? 'text-amber-400' : 'text-red-400'}">${wrW}%</span>
                     </div>
                     ${makeBar(withVol, wrW)}
                 </div>
 
-                <!-- Kh�ng Volume -->
+                <!-- Khứng Volume -->
                 <div class="flex flex-col gap-1.5">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span class="flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-zinc-500 inline-block"></span>
-                            <span class="text-zinc-300">Kh�ng Volume</span>
-                            <span class="text-zinc-500 font-mono">${noVol.length} l?nh</span>
+                            <span class="text-zinc-300">Khứng Volume</span>
+                            <span class="text-zinc-500 font-mono">${noVol.length} lệnh</span>
                         </span>
                         <span class="font-black font-mono text-sm ${wrN >= 60 ? 'text-emerald-400' : wrN >= 40 ? 'text-zinc-300' : 'text-red-400'}">${wrN}%</span>
                     </div>
@@ -1193,13 +1248,13 @@
                     <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>Win</span>
                     <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block"></span>Loss</span>
                     <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-zinc-500 inline-block"></span>BE</span>
-                    <span class="ml-auto text-zinc-600">${data.length} t?ng l?nh</span>
+                    <span class="ml-auto text-zinc-600">${data.length} tổng lệnh</span>
                 </div>
             </div>`;
         }
 
         // ===== TABLE =====
-        let _rowGalleries = []; // [{urls:[], labels:[]}] � index = gallery id
+        let _rowGalleries = []; // [{urls:[], labels:[]}] – index = gallery id
 
         function renderTable(data) {
             const tbody = document.getElementById('table-body');
@@ -1208,7 +1263,7 @@
             if (data.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
             empty.classList.add('hidden');
 
-            // �p d?ng sort n?u c�
+            // Áp d?ng sort n?u có
             let sorted = [...data];
             if (sortState.key) {
                 const sk = sortState.key;
@@ -1220,13 +1275,13 @@
             }
 
             const keys = Object.keys(rawData[0] || {});
-            _rowGalleries = []; // reset m?i l?n render
+            _rowGalleries = []; // reset mỗi lần render
 
             tbody.innerHTML = sorted.map((row, rowIdx) => {
-                const res = getVal(row, 'K?t qu?', 'ketqua', 'result').toLowerCase();
+                const res = getVal(row, 'Kết quả', 'ketqua', 'result').toLowerCase();
                 const rowCls = res.includes('win') ? 'border-l-2 border-l-emerald-400' : res.includes('loss') ? 'border-l-2 border-l-red-400' : '';
 
-                // Thu th?p ?nh+label c?a d�ng ? luu v�o global array
+                // Thu thập ảnh+label của dòng để lưu vào global array
                 const rowImgEntries = keys
                     .filter(k => String(row[k] ?? '').startsWith('http'))
                     .map(k => ({ url: String(row[k]), label: k }));
@@ -1236,40 +1291,40 @@
                 const cells = keys.map(k => {
                     let val = row[k] ?? '';
                     const vStr = String(val);
-                    // N?u l� URL ?nh ? render thumbnail
+                    // N?u lỗ URL ?nh ? render thumbnail
                     if (vStr.startsWith('http')) {
                         const imgIdx = rowImgEntries.findIndex(e => e.url === vStr);
                         return `<td class="px-2 py-2">
                             <div class="td-img-wrap">
                                 <img src="${vStr}" loading="lazy"
                                     onclick="openRowImg(${galleryId}, ${imgIdx})"
-                                    class="h-36 w-48 object-cover rounded-lg cursor-zoom-in border border-zinc-200 dark:border-zinc-700 hover:scale-105 transition-transform shadow-sm block"
-                                    onerror="this.closest('td').innerHTML='<span class=\'text-zinc-400 text-[10px]\'>L?i ?nh</span>'">
+                                    class="h-44 w-64 object-cover rounded-lg cursor-zoom-in border border-zinc-200 dark:border-zinc-700 hover:scale-105 transition-transform shadow-sm block"
+                                    onerror="this.closest('td').innerHTML='<span class=\'text-zinc-400 text-[10px]\'>Lỗi ảnh</span>'">
                                 <span class="td-img-badge">${k}</span>
                             </div>
                         </td>`;
                     }
-                    // Style c?a k?t qu? � badge pill n?i b?t
+                    // Style c?a kết quả – badge pill nổi bật
                     const lower = vStr.toLowerCase();
                     if (lower.includes('win'))
-                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">? Win</span>`;
+                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">✅ Win</span>`;
                     else if (lower.includes('loss'))
-                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-red-500/15 text-red-400 border border-red-500/30">? Loss</span>`;
-                    else if (lower === 'be' || lower.includes('h�a') || lower.includes('hoa'))
-                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-zinc-500/15 text-zinc-400 border border-zinc-500/30">? BE</span>`;
-                    else if (!vStr) val = '<span class="text-zinc-300 dark:text-zinc-600">�</span>';
+                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-red-500/15 text-red-400 border border-red-500/30">❌ Loss</span>`;
+                    else if (lower === 'be' || lower.includes('hòa') || lower.includes('hoa'))
+                        val = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-zinc-500/15 text-zinc-400 border border-zinc-500/30">⚖ BE</span>`;
+                    else if (!vStr) val = '<span class="text-zinc-300 dark:text-zinc-600">–</span>';
                     return `<td class="px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-300 whitespace-nowrap max-w-[200px] truncate" title="${vStr}">${val}</td>`;
                 }).join('');
 
-                // N�t Chi ti?t + STT
+                // Nút Chi tiết + STT
                 const sttTd = `<td class="px-3 py-2 text-center text-[10px] font-mono text-zinc-500">${rowIdx + 1}</td>`;
                 const detailBtn = `<td class="px-3 py-2">
                     <button onclick='openDetail(${JSON.stringify(JSON.stringify(row))})'
                         class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 hover:from-violet-500/25 hover:to-fuchsia-500/25 text-violet-400 hover:text-violet-300 text-[11px] font-bold transition active:scale-95 border border-violet-500/25 shadow-sm">
-                        <i class="fa-solid fa-circle-info text-[10px]"></i> Chi ti?t
+                        <i class="fa-solid fa-circle-info text-[10px]"></i> Chi tiết
                     </button>
                 </td>`;
-                // Border tr�i m�u theo k?t qu?
+                // Border trõi mẫu theo kết quả
                 const borderStyle = res.includes('win')
                     ? 'border-left: 3px solid #10b981;'
                     : res.includes('loss') ? 'border-left: 3px solid #ef4444;'
@@ -1281,7 +1336,7 @@
         // ===== GALLERY LIGHTBOX =====
         let _gallery = [], _galIdx = 0; // [{url, label}]
 
-        // M? gallery t? b?ng (d�ng id t? _rowGalleries)
+        // Mở gallery t? b?ng (dòng id từ _rowGalleries)
         function openRowImg(galleryId, imgIdx) {
             const entries = _rowGalleries[galleryId] || [];
             _gallery = entries;
@@ -1289,7 +1344,7 @@
             _showLightbox();
         }
 
-        // M? gallery t? modal chi ti?t
+        // Mở gallery t? modal chi tiết
         let _detailImgs = []; // [{url, label}]
         function openDetailImg(idx) {
             _gallery = _detailImgs;
@@ -1335,24 +1390,24 @@
 
         // ===== DETAIL MODAL =====
 
-        // M�u s?c cho t?ng lo?i field
+        // Màu sắc cho từng loại field
         function getFieldStyle(key) {
             const k = key.normalize('NFC').toLowerCase().replace(/\s+/g, '');
-            if (/th(?|o)igian|ng(�|a)y|date|time/.test(k))
+            if (/th(ờ|ơ|o)igian|ng(à|a)y|date|time/.test(k))
                 return { card: 'border-blue-500 bg-blue-950/40', label: 'text-blue-400', val: 'text-blue-200', icon: 'fa-solid fa-calendar-days' };
-            if (/k(?|e)tqu(?|a)|result/.test(k))
+            if (/k(ế|e)tqu(ả|a)|result/.test(k))
                 return { card: 'border-emerald-500 bg-emerald-950/40', label: 'text-emerald-400', val: 'text-emerald-200', icon: 'fa-solid fa-circle-check' };
-            if (/m(?|a)uhinh|pattern|setup/.test(k))
+            if (/m(ẫ|a)uhinh|pattern|setup/.test(k))
                 return { card: 'border-violet-500 bg-violet-950/40', label: 'text-violet-400', val: 'text-violet-200', icon: 'fa-solid fa-chess-board' };
             if (/r:r|rr|reward|risk/.test(k))
                 return { card: 'border-amber-500 bg-amber-950/40', label: 'text-amber-400', val: 'text-amber-200', icon: 'fa-solid fa-scale-balanced' };
-            if (/vol|kh(?|o)il(u|u)(?|o)ng/.test(k))
+            if (/vol|kh(ố|o)il(ư|u)(ợ|o)ng/.test(k))
                 return { card: 'border-orange-500 bg-orange-950/40', label: 'text-orange-400', val: 'text-orange-200', icon: 'fa-solid fa-wave-square' };
-            if (/c(?|a)pti(?|e)n|dongtien|symbol|pair|money/.test(k))
+            if (/c(ặ|a)pti(ề|e)n|dongtien|symbol|pair|money/.test(k))
                 return { card: 'border-cyan-500 bg-cyan-950/40', label: 'text-cyan-400', val: 'text-cyan-200', icon: 'fa-solid fa-coins' };
-            if (/ghi(ch(�|u)|c(h|�))|note|comment|nhan(x|�t)/.test(k))
+            if (/ghi(ch(ú|u)|c(h|ú))|note|comment|nhan(x|ét)/.test(k))
                 return { card: 'border-pink-500 bg-pink-950/40', label: 'text-pink-400', val: 'text-pink-200', icon: 'fa-solid fa-note-sticky' };
-            if (/huong|direction|bu(?|o)i|session|khung|timeframe|tf/.test(k))
+            if (/huong|direction|bu(ổ|o)i|session|khung|timeframe|tf/.test(k))
                 return { card: 'border-indigo-500 bg-indigo-950/40', label: 'text-indigo-400', val: 'text-indigo-200', icon: 'fa-solid fa-compass' };
             // default
             return { card: 'border-zinc-600 bg-zinc-800/60', label: 'text-zinc-400', val: 'text-zinc-200', icon: 'fa-solid fa-tag' };
@@ -1362,11 +1417,11 @@
             const row = JSON.parse(rowJson);
             const modal = document.getElementById('detail-modal');
             const body = document.getElementById('detail-body');
-            const res = getVal(row, 'K?t qu?', 'ketqua', 'result').toLowerCase();
+            const res = getVal(row, 'Kết quả', 'ketqua', 'result').toLowerCase();
             const badgeCls = res.includes('win') ? 'grad-win' : res.includes('loss') ? 'grad-loss' : 'grad-be';
-            const badgeTxt = res.includes('win') ? '? Win' : res.includes('loss') ? '? Loss' : '? BE';
+            const badgeTxt = res.includes('win') ? '✅ Win' : res.includes('loss') ? '❌ Loss' : '⚖ BE';
 
-            // T�ch d? li?u ?nh v� text
+            // Tách dữ liệu ?nh và text
             const textFields = [], imgFields = [];
             Object.entries(row).forEach(([k, v]) => {
                 const vStr = String(v ?? '');
@@ -1374,50 +1429,50 @@
                 else textFields.push({ k, v: vStr });
             });
 
-            // === Tr�ch xu?t c�c field d?c bi?t ===
-            const dongtien = getVal(row, 'D�ng ti?n', 'dongtien', 'money', 'symbol', 'pair', 'c?pti?n');
-            const mauhinh = getVal(row, 'M?u h�nh', 'mauhinh', 'pattern', 'setup');
-            const thoigian = getVal(row, 'Th?i gian', 'thoigian', 'ng�y', 'date', 'time');
-            // C�c key c?n ?n kh?i ph?n field ph�a du?i (v� d� hi?n th? ? tr�n)
+            // === Trõch xu?t cóc field d?c bi?t ===
+            const dongtien = getVal(row, 'Dòng tiền', 'dongtien', 'money', 'symbol', 'pair', 'cặptiền');
+            const mauhinh = getVal(row, 'Mẫu hình', 'mauhinh', 'pattern', 'setup');
+            const thoigian = getVal(row, 'Thời gian', 'thoigian', 'ngày', 'date', 'time');
+            // Các key cần ẩn khỏi phần field phía dưới (vì đã hiển thị ở trên)
             const isSpecialKey = k => {
                 const nk = n(k);
-                return nk.includes(n('d�ngti?n')) || nk.includes(n('dongtien')) || nk.includes('money') || nk.includes('symbol') || nk.includes('pair')
-                    || nk.includes(n('m?uh�nh')) || nk.includes(n('mauhinh')) || nk.includes('pattern') || nk.includes('setup')
-                    || nk.includes(n('th?igian')) || nk.includes(n('thoigian')) || nk.includes('date') || nk.includes('time')
-                    || nk.includes(n('ng�y')) || nk.includes('ngay')
-                    || nk.includes(n('k?tqu?')) || nk.includes(n('ketqua')) || nk.includes('result');
+                return nk.includes(n('dòngtiền')) || nk.includes(n('dongtien')) || nk.includes('money') || nk.includes('symbol') || nk.includes('pair')
+                    || nk.includes(n('mẫuhình')) || nk.includes(n('mauhinh')) || nk.includes('pattern') || nk.includes('setup')
+                    || nk.includes(n('thờigian')) || nk.includes(n('thoigian')) || nk.includes('date') || nk.includes('time')
+                    || nk.includes(n('ngày')) || nk.includes('ngay')
+                    || nk.includes(n('kếtquả')) || nk.includes(n('ketqua')) || nk.includes('result');
             };
 
             _detailImgs = imgFields.map(f => ({ url: f.v, label: f.k }));
 
             body.innerHTML = `
-                <!-- ===== HERO HEADER: D�ng ti?n + Ng�y + K?t qu? ===== -->
+                <!-- ===== HERO HEADER: Dòng tiền + Ngày + Kết quả ===== -->
                 <div class="flex items-center justify-between gap-3 mb-4 pb-4 border-b border-zinc-700/60">
-                    <!-- Tr�i: D�ng ti?n (to, kh�ng label) + Ng�y -->
+                    <!-- Trái: Dòng tiền (to, khứng label) + Ngày -->
                     <div class="flex flex-col gap-1">
                         ${dongtien ? `<div class="text-2xl font-black text-white tracking-widest font-mono leading-none">${dongtien}</div>` : ''}
                         ${thoigian ? `<div class="text-xs text-zinc-400 font-mono mt-0.5"><i class="fa-regular fa-clock mr-1 opacity-60"></i>${thoigian}</div>` : ''}
                     </div>
-                    <!-- Ph?i: Badge k?t qu? -->
+                    <!-- Phải: Badge kết quả -->
                     <span class="tag ${badgeCls} text-sm px-4 py-1.5 rounded-xl shadow-lg shrink-0">${badgeTxt}</span>
                 </div>
 
-                <!-- ===== M?U H�NH: N?i b?t ? gi?a ===== -->
+                <!-- ===== MẪU HÌNH: Nổi bật ở giữa ===== -->
                 ${mauhinh ? `
                 <div class="flex justify-center mb-5">
                     <div class="text-center bg-gradient-to-br from-violet-900/60 to-fuchsia-900/40 border border-violet-500/40 rounded-2xl px-6 py-3 shadow-lg shadow-violet-900/30">
                         <div class="text-[9px] font-black uppercase tracking-[.2em] text-violet-400 mb-1.5">
-                            <i class="fa-solid fa-chess-board mr-1"></i>M?u H�nh
+                            <i class="fa-solid fa-chess-board mr-1"></i>Mẫu Hình
                         </div>
                         <div class="text-xl font-black text-violet-100 tracking-wide">${mauhinh}</div>
                     </div>
                 </div>` : ''}
 
-                <!-- ===== H�NH ?NH ===== -->
+                <!-- ===== HÌNH ẢNH ===== -->
                 ${imgFields.length ? `
                 <div class="mb-5 rounded-xl border border-violet-800/40 bg-violet-950/20 p-3">
                     <div class="text-[10px] font-black uppercase tracking-widest text-violet-400 flex items-center gap-1.5 mb-3">
-                        <i class="fa-solid fa-images"></i> H�nh ?nh (${imgFields.length})
+                        <i class="fa-solid fa-images"></i> Hình ảnh (${imgFields.length})
                     </div>
                     <div class="grid grid-cols-${Math.min(imgFields.length, 2)} gap-3">
                         ${imgFields.map((f, i) => `
@@ -1427,11 +1482,11 @@
                                 </div>
                                 <div class="relative overflow-hidden rounded-xl ring-1 ring-violet-700/40">
                                     <img src="${f.v}" loading="lazy" class="detail-img-thumb"
-                                        onerror="this.closest('.relative').innerHTML='<div class=\\'flex items-center justify-center h-24 bg-zinc-800 rounded-xl\\'><span class=\\'text-zinc-500 text-xs\\'>L?i ?nh</span></div>'">
+                                        onerror="this.closest('.relative').innerHTML='<div class=\\'flex items-center justify-center h-24 bg-zinc-800 rounded-xl\\'><span class=\\'text-zinc-500 text-xs\\'>Lỗi ảnh</span></div>'">
                                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center pointer-events-none">
                                         <div class="opacity-0 group-hover:opacity-100 transition bg-black/60 rounded-full px-3 py-1.5 flex items-center gap-1.5">
                                             <i class="fa-solid fa-magnifying-glass-plus text-white text-sm"></i>
-                                            <span class="text-white text-xs font-bold">Ph�ng to</span>
+                                            <span class="text-white text-xs font-bold">Phứng to</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1439,13 +1494,13 @@
                     </div>
                 </div>` : ''}
 
-                <!-- ===== C�C FIELD C�N L?I ===== -->
+                <!-- ===== CÁC FIELD CÒN LẠI ===== -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     ${textFields.filter(f => f.v && !isSpecialKey(f.k)).map(f => {
                 const s = getFieldStyle(f.k);
-                const displayVal = f.v.toLowerCase().includes('win') ? '<span class="tag tag-win">? Win</span>'
-                    : f.v.toLowerCase().includes('loss') ? '<span class="tag tag-loss">? Loss</span>'
-                        : (f.v.toLowerCase() === 'be' || f.v.toLowerCase().includes('h�a')) ? '<span class="tag tag-be">? BE</span>'
+                const displayVal = f.v.toLowerCase().includes('win') ? '<span class="tag tag-win">✅ Win</span>'
+                    : f.v.toLowerCase().includes('loss') ? '<span class="tag tag-loss">❌ Loss</span>'
+                        : (f.v.toLowerCase() === 'be' || f.v.toLowerCase().includes('hòa')) ? '<span class="tag tag-be">⚖ BE</span>'
                             : f.v;
                 return `<div class="rounded-xl px-3 py-2.5 border-l-4 ${s.card}">
                             <div class="text-[9px] font-black uppercase tracking-widest mb-1 flex items-center gap-1.5 ${s.label}">
@@ -1475,7 +1530,7 @@
         <div class="flex flex-col items-center gap-2" onclick="event.stopPropagation()" style="max-height:92vh">
             <img id="lb-img" src="" class="max-w-full rounded-xl shadow-2xl object-contain pointer-events-none"
                 style="max-height:82vh; max-width:92vw">
-            <!-- Caption: t�n c?t ?nh -->
+            <!-- Caption: tên cột ảnh -->
             <div id="lb-caption" class="text-xs font-bold text-white/70 tracking-wider uppercase"></div>
         </div>
         <!-- Close -->
@@ -1504,7 +1559,7 @@
                         class="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-500 flex items-center justify-center">
                         <i class="fa-solid fa-circle-info text-white text-sm"></i>
                     </div>
-                    <h2 class="font-bold text-white tracking-tight">Chi Ti?t Ph?n ?ng</h2>
+                    <h2 class="font-bold text-white tracking-tight">Chi Tiết Phản Ứng</h2>
                 </div>
                 <button onclick="closeDetail()"
                     class="w-8 h-8 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition">
@@ -1519,13 +1574,13 @@
     <!-- Scroll to top button -->
     <button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})"
         class="fixed bottom-6 right-6 z-50 w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/30 flex items-center justify-center transition-all duration-300 opacity-0 translate-y-4 pointer-events-none hover:scale-110 active:scale-95"
-        title="L�n d?u trang">
+        title="Lên đầu trang">
         <i class="fa-solid fa-chevron-up text-sm"></i>
     </button>
     <script>
-        (function() {
+        (function () {
             const btn = document.getElementById('scroll-top-btn');
-            window.addEventListener('scroll', function() {
+            window.addEventListener('scroll', function () {
                 if (window.scrollY > 300) {
                     btn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
                     btn.classList.add('opacity-100', 'translate-y-0');
@@ -1536,6 +1591,8 @@
             }, { passive: true });
         })();
     </script>
+    <script src="./shortcuts.js"></script>
+    <script src="./prefetch.js"></script>
 </body>
 
 </html>
