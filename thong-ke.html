@@ -5,6 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trading Journal Pro</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SMC Journal">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('[PWA] SW registered:', reg.scope))
+                .catch(err => console.warn('[PWA] SW failed:', err));
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -1619,12 +1632,16 @@
 
                 if (cachedHistory && cachedHistory.length > 0) {
                     globalData = cachedHistory;
+
+                    if (cachedPrimary && cachedPrimary.length > 0) {
+                        block10Data = cachedPrimary;
+                    }
+
                     populateMoneyFilter(cachedHistory);
                     renderSummaryStats(cachedHistory);
                     resetAndRender();
 
                     if (cachedPrimary && cachedPrimary.length > 0) {
-                        block10Data = cachedPrimary;
                         try { updatePrimaryReport(); } catch (e) { }
                         try { renderBlock10Chart(cachedPrimary); } catch (e) { }
                     } else {
@@ -1653,8 +1670,8 @@
 
                 // 2. Fetch fresh data in background (Parallel)
                 Promise.all([
-                    fetch(API_URL + "?mode=history").then(r => r.json()).catch(err => { console.error("History API error", err); return null; }),
-                    fetch(API_PRIMARY_URL + "?mode=history").then(r => r.json()).catch(err => { console.error("Primary API error", err); return null; })
+                    fetch(API_URL + "?mode=history&_t=" + Date.now()).then(r => r.json()).catch(err => { console.error("History API error", err); return null; }),
+                    fetch(API_PRIMARY_URL + "?mode=history&_t=" + Date.now()).then(r => r.json()).catch(err => { console.error("Primary API error", err); return null; })
                 ]).then(([historyData, primaryData]) => {
                     let shouldRerender = false;
 
@@ -1688,7 +1705,7 @@
                             try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
                             try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
                             try { updatePrimaryReport(); } catch (e) { }
-                            try { renderBlock10Chart(block10Data && block10Data.length ? block10Data : globalData); } catch (e) { }
+                            try { renderBlock10Chart(typeof block10Data !== 'undefined' ? block10Data : globalData); } catch (e) { }
                         }, 500);
 
                         const chartTasks = [
@@ -1870,7 +1887,7 @@
                 const winT = (typeof CONFIG !== 'undefined' ? CONFIG.WIN_THRESHOLD : 10);
                 let wins = 0, loss = 0, be = 0, netR = 0, grossW = 0, grossL = 0;
                 data.forEach(t => {
-                    const p = parseFloat(t.pips) || 0;
+                    const p = parseFloat(t.pip || t.pips) || 0;
                     netR += p;
                     if (p > winT) { wins++; grossW += p; }
                     else if (p < 0) { loss++; grossL += Math.abs(p); }
@@ -1919,7 +1936,7 @@
                 if (cmpCharts[canvasId]) { cmpCharts[canvasId].destroy(); }
                 const sorted = [...data].sort((a, b) => parseDateVal(a.time) - parseDateVal(b.time));
                 let cum = 0;
-                const points = sorted.map((t, i) => { cum += parseFloat(t.pips) || 0; return { x: i + 1, y: parseFloat(cum.toFixed(2)) }; });
+                const points = sorted.map((t, i) => { cum += parseFloat(t.pip || t.pips) || 0; return { x: i + 1, y: parseFloat(cum.toFixed(2)) }; });
                 if (!points.length) return;
                 const isDark = document.documentElement.classList.contains('dark');
                 const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
@@ -1949,7 +1966,7 @@
                 const _winT = (typeof CONFIG !== 'undefined' ? CONFIG.WIN_THRESHOLD : 10);
                 const sorted = [...data].sort((a, b) => parseDateVal(a.time) - parseDateVal(b.time));
                 el.innerHTML = sorted.map(t => {
-                    const p = parseFloat(t.pips) || 0;
+                    const p = parseFloat(t.pip || t.pips) || 0;
                     let cls = 'grad-be';
                     if (p > _winT) cls = 'grad-win';
                     else if (p < 0) cls = 'grad-loss';
@@ -2056,7 +2073,7 @@
                 const sortedData = [...data].sort((a, b) => new Date(b.time) - new Date(a.time));
 
                 data.forEach(t => {
-                    let p = parseFloat(t.pips) || 0;
+                    let p = parseFloat(t.pip || t.pips) || 0;
                     netPips += p;
                     if (p > 0.1) wins++;
                     else if (p < -0.1) loss++;
@@ -2147,11 +2164,11 @@
 
                 // 2. Lọc dữ liệu tổng
                 const now = new Date();
-                let filtered = globalData.filter(d => {
+                const filterLogic = d => {
                     // Filter Money
                     if (fMoney !== 'all' && String(d.money).trim() !== fMoney) return false;
 
-                    const pips = parseFloat(d.pips) || 0;
+                    const pips = parseFloat(d.pip || d.pips) || 0;
                     // Filter Result
                     if (fResult !== 'all') {
                         if (fResult === 'win' && pips <= 0.1) return false;
@@ -2230,7 +2247,9 @@
                     }
 
                     return true;
-                });
+                };
+
+                let filtered = globalData.filter(filterLogic);
 
                 // 3. Cập nhật Stats dựa trên data đã lọc
                 lastFilteredData = filtered;
@@ -2254,7 +2273,10 @@
                     try { renderDurationChart(filtered); } catch (e) { console.error('[Dur]', e); }
                     try { renderDurationDistChart(filtered); } catch (e) { console.error('[DurDist]', e); }
                     try { renderHeatmap(filtered); } catch (e) { console.error('[Heatmap]', e); }
-                    try { renderCalendar(filtered); } catch (e) { console.error('[Calendar]', e); }
+                    try {
+                        const calData = typeof block10Data !== 'undefined' && block10Data.length > 0 ? block10Data.filter(filterLogic) : filtered;
+                        renderCalendar(calData);
+                    } catch (e) { console.error('[Calendar]', e); }
                     try { renderEquityCurve(filtered); } catch (e) { console.error('[Equity]', e); }
                     try { renderBestTrades(filtered); } catch (e) { console.error('[Best Trades]', e); }
                     try { renderPatternLeaderboard(filtered); } catch (e) { console.error('[Leaderboard]', e); }
@@ -2269,9 +2291,9 @@
             function renderPlaybook(data, container, type) {
                 let filteredData = [];
                 if (type === 'win') {
-                    filteredData = data.filter(d => parseFloat(d.pips) > getSettings().winThreshold);
+                    filteredData = data.filter(d => parseFloat(d.pip || d.pips) > getSettings().winThreshold);
                 } else if (type === 'loss') {
-                    filteredData = data.filter(d => parseFloat(d.pips) <= 0);
+                    filteredData = data.filter(d => parseFloat(d.pip || d.pips) <= 0);
                 }
 
                 if (filteredData.length === 0) {
@@ -2282,7 +2304,7 @@
                 let html = '';
                 // Sử dụng spread và reverse để tránh mutation gốc nếu cần, ở đây filteredData là mảng mới nên ổn
                 [...filteredData].reverse().forEach(t => {
-                    let pips = parseFloat(t.pips) || 0;
+                    let pips = parseFloat(t.pip || t.pips) || 0;
                     let badgeClass = 'bg-gray-100 text-gray-500 border-gray-200';
                     if (pips > getSettings().winThreshold) badgeClass = 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800';
                     else if (pips < 0) badgeClass = 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800';
@@ -2334,7 +2356,7 @@
                 }
 
                 // Lấy danh sách các lệnh THẮNG (lớn hơn BE/Win Threshold)
-                const wins = data.filter(d => parseFloat(d.pips) > 0);
+                const wins = data.filter(d => parseFloat(d.pip || d.pips) > 0);
                 // Sắp xếp giảm dần theo lợi nhuận ($)
                 wins.sort((a, b) => parseFloat(b.pips) - parseFloat(a.pips));
 
@@ -2416,7 +2438,7 @@
                     const safeKey = key.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
 
                     trades.forEach(t => {
-                        let pips = parseFloat(t.pips) || 0;
+                        let pips = parseFloat(t.pip || t.pips) || 0;
                         let txt = 'B', col = CONFIG.COLORS.BE, res = 'BE';
                         if (pips > CONFIG.WIN_THRESHOLD || (pips > 0 && t.ketqua === 'win' && pips > CONFIG.WIN_THRESHOLD) || (pips > 0 && t.calcRes === 'WIN')) { txt = 'W'; col = CONFIG.COLORS.WIN; res = 'WIN'; wins++; }
                         else if (pips < 0 || (pips <= 0 && t.ketqua === 'loss')) { txt = 'L'; col = CONFIG.COLORS.LOSS; res = 'LOSS'; }
@@ -2544,7 +2566,7 @@
                 // 1. Tính toán
                 let wins = 0, loss = 0, be = 0;
                 data.forEach(t => {
-                    let p = parseFloat(t.pips) || 0;
+                    let p = parseFloat(t.pip || t.pips) || 0;
                     if (p > CONFIG.WIN_THRESHOLD) wins++;
                     else if (p > 0) be++;
                     else loss++;
@@ -2642,13 +2664,13 @@
                     activeBtn.className = "img-tab px-4 py-2 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800 shadow-sm cursor-default";
                 }
 
-                // Logic hiển thị ảnh (như cũ)
+                // Logic hiển thị ảnh (hỗ trợ đa nguồn dữ liệu)
                 let src = "";
-                if (type === 'd1') src = currentTrade.imgD1;
-                if (type === 'h4') src = currentTrade.imgH4;
-                if (type === 'h1') src = currentTrade.imgH1;
-                if (type === 'm15') src = currentTrade.imgM15;
-                if (type === 'entry') src = currentTrade.imgEntry;
+                if (type === 'd1') src = currentTrade.imgD1 || currentTrade.d1 || currentTrade.htf;
+                if (type === 'h4') src = currentTrade.imgH4 || currentTrade.h4;
+                if (type === 'h1') src = currentTrade.imgH1 || currentTrade.h1;
+                if (type === 'm15') src = currentTrade.imgM15 || currentTrade.m15 || currentTrade.ltf;
+                if (type === 'entry') src = currentTrade.imgEntry || currentTrade.thucte || currentTrade.entryImg || currentTrade.entry;
 
                 const imgEl = document.getElementById('m-display-img');
                 const noImgEl = document.getElementById('m-no-img');
@@ -2965,19 +2987,19 @@
             function openModal(trade) {
                 currentTrade = trade;
 
-                // Điền thông tin cơ bản
-                document.getElementById('m-pattern').innerText = trade.pattern || 'Setup';
-                document.getElementById('m-time').innerText = trade.time || '';
-                document.getElementById('m-money-badge').innerText = trade.money || "";
-                document.getElementById('m-dienbien').innerText = trade.dien_bien || "Không có nội dung.";
-                document.getElementById('m-baihoc').innerText = trade.bai_hoc || "Không có nội dung.";
+                // Điền thông tin cơ bản (Hỗ trợ đa nguồn API)
+                document.getElementById('m-pattern').innerText = trade.pattern || trade.trade || trade.mau_hinh || 'Setup';
+                document.getElementById('m-time').innerText = trade.time || trade.thoigian || '';
+                document.getElementById('m-money-badge').innerText = trade.money || trade.dong_tien || trade.phien || "";
+                document.getElementById('m-dienbien').innerText = trade.dien_bien || trade.goc_nhin || "Không có nội dung.";
+                document.getElementById('m-baihoc').innerText = trade.bai_hoc || trade.ghi_chu || trade.note || "Không có nội dung.";
                 document.getElementById('m-cam_nhan').innerText = trade.cam_nhan || "Không có nội dung.";
 
 
                 // Xử lý Kết quả (Win/Loss)
                 let res = trade.calcRes;
                 if (!res) {
-                    let pips = parseFloat(trade.pips) || 0;
+                    let pips = parseFloat(trade.pips || trade.pip || trade._pips) || 0;
                     if (pips > getSettings().winThreshold) res = 'WIN';
                     else if (pips > 0) res = 'BE';
                     else res = 'LOSS';
@@ -2989,9 +3011,9 @@
                 else if (res === 'BE') rEl.className = "text-2xl font-black font-mono text-zinc-400";
                 else rEl.className = "text-2xl font-black font-mono text-red-600 dark:text-red-500 drop-shadow-sm";
 
-                const pips = parseFloat(trade.pips) || 0;
+                const pips = parseFloat(trade.pips || trade.pip || trade._pips) || 0;
                 const pEl = document.getElementById('m-pips');
-                pEl.innerText = (pips > 0 ? '+' : '') + pips + " R";
+                pEl.innerText = (pips > 0 ? '+' : '') + pips + " P";
                 pEl.className = `text-2xl font-black font-mono ${pips > 0 ? 'text-green-600 dark:text-green-500' : (pips < 0 ? 'text-red-600 dark:text-red-500' : 'text-zinc-400')}`;
 
                 // --- XỬ LÝ BLIND MODE ---
@@ -3121,7 +3143,7 @@
                 let totalLoss = 0;
 
                 data.forEach(t => {
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
 
                     // Chỉ lấy lệnh Thua hoặc Hòa (<= 0) VÀ có ghi chú lỗi sai
                     // Lưu ý: Đảm bảo Google Sheet có cột 'Ghi_chu' -> JSON trả về key là 'ghi_chu'
@@ -3233,7 +3255,7 @@
                     const date = new Date(t.time);
                     if (!isNaN(date.getTime())) {
                         const session = getSessionFromDate(date);
-                        const pips = parseFloat(t.pips) || 0;
+                        const pips = parseFloat(t.pip || t.pips) || 0;
                         stats[session] += pips;
                     }
                 });
@@ -3324,7 +3346,7 @@
 
                     if (symbol === "") symbol = "KHÁC";
 
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
 
                     if (!stats[symbol]) stats[symbol] = 0;
                     stats[symbol] += pips;
@@ -3422,7 +3444,7 @@
                     if (pat.length > 0) pat = pat.charAt(0).toUpperCase() + pat.slice(1);
                     if (pat === "") pat = "Khác";
 
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
 
                     if (!stats[pat]) stats[pat] = 0;
                     stats[pat] += pips;
@@ -3547,7 +3569,7 @@
                     const duration = parseDuration(t.hold_time);
                     if (duration <= 0) return;
 
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
                     const point = { x: duration, y: pips };
 
                     if (pips > getSettings().winThreshold) {
@@ -3726,7 +3748,7 @@
                 // Filter by Local Result Filter (MỚI)
                 if (localInsightsFilter !== 'all') {
                     withLessons = withLessons.filter(d => {
-                        const pips = parseFloat(d.pips) || 0;
+                        const pips = parseFloat(d.pip || d.pips) || 0;
                         if (localInsightsFilter === 'win') return pips > 0.1;
                         if (localInsightsFilter === 'loss') return pips < -0.1;
                         if (localInsightsFilter === 'be') return Math.abs(pips) <= 0.1;
@@ -3744,7 +3766,7 @@
                 let html = '';
 
                 [...withLessons].reverse().forEach(t => {
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
                     const isWin = pips > 0.1;
                     const isLoss = pips < -0.1;
 
@@ -3852,7 +3874,7 @@
                 const hours = Array.from({ length: 24 }, (_, i) => ({ h: i, wins: 0, loss: 0, be: 0 }));
                 data.forEach(t => {
                     const dt = new Date(t.time); if (isNaN(dt)) return;
-                    const h = dt.getHours(); const p = parseFloat(t.pips) || 0;
+                    const h = dt.getHours(); const p = parseFloat(t.pip || t.pips) || 0;
                     if (p > 0.1) hours[h].wins++; else if (p < -0.1) hours[h].loss++; else hours[h].be++;
                 });
                 const ctx = document.getElementById('hoursChart');
@@ -3896,8 +3918,8 @@
                         return '<span style="font-size:' + sz + 'px;opacity:' + op + ';font-weight:600;background:rgba(139,92,246,0.1);color:rgb(139,92,246);padding:3px 8px;border-radius:999px" title="' + n + ' lan">' + w + '</span>';
                     }).join('');
                 }
-                const losses = data.filter(t => (parseFloat(t.pips) || 0) < -0.1);
-                const wins = data.filter(t => (parseFloat(t.pips) || 0) > 0.1);
+                const losses = data.filter(t => (parseFloat(t.pip || t.pips) || 0) < -0.1);
+                const wins = data.filter(t => (parseFloat(t.pip || t.pips) || 0) > 0.1);
                 function topPhrases(arr, field) {
                     const fp = {};
                     arr.forEach(t => { (t[field] || '').split(/[.\n!?]/).map(s => s.trim()).filter(s => s.length > 10).slice(0, 3).forEach(s => { fp[s] = (fp[s] || 0) + 1; }); });
@@ -3926,11 +3948,12 @@
             let block10ChartInst = null;
             function renderBlock10Chart(data) {
                 // Normalize field names to support both API formats
-                const sorted = [...data].map(t => ({
+                // Lật ngược lại mảng để đúng mạch từ dòng đầu mảng đến dòng cuối mảng (khớp với Excel Top-Down) mà không cần quan tâm ngày tháng
+                const sorted = [...data].reverse().map(t => ({
                     ...t,
                     _pips: parseFloat(t.pips || t.pip || 0),
                     _time: t.time || t.thoigian || ''
-                })).sort((a, b) => new Date(a._time) - new Date(b._time));
+                }));
                 const blocks = [];
                 for (let i = 0; i < sorted.length; i += 10) {
                     const chunk = sorted.slice(i, i + 10);
@@ -3962,7 +3985,7 @@
                         ['#059669', 'fa-trophy', 'Block tốt nhất', 'C' + best.idx + ': ' + best.wr.toFixed(0) + '%', 'text-emerald-400'],
                         ['#dc2626', 'fa-circle-xmark', 'Block tệ nhất', 'C' + worst.idx + ': ' + worst.wr.toFixed(0) + '%', 'text-red-400'],
                         ['#d97706', 'fa-bullseye', 'WR trung bình', avgWR + '%', 'text-amber-400'],
-                        [totalNetR >= 0 ? '#059669' : '#dc2626', 'fa-coins', 'Net R tổng', (totalNetR >= 0 ? '+' : '') + totalNetR.toFixed(2) + 'R', nc],
+                        [totalNetR >= 0 ? '#059669' : '#dc2626', 'fa-coins', 'Net P tổng', (totalNetR >= 0 ? '+' : '') + totalNetR.toFixed(2) + 'P', nc],
                     ].map(([border, icon, label, val, valcls]) =>
                         `<div class="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 rounded-xl px-3.5 py-2.5 min-w-[130px]" style="border-left:3px solid ${border}">
                         <i class="fa-solid ${icon} text-xs" style="color:${border}"></i>
@@ -3982,7 +4005,7 @@
                         const barCol = isGood ? '#10b981' : isBad ? '#ef4444' : '#f59e0b';
                         const barBg = isGood ? 'rgba(16,185,129,0.12)' : isBad ? 'rgba(239,68,68,0.12)' : 'rgba(245,158,11,0.12)';
                         const netCol = b.netR >= 0 ? '#10b981' : '#ef4444';
-                        const netTxt = (b.netR >= 0 ? '+' : '') + b.netR.toFixed(1) + 'R';
+                        const netTxt = (b.netR >= 0 ? '+' : '') + b.netR.toFixed(1) + 'P';
 
                         // Trend badge
                         let trendHtml = '';
@@ -3998,8 +4021,9 @@
                             if (p > 10 || (p > 0 && rs.includes('win') && p > 10)) { lbl = 'W'; col = '#4ade80'; }
                             else if (p < 0 || rs.includes('loss')) { lbl = 'L'; col = '#f87171'; }
 
+                            const safeJson = encodeURIComponent(JSON.stringify(t));
                             return `
-                            <div style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:34px;height:34px;background:transparent;border:2px solid ${col};border-radius:10px;box-shadow:inset 0 0 8px ${col}40, 0 0 8px ${col}40;position:relative;margin:0 4px 10px 4px;">
+                            <div onclick="openModal(JSON.parse(decodeURIComponent('${safeJson}'))); event.stopPropagation();" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:34px;height:34px;background:transparent;border:2px solid ${col};border-radius:10px;box-shadow:inset 0 0 8px ${col}40, 0 0 8px ${col}40;position:relative;margin:0 4px 10px 4px;cursor:pointer;transition:transform 0.1s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Xem lệnh ${t.time || t.id || ''}">
                                 <span style="font-family:'Arial Rounded MT Bold', 'Nunito', 'Segoe UI', sans-serif;font-size:20px;font-weight:900;color:transparent;-webkit-text-stroke:1.5px ${col};text-shadow:0 0 4px ${col}80;letter-spacing:1px">${lbl}</span>
                                 <div style="display:flex;gap:3px;position:absolute;bottom:-10px;">
                                     <div style="width:3px;height:3px;background:${col};border-radius:50%;box-shadow:0 0 4px ${col};opacity:1"></div>
@@ -4519,9 +4543,9 @@
 
             function applyNotesFilter() {
                 if (notesFilter === 'win') {
-                    notesCachedData = notesAllData.filter(t => parseFloat(t.pips) > getSettings().winThreshold);
+                    notesCachedData = notesAllData.filter(t => parseFloat(t.pip || t.pips) > getSettings().winThreshold);
                 } else if (notesFilter === 'loss') {
-                    notesCachedData = notesAllData.filter(t => parseFloat(t.pips) < 0);
+                    notesCachedData = notesAllData.filter(t => parseFloat(t.pip || t.pips) < 0);
                 } else {
                     notesCachedData = [...notesAllData];
                 }
@@ -4546,7 +4570,7 @@
                 let html = '<div class="absolute left-[15px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-500 via-zinc-700 to-transparent"></div>';
 
                 slice.forEach((t, i) => {
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
                     let dotColor = 'bg-zinc-500'; let badge = 'BE'; let badgeCls = 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400';
                     if (pips > getSettings().winThreshold) { dotColor = 'bg-green-500'; badge = 'WIN'; badgeCls = 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'; }
                     else if (pips < 0) { dotColor = 'bg-red-500'; badge = 'LOSS'; badgeCls = 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'; }
@@ -4637,7 +4661,7 @@
 
                     const session = getSessionFromDate(dDate);
                     const key = session + '_' + dayName;
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
 
                     matrix[key].total++;
                     matrix[key].totalR += pips;
@@ -4748,7 +4772,7 @@
                 let athIdx = 0;
 
                 sorted.forEach((t, i) => {
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
                     cumR += pips;
                     if (cumR > maxR) { maxR = cumR; athIdx = i; }
                     const dd = maxR - cumR;
@@ -4856,7 +4880,7 @@
                     const p = (t.pattern || '').trim();
                     if (!p || p.length < 2) return;
                     if (!patterns[p]) patterns[p] = { win: 0, loss: 0, be: 0, total: 0, totalR: 0 };
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
                     patterns[p].total++;
                     patterns[p].totalR += pips;
                     if (pips > getSettings().winThreshold) patterns[p].win++;
@@ -4960,7 +4984,7 @@
 
                     const dayKey = dDate.getDate();
                     if (!dayMap[dayKey]) dayMap[dayKey] = { totalR: 0, win: 0, loss: 0, be: 0, trades: 0 };
-                    const pips = parseFloat(t.pips) || 0;
+                    const pips = parseFloat(t.pip || t.pips) || 0;
                     dayMap[dayKey].totalR += pips;
                     dayMap[dayKey].trades++;
                     if (pips > getSettings().winThreshold) dayMap[dayKey].win++;
@@ -5079,14 +5103,14 @@
                 // ⌨️ Phím tắt
                 shortcuts: {
                     reload: 'r',  // Tải lại dữ liệu
-                    settings: 'c',  // Mở Settings
+                    settings: 's',  // Mở Settings
                     notes: 'n',  // Mở Notes
                     dashboard: 'd',  // Chuyển Dashboard view
                     'playbook-win': 'w',  // Chuyển Playbook Win
                     'playbook-loss': 'x',  // Chuyển Playbook Loss
                     'nhap-lieu': 'i',  // Mở trang Nhập liệu
                     'phan-ung': 'u',  // Mở trang Mẫu hình PƯ
-                    help: 's',  // Hiện bảng phím tắt
+                    help: '?',  // Hiện bảng phím tắt
                     logout: 'l',  // Đăng xuất
                 },
             };
@@ -5251,12 +5275,12 @@
                     // ⌨️ Shortcuts
                     shortcuts: {
                         reload: document.getElementById('sk-reload').value.trim() || 'r',
-                        settings: document.getElementById('sk-settings').value.trim() || 'c',
+                        settings: document.getElementById('sk-settings').value.trim() || 's',
                         notes: document.getElementById('sk-notes').value.trim() || 'n',
                         dashboard: document.getElementById('sk-dashboard').value.trim() || 'd',
                         'playbook-win': document.getElementById('sk-playbook-win').value.trim() || 'w',
                         'playbook-loss': document.getElementById('sk-playbook-loss').value.trim() || 'x',
-                        help: document.getElementById('sk-help').value.trim() || 's',
+                        help: document.getElementById('sk-help').value.trim() || '?',
                         logout: document.getElementById('sk-logout').value.trim() || 'l',
                     },
                 };
@@ -5332,131 +5356,9 @@
                 if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
             });
 
-            // ============================================================
-            //  ⌨️ KEYBOARD SHORTCUT ENGINE
-            // ============================================================
-            let _shortcutEnabled = true;
-
-            function getShortcuts() {
-                return { ...DEFAULT_SETTINGS.shortcuts, ...(getSettings().shortcuts || {}) };
-            }
-
-            function executeShortcut(action) {
-                switch (action) {
-                    case 'reload': loadData(); break;
-                    case 'settings': openSettingsModal(); break;
-                    case 'notes': openNotesModal(); break;
-                    case 'dashboard': switchView('dashboard'); break;
-                    case 'playbook-win': switchView('win'); break;
-                    case 'playbook-loss': switchView('loss'); break;
-                    case 'playbook': switchView('win'); break;  // legacy
-                    case 'nhap-lieu': window.location.href = './index.html'; break;
-                    case 'phan-ung': window.location.href = './phan-ung.html'; break;
-                    case 'help': toggleShortcutHelp(); break;
-                    case 'logout': const _s = getSettings(); if (_s.loginRequired) doLogout(); break;
-                }
-            }
-
-            document.addEventListener('keydown', function (e) {
-                if (!_shortcutEnabled) return;
-                // Bỏ qua khi đang gõ trong input/textarea
-                const tag = document.activeElement ? document.activeElement.tagName : '';
-                if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-                // Bỏ qua khi Settings/Notes modal đang mở
-                const settingsOpen = !document.getElementById('settings-modal').classList.contains('hidden');
-                const notesOpen = !document.getElementById('notes-modal').classList.contains('hidden');
-                if (settingsOpen || notesOpen) {
-                    if (e.key === 'Escape') { closeSettingsModal(); closeNotesModal(); }
-                    return;
-                }
-                // Bỏ qua Ctrl/Alt combinations
-                if (e.ctrlKey || e.altKey || e.metaKey) return;
-
-                const key = e.key;
-                const sc = getShortcuts();
-                for (const [action, k] of Object.entries(sc)) {
-                    if (key === k || key.toLowerCase() === k.toLowerCase()) {
-                        e.preventDefault();
-                        executeShortcut(action);
-                        showShortcutToast(action, k);
-                        return;
-                    }
-                }
-            });
-
-            // Toast thông báo phím tắt
-            function showShortcutToast(action, key) {
-                const labels = {
-                    reload: 'Tải lại', settings: 'Cài đặt', notes: 'Ghi chú',
-                    dashboard: 'Dashboard', 'playbook-win': 'Playbook Win',
-                    'playbook-loss': 'Playbook Loss', playbook: 'Playbook',
-                    'nhap-lieu': 'Nhập liệu', 'phan-ung': 'Mẫu hình PƯ',
-                    help: 'Phím tắt', logout: 'Đăng xuất'
-                };
-                let toast = document.getElementById('shortcut-toast');
-                if (!toast) {
-                    toast = document.createElement('div');
-                    toast.id = 'shortcut-toast';
-                    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;transition:all 0.2s;opacity:0;pointer-events:none';
-                    document.body.appendChild(toast);
-                }
-                toast.innerHTML = `<div style="background:#18181b;border:1px solid #3f3f46;border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
-                    <kbd style="background:#27272a;border:1px solid #52525b;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:12px;color:#e4e4e7;font-weight:bold">${key.toUpperCase()}</kbd>
-                    <span style="font-size:12px;color:#a1a1aa;font-weight:600">${labels[action] || action}</span>
-                </div>`;
-                toast.style.opacity = '1';
-                toast.style.transform = 'translateX(-50%) translateY(0)';
-                clearTimeout(toast._t);
-                toast._t = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)'; }, 1500);
-            }
-
-            // Help Overlay
-            function toggleShortcutHelp() {
-                let overlay = document.getElementById('shortcut-help-overlay');
-                if (overlay) { overlay.remove(); return; }
-                const sc = getShortcuts();
-                const labels = {
-                    reload: 'Tải lại dữ liệu', settings: 'Mở Cài đặt', notes: 'Mở Ghi chú',
-                    dashboard: 'Dashboard', 'playbook-win': 'Playbook Win',
-                    'playbook-loss': 'Playbook Loss', playbook: 'Playbook',
-                    'nhap-lieu': '→ Nhập liệu', 'phan-ung': '→ Mẫu hình PƯ',
-                    help: 'Xem phím tắt', logout: 'Đăng xuất'
-                };
-                const icons = {
-                    reload: 'fa-rotate-right', settings: 'fa-gear', notes: 'fa-book-open',
-                    dashboard: 'fa-chart-simple', 'playbook-win': 'fa-trophy',
-                    'playbook-loss': 'fa-skull-crossbones', playbook: 'fa-layer-group',
-                    'nhap-lieu': 'fa-pen-to-square', 'phan-ung': 'fa-diagram-project',
-                    help: 'fa-keyboard', logout: 'fa-right-from-bracket'
-                };
-                let rows = Object.entries(sc).map(([action, key]) => `
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #27272a">
-                        <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#a1a1aa">
-                            <i class="fa-solid ${icons[action] || 'fa-bolt'}" style="width:16px;color:#71717a"></i>${labels[action] || action}
-                        </span>
-                        <kbd style="background:#27272a;border:1px solid #52525b;border-radius:6px;padding:3px 10px;font-family:monospace;font-size:13px;color:#e4e4e7;font-weight:bold;min-width:28px;text-align:center">${key.toUpperCase()}</kbd>
-                    </div>`).join('');
-                overlay = document.createElement('div');
-                overlay.id = 'shortcut-help-overlay';
-                overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)';
-                overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
-                overlay.innerHTML = `<div style="background:#18181b;border:1px solid #3f3f46;border-radius:20px;padding:28px;width:360px;max-width:90vw;box-shadow:0 24px 60px rgba(0,0,0,0.6)">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-                        <div style="display:flex;align-items:center;gap:10px">
-                            <div style="width:36px;height:36px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center">
-                                <i class="fa-solid fa-keyboard" style="color:white;font-size:15px"></i>
-                            </div>
-                            <span style="font-size:15px;font-weight:900;color:white">Phím tắt</span>
-                        </div>
-                        <button onclick="document.getElementById('shortcut-help-overlay').remove()"
-                            style="background:#27272a;border:none;border-radius:8px;width:30px;height:30px;color:#71717a;cursor:pointer;font-size:14px">✕</button>
-                    </div>
-                    ${rows}
-                    <p style="margin-top:12px;font-size:11px;color:#52525b;text-align:center">Có thể tùy chỉnh trong ⚙️ Cài đặt • Nhấn ESC hoặc click ngoài để đóng</p>
-                </div>`;
-                document.body.appendChild(overlay);
-            }
+            // ⌨️ Keyboard shortcuts → loaded from shared shortcuts.js
         </script>
+        <script src="./shortcuts.js"></script>
 
         <!-- Notes Modal -->
         <div id="notes-modal" class="fixed inset-0 z-[90] hidden">
@@ -5924,5 +5826,6 @@
         }
     })();
 </script>
+<script src="./prefetch.js"></script>
 
 </html>
