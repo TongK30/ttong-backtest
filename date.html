@@ -472,35 +472,58 @@
                     return 'text-' + c;
                 },
 
-                // --- HÀM CẬP NHẬT (Đã sửa logic) ---
-                updateAccount(acc) {
-                    const todayStr = new Date().toLocaleDateString('en-GB'); // dd/mm/yyyy
+                // --- HÀM CẬP NHẬT (Đã sửa logic cho phép chọn ngày) ---
+                async updateAccount(acc) {
+                    // Lấy ngày hiện tại format YYYY-MM-DD để làm giá trị mặc định cho Date Picker
+                    const today = new Date();
+                    const localISOString = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
-                    // Đã xóa bỏ đoạn kiểm tra if (acc.date_last === todayStr) return;
-                    // Để cho phép người dùng bấm cập nhật lại bất cứ lúc nào.
-
-                    acc.updating = true;
-
-                    fetch(WEB_APP_URL, {
-                        method: 'POST', mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify({ tk: acc.tk, date: todayStr })
-                    }).then(() => {
-                        // Giả lập độ trễ mạng một chút để thấy hiệu ứng
-                        setTimeout(() => {
-                            acc.date_last = todayStr;
-                            acc.updating = false; // Mở lại nút bấm ngay lập tức
-                            this.fetchAccounts(true); // Cập nhật ngầm lại danh sách
-
-                            // Thông báo nhỏ
-                            const Toast = Swal.mixin({
-                                toast: true, position: 'top-end', showConfirmButton: false, timer: 1500,
-                                timerProgressBar: true
-                            });
-                            Toast.fire({ icon: 'success', title: 'Đã cập nhật!' });
-
-                        }, 800);
+                    // Hiển thị Popup chọn ngày bằng SweetAlert2
+                    const { value: selectedDate } = await Swal.fire({
+                        title: 'Chọn ngày cập nhật',
+                        html: `<input type="date" id="swal-update-date" class="swal2-input" value="${localISOString}" style="max-width:200px;">`,
+                        focusConfirm: false,
+                        showCancelButton: true,
+                        confirmButtonText: 'Lưu',
+                        cancelButtonText: 'Hủy',
+                        preConfirm: () => {
+                            return document.getElementById('swal-update-date').value;
+                        }
                     });
+
+                    // Nếu user bấm Hủy thì selectedDate sẽ undefined
+                    if (selectedDate) {
+                        // Chuyển đổi từ định dạng YYYY-MM-DD (của input date) sang DD/MM/YYYY (của file Google Sheet)
+                        const parts = selectedDate.split('-');
+                        const formattedDateStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+                        acc.updating = true;
+
+                        fetch(WEB_APP_URL, {
+                            method: 'POST', mode: 'no-cors',
+                            headers: { 'Content-Type': 'text/plain' },
+                            body: JSON.stringify({ tk: acc.tk, date: formattedDateStr })
+                        }).then(() => {
+                            // Giả lập độ trễ mạng một chút để thấy hiệu ứng
+                            setTimeout(() => {
+                                acc.date_last = formattedDateStr;
+                                acc.updating = false; // Mở lại nút bấm
+                                this.fetchAccounts(true); // Cập nhật ngầm lại danh sách
+
+                                // Thông báo cập nhật thành công
+                                const Toast = Swal.mixin({
+                                    toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
+                                    timerProgressBar: true
+                                });
+                                Toast.fire({ icon: 'success', title: `Đã cập nhật đến: ${formattedDateStr}` });
+
+                            }, 800);
+                        }).catch(e => {
+                            acc.updating = false;
+                            Swal.fire('Lỗi', 'Có lỗi xảy ra khi gọi Google Script', 'error');
+                            console.error(e);
+                        });
+                    }
                 }
             }
         }).mount('#app');
