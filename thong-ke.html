@@ -1217,6 +1217,135 @@
                 </div>
             </div>
 
+            <!-- 🧠 PSYCHOLOGY SCORE SECTION -->
+            <div id="psychology-section" class="max-w-6xl mx-auto px-4 mb-20 scroll-mt-24">
+                <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                                <i class="fa-solid fa-brain text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-zinc-800 dark:text-zinc-100 text-lg">Trading Psychology Score</h3>
+                                <p class="text-xs text-zinc-400 font-medium">Phân tích kỷ luật & phát hiện sai lầm tâm lý</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Score Cards Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                        <!-- Main Score Gauge -->
+                        <div class="md:col-span-2 glass-neon-card rounded-2xl p-6 flex flex-col items-center justify-center min-h-[220px]">
+                            <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">Discipline Score</div>
+                            <div class="w-full max-w-[160px] flex flex-col items-center justify-center">
+                                <svg viewBox="0 0 200 120" class="w-full h-auto overflow-visible">
+                                    <defs>
+                                        <linearGradient id="psy-gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#ef4444" />
+                                            <stop offset="50%" stop-color="#fbbf24" />
+                                            <stop offset="100%" stop-color="#10b981" />
+                                        </linearGradient>
+                                        <filter id="psyNeedleShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.3" />
+                                        </filter>
+                                    </defs>
+                                    <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#psy-gauge-grad)" stroke-width="20" stroke-linecap="round" />
+                                    <g id="psy-needle" style="transform-origin: 100px 100px; transform: rotate(0deg); transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);" filter="url(#psyNeedleShadow)">
+                                        <line x1="100" y1="100" x2="25" y2="100" stroke="#27272a" stroke-width="7" stroke-linecap="round" class="dark:stroke-white" />
+                                        <line x1="100" y1="100" x2="28" y2="100" stroke="#f4f4f5" stroke-width="3.5" stroke-linecap="round" class="dark:stroke-zinc-900" />
+                                        <circle cx="100" cy="100" r="9" fill="#27272a" class="dark:fill-white" />
+                                        <circle cx="100" cy="100" r="3.5" fill="#f4f4f5" class="dark:fill-zinc-900" />
+                                    </g>
+                                </svg>
+                                <div class="flex items-baseline mt-2 justify-center">
+                                    <span id="psy-score-text" class="text-5xl font-black text-zinc-900 dark:text-white drop-shadow-md tracking-tighter">0</span>
+                                    <span class="text-xl font-bold text-zinc-400 ml-1">/100</span>
+                                </div>
+                                <div id="psy-rating-badge" class="mt-2 px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-zinc-100 dark:bg-zinc-800 text-zinc-500">--</div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Detector Mini Cards -->
+                        <div class="md:col-span-3 grid grid-cols-2 gap-3">
+                            <!-- Revenge Trade -->
+                            <div class="glass-neon-card rounded-xl p-4 flex flex-col">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center"><i class="fa-solid fa-fire-flame-curved text-red-500 text-xs"></i></div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Revenge</span>
+                                </div>
+                                <div id="psy-revenge-count" class="text-2xl font-black text-zinc-900 dark:text-white">0</div>
+                                <div class="text-[10px] text-zinc-400 mt-auto">lần phát hiện</div>
+                                <div id="psy-revenge-impact" class="text-[10px] font-bold text-red-400 mt-1">-0 điểm</div>
+                            </div>
+                            <!-- Overtrading -->
+                            <div class="glass-neon-card rounded-xl p-4 flex flex-col">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center"><i class="fa-solid fa-chart-bar text-amber-500 text-xs"></i></div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Overtrading</span>
+                                </div>
+                                <div id="psy-overtrade-count" class="text-2xl font-black text-zinc-900 dark:text-white">0</div>
+                                <div class="text-[10px] text-zinc-400 mt-auto">ngày vượt ngưỡng</div>
+                                <div id="psy-overtrade-impact" class="text-[10px] font-bold text-amber-400 mt-1">-0 điểm</div>
+                            </div>
+                            <!-- FOMO -->
+                            <div class="glass-neon-card rounded-xl p-4 flex flex-col">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center"><i class="fa-solid fa-clock text-orange-500 text-xs"></i></div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">FOMO</span>
+                                </div>
+                                <div id="psy-fomo-count" class="text-2xl font-black text-zinc-900 dark:text-white">0</div>
+                                <div class="text-[10px] text-zinc-400 mt-auto">lệnh ngoài giờ vàng</div>
+                                <div id="psy-fomo-impact" class="text-[10px] font-bold text-orange-400 mt-1">-0 điểm</div>
+                            </div>
+                            <!-- Tilt -->
+                            <div class="glass-neon-card rounded-xl p-4 flex flex-col">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-7 h-7 rounded-lg bg-rose-500/10 flex items-center justify-center"><i class="fa-solid fa-tornado text-rose-500 text-xs"></i></div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Tilt</span>
+                                </div>
+                                <div id="psy-tilt-count" class="text-2xl font-black text-zinc-900 dark:text-white">0</div>
+                                <div class="text-[10px] text-zinc-400 mt-auto">chuỗi thua liên tiếp</div>
+                                <div id="psy-tilt-impact" class="text-[10px] font-bold text-rose-400 mt-1">-0 điểm</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Violation Timeline Table -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-black text-zinc-700 dark:text-zinc-300 uppercase tracking-widest mb-3"><i class="fa-solid fa-timeline text-purple-500 mr-2"></i>Chi Tiết Vi Phạm</h4>
+                        <div class="max-h-[250px] overflow-y-auto nice-scrollbar rounded-xl border border-zinc-200 dark:border-zinc-700/50">
+                            <table class="w-full text-sm">
+                                <thead class="sticky top-0 bg-zinc-100 dark:bg-zinc-800 z-10">
+                                    <tr class="text-left text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                        <th class="px-4 py-2.5">Ngày</th>
+                                        <th class="px-4 py-2.5">Loại</th>
+                                        <th class="px-4 py-2.5">Chi tiết</th>
+                                        <th class="px-4 py-2.5 text-right">Pip</th>
+                                        <th class="px-4 py-2.5 text-right">Điểm</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="psy-violations-tbody" class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                    <tr><td colspan="5" class="px-4 py-6 text-center text-zinc-400 italic text-xs">Đang phân tích...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- AI Insight Card -->
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 rounded-2xl p-5 border border-purple-100 dark:border-purple-900/30">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <i class="fa-solid fa-lightbulb text-purple-500 text-sm"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-1">Phân Tích Tâm Lý</h5>
+                                <p id="psy-ai-insight" class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">Đang phân tích dữ liệu giao dịch...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="insights-section" class="max-w-6xl mx-auto px-4 mb-20 scroll-mt-24">
                 <div
                     class="bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800">
@@ -1576,6 +1705,14 @@
                 </span>
                 <i class="fa-solid fa-file-invoice text-indigo-500 text-lg min-w-[20px] text-center"></i>
             </button>
+            <button onclick="scrollToSection('psychology-section')"
+                class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
+                <span
+                    class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-purple-600 dark:text-purple-400 mr-3 hidden group-hover:block">
+                    Psychology
+                </span>
+                <i class="fa-solid fa-brain text-purple-500 text-lg min-w-[20px] text-center"></i>
+            </button>
 
             <a href="./forex_calendar.html"
                 class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
@@ -1596,7 +1733,7 @@
             </button>
 
             <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
-                class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap mt-4">
+                class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap mt-8">
                 <span
                     class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-zinc-500 dark:text-zinc-400 mr-3 hidden group-hover:block">
                     Len dau
@@ -1856,7 +1993,8 @@
                             () => renderSymbolChart(globalData),
                             () => renderDurationChart(globalData),
                             () => renderDurationDistChart(globalData),
-                            () => renderInsights(globalData)
+                            () => renderInsights(globalData),
+                            () => renderPsychologyScore(globalData)
                         ];
 
                         let i = 0;
@@ -2423,6 +2561,7 @@
                         renderExitStrategyBoard(exitData); 
                     } catch (e) { console.error('[Exit Strategy]', e); }
                     try { renderPatternLeaderboard(filtered); } catch (e) { console.error('[Leaderboard]', e); }
+                    try { renderPsychologyScore(filtered); } catch (e) { console.error('[Psychology]', e); }
                 } else {
                     container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20";
                     renderPlaybook(filtered, container, currentView);
@@ -4924,6 +5063,270 @@
                 }
             }
 
+            // ===== 🧠 TRADING PSYCHOLOGY SCORE =====
+            function renderPsychologyScore(data) {
+                if (!data || data.length < 2) {
+                    document.getElementById('psy-score-text').textContent = '--';
+                    document.getElementById('psy-rating-badge').textContent = 'Chưa đủ dữ liệu';
+                    document.getElementById('psy-ai-insight').textContent = 'Cần ít nhất 2 lệnh để phân tích tâm lý giao dịch.';
+                    return;
+                }
+
+                const PSY_CONFIG = { REVENGE_WINDOW: 30, MAX_TRADES_DAY: 4, TILT_THRESHOLD: 2 };
+                const s = typeof getSettings === 'function' ? getSettings() : {};
+
+                // Sort by time
+                const sorted = [...data].filter(t => t.time).sort((a, b) => new Date(a.time) - new Date(b.time));
+                
+                // Helper: get result
+                function getResult(t) {
+                    const pips = parseFloat(t.pip || t.pips || 0);
+                    const rs = (t.ket_qua_primary || t.ketqua || t.ket_qua || t.ket_qua_secondary || '').toLowerCase();
+                    if (pips > 10 || (pips > 0 && rs.includes('win') && pips > 10)) return 'WIN';
+                    if (pips < 0 || rs.includes('loss')) return 'LOSS';
+                    return 'BE';
+                }
+
+                // Helper: get session
+                function getSess(t) {
+                    try {
+                        const dt = new Date(t.time);
+                        if (isNaN(dt)) return 'Unknown';
+                        const h = dt.getHours();
+                        if (s.sessionAsia && h >= s.sessionAsia[0] && h < s.sessionAsia[1]) return 'Asia';
+                        if (s.sessionLondon && h >= s.sessionLondon[0] && h < s.sessionLondon[1]) return 'London';
+                        if (s.sessionNewYork) { if (h >= s.sessionNewYork[0] || h < (s.sessionNewYork[1] || 4)) return 'NewYork'; }
+                        // Default session ranges
+                        if (h >= 1 && h < 9) return 'Asia';
+                        if (h >= 14 && h < 19) return 'London';
+                        if (h >= 19 || h < 1) return 'NewYork';
+                        return 'Other';
+                    } catch(e) { return 'Unknown'; }
+                }
+
+                let violations = [];
+
+                // ===== 1. REVENGE TRADE DETECTION =====
+                let revengeCount = 0, revengePips = 0;
+                for (let i = 1; i < sorted.length; i++) {
+                    const prev = sorted[i - 1], curr = sorted[i];
+                    const prevRes = getResult(prev);
+                    const d1 = new Date(prev.time), d2 = new Date(curr.time);
+                    if (isNaN(d1) || isNaN(d2)) continue;
+                    const diffMin = (d2 - d1) / 60000;
+                    if (prevRes === 'LOSS' && diffMin >= 0 && diffMin < PSY_CONFIG.REVENGE_WINDOW) {
+                        revengeCount++;
+                        const p = parseFloat(curr.pip || curr.pips || 0);
+                        revengePips += p;
+                        const samePair = String(prev.money||'').trim() === String(curr.money||'').trim();
+                        violations.push({
+                            date: curr.time ? curr.time.substring(0, 10) : '--',
+                            type: 'REVENGE',
+                            icon: '🔴',
+                            detail: `${curr.money || 'Pair'} sau ${Math.round(diffMin)}' ${samePair ? '(CÙNG CẶP!)' : ''}`,
+                            pip: p,
+                            penalty: samePair ? -7 : -5,
+                            trade: curr
+                        });
+                    }
+                }
+
+                // ===== 2. OVERTRADING DETECTION =====
+                let overtradeDays = 0, overtradePips = 0;
+                const byDay = {};
+                sorted.forEach(t => {
+                    const day = t.time ? t.time.substring(0, 10) : 'unknown';
+                    if (!byDay[day]) byDay[day] = [];
+                    byDay[day].push(t);
+                });
+                Object.entries(byDay).forEach(([day, trades]) => {
+                    if (trades.length > PSY_CONFIG.MAX_TRADES_DAY) {
+                        overtradeDays++;
+                        const excessTrades = trades.slice(PSY_CONFIG.MAX_TRADES_DAY);
+                        const excessPips = excessTrades.reduce((s, t) => s + (parseFloat(t.pip || t.pips || 0)), 0);
+                        overtradePips += excessPips;
+                        violations.push({
+                            date: day,
+                            type: 'OVERTRADE',
+                            icon: '🟡',
+                            detail: `${trades.length} lệnh (max: ${PSY_CONFIG.MAX_TRADES_DAY})`,
+                            pip: excessPips,
+                            penalty: -3,
+                            trade: trades[PSY_CONFIG.MAX_TRADES_DAY]
+                        });
+                    }
+                });
+
+                // ===== 3. FOMO HOURS DETECTION =====
+                let fomoCount = 0, fomoPips = 0;
+                const sessionStats = {};
+                sorted.forEach(t => {
+                    const sess = getSess(t);
+                    if (!sessionStats[sess]) sessionStats[sess] = { win: 0, total: 0, pips: 0 };
+                    sessionStats[sess].total++;
+                    const p = parseFloat(t.pip || t.pips || 0);
+                    sessionStats[sess].pips += p;
+                    if (getResult(t) === 'WIN') sessionStats[sess].win++;
+                });
+                // Find best & worst session (min 3 trades)
+                let bestSess = null, worstSess = null, bestWR = -1, worstWR = 101;
+                Object.entries(sessionStats).forEach(([sess, st]) => {
+                    if (st.total >= 3) {
+                        const wr = (st.win / st.total) * 100;
+                        if (wr > bestWR) { bestWR = wr; bestSess = sess; }
+                        if (wr < worstWR) { worstWR = wr; worstSess = sess; }
+                    }
+                });
+                if (worstSess && bestSess && worstSess !== bestSess) {
+                    sorted.forEach(t => {
+                        if (getSess(t) === worstSess) {
+                            const p = parseFloat(t.pip || t.pips || 0);
+                            if (p < 0) {
+                                fomoCount++;
+                                fomoPips += p;
+                                violations.push({
+                                    date: t.time ? t.time.substring(0, 10) : '--',
+                                    type: 'FOMO',
+                                    icon: '🟠',
+                                    detail: `${worstSess} (Best: ${bestSess})`,
+                                    pip: p,
+                                    penalty: -2,
+                                    trade: t
+                                });
+                            }
+                        }
+                    });
+                }
+
+                // ===== 4. TILT DETECTION =====
+                let tiltZones = 0, tiltPips = 0, consecLoss = 0;
+                sorted.forEach(t => {
+                    const res = getResult(t);
+                    if (res === 'LOSS') {
+                        consecLoss++;
+                        if (consecLoss === PSY_CONFIG.TILT_THRESHOLD) {
+                            tiltZones++;
+                            const p = parseFloat(t.pip || t.pips || 0);
+                            tiltPips += p;
+                            violations.push({
+                                date: t.time ? t.time.substring(0, 10) : '--',
+                                type: 'TILT',
+                                icon: '🔴',
+                                detail: `${consecLoss} loss liên tiếp`,
+                                pip: p,
+                                penalty: -4,
+                                trade: t
+                            });
+                        } else if (consecLoss > PSY_CONFIG.TILT_THRESHOLD) {
+                            const p = parseFloat(t.pip || t.pips || 0);
+                            tiltPips += p;
+                        }
+                    } else {
+                        consecLoss = 0;
+                    }
+                });
+
+                // ===== 5. DISCIPLINE SCORE =====
+                let score = 100;
+                score -= revengeCount * 5;
+                score -= overtradeDays * 3;
+                score -= fomoCount * 2;
+                score -= tiltZones * 4;
+                // Bonus: bai_hoc written
+                const lessonsWritten = sorted.filter(t => t.bai_hoc && String(t.bai_hoc).trim().length > 3).length;
+                const lessonRate = sorted.length > 0 ? lessonsWritten / sorted.length : 0;
+                score += Math.round(lessonRate * 10);
+                score = Math.max(0, Math.min(100, score));
+
+                // ===== UPDATE UI =====
+                // Gauge Needle
+                const needle = document.getElementById('psy-needle');
+                if (needle) {
+                    const rot = (score / 100) * 180;
+                    needle.style.transform = `rotate(${rot}deg)`;
+                }
+                document.getElementById('psy-score-text').textContent = score;
+
+                // Rating badge
+                const badge = document.getElementById('psy-rating-badge');
+                let rating = '', badgeClass = '';
+                if (score >= 90) { rating = '🏆 MASTER'; badgeClass = 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'; }
+                else if (score >= 70) { rating = '✅ GOOD'; badgeClass = 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'; }
+                else if (score >= 50) { rating = '⚠️ WARNING'; badgeClass = 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'; }
+                else if (score >= 30) { rating = '🔴 DANGER'; badgeClass = 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'; }
+                else { rating = '💀 CRITICAL'; badgeClass = 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'; }
+                badge.textContent = rating;
+                badge.className = `mt-2 px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest ${badgeClass}`;
+
+                // Detector cards
+                const revPenalty = revengeCount * 5;
+                const overPenalty = overtradeDays * 3;
+                const fomoPenalty = fomoCount * 2;
+                const tiltPenalty = tiltZones * 4;
+
+                document.getElementById('psy-revenge-count').textContent = revengeCount;
+                document.getElementById('psy-revenge-impact').textContent = revPenalty > 0 ? `-${revPenalty} điểm` : '✅ 0';
+                document.getElementById('psy-revenge-impact').className = `text-[10px] font-bold mt-1 ${revPenalty > 0 ? 'text-red-400' : 'text-emerald-400'}`;
+
+                document.getElementById('psy-overtrade-count').textContent = overtradeDays;
+                document.getElementById('psy-overtrade-impact').textContent = overPenalty > 0 ? `-${overPenalty} điểm` : '✅ 0';
+                document.getElementById('psy-overtrade-impact').className = `text-[10px] font-bold mt-1 ${overPenalty > 0 ? 'text-amber-400' : 'text-emerald-400'}`;
+
+                document.getElementById('psy-fomo-count').textContent = fomoCount;
+                document.getElementById('psy-fomo-impact').textContent = fomoPenalty > 0 ? `-${fomoPenalty} điểm` : '✅ 0';
+                document.getElementById('psy-fomo-impact').className = `text-[10px] font-bold mt-1 ${fomoPenalty > 0 ? 'text-orange-400' : 'text-emerald-400'}`;
+
+                document.getElementById('psy-tilt-count').textContent = tiltZones;
+                document.getElementById('psy-tilt-impact').textContent = tiltPenalty > 0 ? `-${tiltPenalty} điểm` : '✅ 0';
+                document.getElementById('psy-tilt-impact').className = `text-[10px] font-bold mt-1 ${tiltPenalty > 0 ? 'text-rose-400' : 'text-emerald-400'}`;
+
+                // Violations Table
+                const tbody = document.getElementById('psy-violations-tbody');
+                violations.sort((a, b) => b.date < a.date ? -1 : 1);
+                if (violations.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-emerald-500 font-bold text-sm"><i class="fa-solid fa-trophy mr-2"></i>Không có vi phạm tâm lý! Kỷ luật tuyệt vời!</td></tr>';
+                } else {
+                    tbody.innerHTML = violations.map(v => {
+                        const typeColors = { REVENGE: 'text-red-500 bg-red-500/10', OVERTRADE: 'text-amber-500 bg-amber-500/10', FOMO: 'text-orange-500 bg-orange-500/10', TILT: 'text-rose-500 bg-rose-500/10' };
+                        const tc = typeColors[v.type] || 'text-zinc-400 bg-zinc-500/10';
+                        const pipColor = v.pip >= 0 ? 'text-green-500' : 'text-red-400';
+                        return `<tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors" onclick="if(typeof openModal==='function' && arguments[0]) openModal(${JSON.stringify(v.trade).replace(/"/g, '&quot;')})">
+                            <td class="px-4 py-2.5 text-xs font-mono text-zinc-500">${v.date}</td>
+                            <td class="px-4 py-2.5"><span class="text-[10px] font-black px-2 py-0.5 rounded-full ${tc}">${v.icon} ${v.type}</span></td>
+                            <td class="px-4 py-2.5 text-xs text-zinc-600 dark:text-zinc-400">${v.detail}</td>
+                            <td class="px-4 py-2.5 text-right text-xs font-bold ${pipColor}">${v.pip > 0 ? '+' : ''}${v.pip.toFixed(0)}</td>
+                            <td class="px-4 py-2.5 text-right text-xs font-black text-red-400">${v.penalty}</td>
+                        </tr>`;
+                    }).join('');
+                }
+
+                // AI Insight
+                const insightEl = document.getElementById('psy-ai-insight');
+                let insights = [];
+                if (revengeCount > 0) {
+                    const revengeWR = violations.filter(v => v.type === 'REVENGE' && getResult(v.trade) === 'WIN').length;
+                    const revengeTotal = violations.filter(v => v.type === 'REVENGE').length;
+                    const rwrPct = revengeTotal > 0 ? Math.round((revengeWR / revengeTotal) * 100) : 0;
+                    insights.push(`😤 <strong>Revenge Trade:</strong> ${revengeCount} lần phát hiện, WR chỉ ${rwrPct}%. Tổng: ${revengePips > 0 ? '+' : ''}${revengePips.toFixed(0)} Pip. <em>Hãy chờ ít nhất 30 phút sau lệnh thua.</em>`);
+                }
+                if (overtradeDays > 0) {
+                    insights.push(`📊 <strong>Overtrading:</strong> ${overtradeDays} ngày vượt ${PSY_CONFIG.MAX_TRADES_DAY} lệnh. Các lệnh thừa thường có kết quả kém hơn.`);
+                }
+                if (fomoCount > 0 && worstSess) {
+                    insights.push(`⏰ <strong>FOMO:</strong> ${fomoCount} lệnh thua ở phiên ${worstSess} (WR: ${Math.round(worstWR)}%). Phiên mạnh nhất: ${bestSess} (WR: ${Math.round(bestWR)}%).`);
+                }
+                if (tiltZones > 0) {
+                    insights.push(`🌀 <strong>Tilt:</strong> ${tiltZones} lần rơi vào chuỗi thua ≥${PSY_CONFIG.TILT_THRESHOLD}. Sau chuỗi thua nên nghỉ ít nhất 1-2 giờ.`);
+                }
+                if (lessonRate > 0.7) {
+                    insights.push(`✍️ <strong>Bonus:</strong> Bạn ghi bài học ${Math.round(lessonRate * 100)}% lệnh — kỷ luật ghi chép rất tốt! (+${Math.round(lessonRate * 10)} điểm)`);
+                }
+                if (insights.length === 0) {
+                    insights.push('🏆 <strong>Xuất sắc!</strong> Không phát hiện lỗi tâm lý nào trong kỳ này. Tiếp tục giữ vững kỷ luật!');
+                }
+                insightEl.innerHTML = insights.join('<br class="mb-1.5">');
+            }
+
             // --- EQUITY CURVE ---
             let equityChartInstance = null;
             function renderExitStrategyBoard(data) {
@@ -5430,7 +5833,7 @@
                 autoTheme: false, // Tự động Đổi màu theo giờ (Sáng 6h-18h / Tối 18h-6h)
                 sectionOrder: [
                     'dashboard-grid', 'best-trades-section', 'stats-area', 'analytics-area', 'relative-symbol',
-                    'pattern-section', 'duration-section', 'hours-section', 'ai-summary-section', 'block10-section', 'insights-section',
+                    'pattern-section', 'duration-section', 'hours-section', 'ai-summary-section', 'block10-section', 'psychology-section', 'insights-section',
                     'heatmap-section', 'calendar-section', 'equity-section'
                 ],
                 // 🔐 Đăng nhập
@@ -5512,7 +5915,7 @@
                     'relative-symbol': 'Quan hệ cặp tiền', 'pattern-section': 'Hiệu suất tiềm năng',
                     'duration-section': 'Thời gian giữ lệnh', 'hours-section': 'Best Hours',
                     'ai-summary-section': 'Journal AI', 'block10-section': 'Block 10',
-                    'insights-section': 'Nhật ký bài học', 'heatmap-section': 'Heatmap',
+                    'psychology-section': 'Psychology Score', 'insights-section': 'Nhật ký bài học', 'heatmap-section': 'Heatmap',
                     'calendar-section': 'Lịch giao dịch', 'equity-section': 'Đường cong vốn (Equity)'
                 };
                 let currentOrder = [...(s.sectionOrder || DEFAULT_SETTINGS.sectionOrder)];
