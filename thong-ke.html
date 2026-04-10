@@ -38,6 +38,33 @@
     </script>
     <style>
         /* --- CẤU HÌNH CSS CƠ BẢN --- */
+        /* Scrollbar: Hi-Tech Accent (Màu Điểm Nhấn Ngọc Lục Bảo) */
+        .nice-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .nice-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+        }
+        .dark .nice-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .nice-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(161, 161, 170, 0.4); /* zinc-400 */
+            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+        }
+        /* Hi-Tech Hover Glow - Emerald 500 */
+        .nice-scrollbar:hover::-webkit-scrollbar-thumb {
+            background-color: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+        .dark .nice-scrollbar:hover::-webkit-scrollbar-thumb {
+            background-color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+        }
+        /* End Scrollbar */
         body {
             /* Xóa màu cứng, để Tailwind lo việc này */
             min-height: 100vh;
@@ -66,6 +93,49 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
             color: #e4e4e7;
+        }
+
+        /* --- GLASS + NEON GLOW CARD (Report Stat Cards) --- */
+        .glass-neon-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(16, 185, 129, 0.15);
+            border-radius: 16px;
+            box-shadow:
+                0 0 0 1px rgba(16, 185, 129, 0.05),
+                0 4px 24px -4px rgba(16, 185, 129, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-neon-card:hover {
+            border-color: rgba(16, 185, 129, 0.35);
+            box-shadow:
+                0 0 0 1px rgba(16, 185, 129, 0.1),
+                0 8px 32px -4px rgba(16, 185, 129, 0.15),
+                0 0 20px -4px rgba(16, 185, 129, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            transform: translateY(-2px);
+        }
+        .dark .glass-neon-card {
+            background: rgba(24, 24, 27, 0.55);
+            border: 1.5px solid rgba(16, 185, 129, 0.2);
+            box-shadow:
+                0 0 0 1px rgba(16, 185, 129, 0.05),
+                0 4px 24px -4px rgba(16, 185, 129, 0.12),
+                0 0 40px -8px rgba(16, 185, 129, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            color: #e4e4e7;
+        }
+        .dark .glass-neon-card:hover {
+            border-color: rgba(16, 185, 129, 0.45);
+            box-shadow:
+                0 0 0 1px rgba(16, 185, 129, 0.15),
+                0 8px 32px -4px rgba(16, 185, 129, 0.2),
+                0 0 50px -8px rgba(16, 185, 129, 0.15),
+                0 0 15px -2px rgba(16, 185, 129, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
         }
 
         /* --- ACTIVE CARD (Khi có nhiều Block) --- */
@@ -746,6 +816,67 @@
             </div>
 
 
+            <!-- START: EXIT STRATEGY SECTION -->
+            <div id="exit-strategy-section" class="max-w-6xl mx-auto px-4 mb-20">
+                <div class="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-bold text-emerald-600 dark:text-emerald-500 text-lg uppercase tracking-wider flex items-center">
+                                <i class="fa-solid fa-flag-checkered mr-2"></i>Bảng Phân Tích Phương Án Cắt Lệnh (Exit Analytics)
+                            </h3>
+                            <p class="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Đánh giá hiệu suất tối ưu chốt lời & cắt lỗ dựa theo Pips</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto overflow-y-auto max-h-[350px] nice-scrollbar rounded-xl border border-zinc-100 dark:border-zinc-800/80">
+                        <table class="w-full text-left border-collapse min-w-[600px] relative">
+                            <thead class="sticky top-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md z-10 shadow-sm border-b border-zinc-200 dark:border-zinc-800">
+                                <tr class="text-zinc-500 dark:text-zinc-400 text-[11px] uppercase tracking-wide">
+                                    <th class="py-3 px-4 font-bold w-1/3 text-left">QUYẾT ĐỊNH KẾT THÚC (KETQUA)</th>
+                                    <th class="py-3 px-4 font-bold text-center w-1/4">TẦN SUẤT SỬ DỤNG</th>
+                                    <th class="py-3 px-4 font-bold text-center w-1/6">TỶ LỆ LỰA CHỌN ĐÚNG</th>
+                                    <th class="py-3 px-4 font-bold text-right w-1/4">TỔNG PIPS MANG LẠI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exit-strategy-tbody" class="text-sm">
+                                <!-- Chờ Javascript đổ dữ liệu -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- END: EXIT STRATEGY SECTION -->
+
+            <!-- EXIT TRADES MODAL -->
+            <div id="exitListModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeExitListModal()"></div>
+                <div class="relative bg-white dark:bg-[#0f0f12] rounded-2xl w-full max-w-4xl shadow-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col max-h-[85vh] overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+                    <div class="flex items-center justify-between p-5 border-b border-zinc-100 dark:border-zinc-800 bg-white/95 dark:bg-[#0f0f12]/95 backdrop-blur-md z-20">
+                        <h3 id="exitListTitle" class="text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2"><i class="fa-solid fa-layer-group text-blue-500"></i> Lịch sử các lệnh</h3>
+                        <button onclick="closeExitListModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-red-100 hover:text-red-500 transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="overflow-y-auto nice-scrollbar flex-1 p-0 relative z-10">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-zinc-50 dark:bg-zinc-800/50 sticky top-0 border-b border-zinc-200 dark:border-zinc-800/80 z-10">
+                                <tr class="text-xs text-zinc-500 dark:text-zinc-400">
+                                    <th class="py-3 px-4 font-bold w-12 text-center">#</th>
+                                    <th class="py-3 px-4 font-bold">PAIR/SETUP</th>
+                                    <th class="py-3 px-4 font-bold">THỜI GIAN</th>
+                                    <th class="py-3 px-4 font-bold">GHI CHÚ / CẢM NHẬN</th>
+                                    <th class="py-3 px-4 font-bold text-center">R:R</th>
+                                    <th class="py-3 px-4 font-bold text-right">PIPS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exitListBody">
+                                <!-- JS Gen -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- END MODAL -->
+
             <div id="analytics-area" class="max-w-6xl mx-auto px-4 mb-20 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <div
@@ -1325,6 +1456,14 @@
                 </span>
                 <i class="fa-solid fa-chart-line text-blue-500 text-lg min-w-[20px] text-center"></i>
             </button>
+            <button onclick="scrollToSection('exit-strategy-section')"
+                class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
+                <span
+                    class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-xs font-bold text-emerald-600 dark:text-emerald-400 mr-3 hidden group-hover:block">
+                    Thoat Lenh
+                </span>
+                <i class="fa-solid fa-flag-checkered text-emerald-500 text-lg min-w-[20px] text-center"></i>
+            </button>
             <button onclick="scrollToSection('analytics-area')"
                 class="group flex items-center justify-end bg-white dark:bg-zinc-800 p-3 pl-4 rounded-l-2xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-y border-l border-zinc-100 dark:border-zinc-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 translate-x-2 hover:translate-x-0 w-12 hover:w-auto overflow-hidden whitespace-nowrap">
                 <span
@@ -1628,11 +1767,11 @@
                     const cPrimary = localStorage.getItem('tk-primary-cache');
                     if (cHistory) cachedHistory = JSON.parse(cHistory);
                     if (cPrimary) cachedPrimary = JSON.parse(cPrimary);
-                } catch (e) { }
+                } catch(e) {}
 
                 if (cachedHistory && cachedHistory.length > 0) {
                     globalData = cachedHistory;
-
+                    
                     if (cachedPrimary && cachedPrimary.length > 0) {
                         block10Data = cachedPrimary;
                     }
@@ -1640,14 +1779,14 @@
                     populateMoneyFilter(cachedHistory);
                     renderSummaryStats(cachedHistory);
                     resetAndRender();
-
+                    
                     if (cachedPrimary && cachedPrimary.length > 0) {
-                        try { updatePrimaryReport(); } catch (e) { }
-                        try { renderBlock10Chart(cachedPrimary); } catch (e) { }
+                        try { updatePrimaryReport(); } catch(e){}
+                        try { renderBlock10Chart(cachedPrimary); } catch(e){}
                     } else {
-                        try { renderBlock10Chart(globalData); } catch (e) { }
+                        try { renderBlock10Chart(globalData); } catch(e){}
                     }
-
+                    
                     // Render other charts initially
                     setTimeout(() => {
                         try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
@@ -1661,7 +1800,7 @@
                         renderDurationChart(cachedHistory);
                         renderDurationDistChart(cachedHistory);
                         renderInsights(cachedHistory);
-
+                        
                         const initLoading = document.getElementById('initial-loading');
                         if (initLoading) initLoading.classList.add('hidden');
                         // DO NOT remove animate-spin yet, we are still fetching in background
@@ -1674,7 +1813,7 @@
                     fetch(API_PRIMARY_URL + "?mode=history&_t=" + Date.now()).then(r => r.json()).catch(err => { console.error("Primary API error", err); return null; })
                 ]).then(([historyData, primaryData]) => {
                     let shouldRerender = false;
-
+                    
                     if (historyData && historyData.length > 0) {
                         const newHash = JSON.stringify(historyData);
                         const oldHash = cachedHistory ? JSON.stringify(cachedHistory) : "";
@@ -1684,7 +1823,7 @@
                             localStorage.setItem('tk-history-cache', newHash);
                         }
                     }
-
+                    
                     if (primaryData && primaryData.length > 0) {
                         const newPHash = JSON.stringify(primaryData);
                         const oldPHash = cachedPrimary ? JSON.stringify(cachedPrimary) : "";
@@ -1700,11 +1839,11 @@
                         populateMoneyFilter(globalData);
                         renderSummaryStats(globalData);
                         resetAndRender();
-
+                        
                         setTimeout(function () {
                             try { renderHoursChart(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
                             try { renderAISummary(lastFilteredData.length ? lastFilteredData : globalData); } catch (e) { }
-                            try { updatePrimaryReport(); } catch (e) { }
+                            try { updatePrimaryReport(); } catch (e) { } 
                             try { renderBlock10Chart(typeof block10Data !== 'undefined' ? block10Data : globalData); } catch (e) { }
                         }, 500);
 
@@ -1728,7 +1867,7 @@
                                 setTimeout(runNextTask, 50);
                             } else {
                                 const initLoading = document.getElementById('initial-loading');
-                                if (initLoading) initLoading.classList.add('hidden');
+                                if(initLoading) initLoading.classList.add('hidden');
                                 loadingIcons.forEach(icon => icon.classList.remove('animate-spin'));
                             }
                         }
@@ -1736,7 +1875,7 @@
                     } else {
                         // Just stop the spinner if data hasn't changed
                         const initLoading = document.getElementById('initial-loading');
-                        if (initLoading) initLoading.classList.add('hidden');
+                        if(initLoading) initLoading.classList.add('hidden');
                         loadingIcons.forEach(icon => icon.classList.remove('animate-spin'));
                     }
                 }).catch(e => {
@@ -2248,7 +2387,7 @@
 
                     return true;
                 };
-
+                
                 let filtered = globalData.filter(filterLogic);
 
                 // 3. Cập nhật Stats dựa trên data đã lọc
@@ -2273,12 +2412,16 @@
                     try { renderDurationChart(filtered); } catch (e) { console.error('[Dur]', e); }
                     try { renderDurationDistChart(filtered); } catch (e) { console.error('[DurDist]', e); }
                     try { renderHeatmap(filtered); } catch (e) { console.error('[Heatmap]', e); }
-                    try {
+                    try { 
                         const calData = typeof block10Data !== 'undefined' && block10Data.length > 0 ? block10Data.filter(filterLogic) : filtered;
-                        renderCalendar(calData);
+                        renderCalendar(calData); 
                     } catch (e) { console.error('[Calendar]', e); }
                     try { renderEquityCurve(filtered); } catch (e) { console.error('[Equity]', e); }
                     try { renderBestTrades(filtered); } catch (e) { console.error('[Best Trades]', e); }
+                    try { 
+                        const exitData = typeof block10Data !== 'undefined' && block10Data.length > 0 ? block10Data.filter(filterLogic) : filtered;
+                        renderExitStrategyBoard(exitData); 
+                    } catch (e) { console.error('[Exit Strategy]', e); }
                     try { renderPatternLeaderboard(filtered); } catch (e) { console.error('[Leaderboard]', e); }
                 } else {
                     container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20";
@@ -4236,7 +4379,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                         <!-- Stat 1 -->
                         <div
-                            class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
+                            class="glass-neon-card rounded-2xl py-10 px-6 min-h-[240px] text-center flex flex-col items-center justify-center">
                             <div
                                 class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">
                                 Tổng Số Lệnh</div>
@@ -4244,21 +4387,52 @@
                         </div>
                         <!-- Stat 2 -->
                         <div
-                            class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center">
+                            class="glass-neon-card rounded-2xl py-10 px-6 min-h-[240px] text-center flex flex-col items-center justify-center">
                             <div
                                 class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2">
                                 Lợi Nhuận Ròng</div>
                             <div class="text-5xl font-black text-green-500" id="rep-net-r">+0 Pip</div>
                         </div>
-                        <!-- Stat 3 -->
-                        <div
-                            class="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-6 border border-zinc-100 dark:border-zinc-700/50 text-center flex flex-col items-center justify-center relative overflow-hidden">
-                            <div
-                                class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2 relative z-10">
-                                Tỷ Lệ Thắng</div>
-                            <div class="text-5xl font-black text-blue-500 relative z-10" id="rep-wr">0%</div>
-                            <div class="absolute bottom-0 left-0 h-1 w-full bg-zinc-200 dark:bg-zinc-700">
-                                <div id="rep-wr-bar" class="h-full bg-blue-500" style="width: 0%"></div>
+                        <!-- Stat 3 (Gauge Chart) -->
+                        <div class="glass-neon-card rounded-2xl py-10 px-6 min-h-[240px] flex flex-col items-center justify-center relative">
+                            <div class="text-zinc-500 dark:text-zinc-400 text-xs font-bold uppercase tracking-widest mb-2 relative z-10 w-full text-center">
+                                Tỷ Lệ Thắng
+                            </div>
+                            
+                            <div class="w-full max-w-[180px] mt-2 mb-2 flex flex-col items-center justify-center">
+                                <!-- SVG Arc (Gradient) -->
+                                <svg viewBox="0 0 200 110" class="w-full h-auto drop-shadow-md pb-1 overflow-visible">
+                                    <defs>
+                                        <linearGradient id="wr-gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#ef4444" /> <!-- Red -->
+                                            <stop offset="40%" stop-color="#f59e0b" /> <!-- Amber -->
+                                            <stop offset="70%" stop-color="#eab308" /> <!-- Yellow -->
+                                            <stop offset="100%" stop-color="#22c55e" /> <!-- Green -->
+                                        </linearGradient>
+                                        <filter id="needleShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.3" />
+                                        </filter>
+                                    </defs>
+                                    
+                                    <!-- Background Track -->
+                                    <path d="M 20 100 A 80 80 0 0 1 180 100" stroke="rgba(161, 161, 170, 0.15)" stroke-width="15" stroke-linecap="round" fill="none" class="dark:stroke-zinc-700/50" />
+                                    
+                                    <!-- Colored Arc -->
+                                    <path d="M 20 100 A 80 80 0 0 1 180 100" stroke="url(#wr-gauge-gradient)" stroke-width="15" stroke-linecap="round" fill="none" />
+                                    <!-- Needle Pointer (Copied from TRUC) -->
+                                    <g id="rep-wr-needle" style="transform-origin: 100px 100px; transform: rotate(0deg); transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);" filter="url(#needleShadow)">
+                                        <line x1="100" y1="100" x2="25" y2="100" stroke="#27272a" stroke-width="8" stroke-linecap="round" class="dark:stroke-white" />
+                                        <line x1="100" y1="100" x2="28" y2="100" stroke="#f4f4f5" stroke-width="4" stroke-linecap="round" class="dark:stroke-zinc-900" />
+                                        <circle cx="100" cy="100" r="10" fill="#27272a" class="dark:fill-white" />
+                                        <circle cx="100" cy="100" r="4" fill="#f4f4f5" class="dark:fill-zinc-900" />
+                                    </g>
+                                </svg>
+                                
+                                <!-- Percentage Text -->
+                                <div class="flex items-baseline mt-3 relative z-10 w-full justify-center">
+                                    <span id="rep-wr" class="text-5xl font-black text-zinc-900 dark:text-white drop-shadow-md tracking-tighter">0</span>
+                                    <span class="text-2xl font-bold text-zinc-500 dark:text-zinc-400 ml-0.5">%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -4391,8 +4565,9 @@
             function renderReport(data) {
                 if (!data || data.length === 0) {
                     document.getElementById('rep-total-trades').innerText = '0';
-                    document.getElementById('rep-wr').innerText = '0%';
-                    document.getElementById('rep-wr-bar').style.width = '0%';
+                    document.getElementById('rep-wr').innerText = '0';
+                    const wrNeedle = document.getElementById('rep-wr-needle');
+                    if (wrNeedle) wrNeedle.style.transform = 'rotate(0deg)';
                     const netEl = document.getElementById('rep-net-r');
                     netEl.innerText = '0 Pip';
                     netEl.className = 'text-5xl font-black text-zinc-400';
@@ -4426,8 +4601,12 @@
                 });
 
                 const wr = data.length > 0 ? Math.round((wins / data.length) * 100) : 0;
-                document.getElementById('rep-wr').innerText = wr + '%';
-                document.getElementById('rep-wr-bar').style.width = wr + '%';
+                document.getElementById('rep-wr').innerText = wr;
+                const wrNeedle = document.getElementById('rep-wr-needle');
+                if (wrNeedle) {
+                    const rot = Math.min(Math.max((wr / 100) * 180, 0), 180);
+                    wrNeedle.style.transform = `rotate(${rot}deg)`;
+                }
 
                 const netEl = document.getElementById('rep-net-r');
                 netEl.innerText = (netPips > 0 ? '+' : '') + netPips.toFixed(0) + ' Pip';
@@ -4747,6 +4926,165 @@
 
             // --- EQUITY CURVE ---
             let equityChartInstance = null;
+            function renderExitStrategyBoard(data) {
+                window._currentExitData = data || [];
+                const tbody = document.getElementById('exit-strategy-tbody');
+                if (!tbody) return;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-zinc-500">Chưa có dữ liệu giao dịch</td></tr>';
+                    return;
+                }
+
+                const group = {};
+                let totalTrades = 0;
+
+                data.forEach(trade => {
+                    let reason = String(trade['KetQua'] || trade['ketqua'] || '').trim();
+                    if (!reason || reason.toLowerCase() === 'running' || reason.toLowerCase() === 'chưa có' || reason.toLowerCase() === 'đang chạy') return;
+                    totalTrades++;
+
+                    if (!group[reason]) {
+                        group[reason] = { count: 0, pips: 0, wins: 0 };
+                    }
+                    group[reason].count++;
+                    const pipVal = parseFloat(trade.pip || trade.pips) || 0;
+                    group[reason].pips += pipVal;
+                    
+                    if (pipVal > 0.1 || reason.toLowerCase().match(/win|tp|chốt/i)) {
+                        group[reason].wins++;
+                    }
+                });
+
+                const sorted = Object.keys(group).map(k => ({
+                    reason: k,
+                    ...group[k]
+                })).sort((a, b) => {
+                    // Sort descending by highest generated PIPs
+                    if(b.pips !== a.pips) return b.pips - a.pips;
+                    return b.count - a.count;
+                });
+
+                let html = '';
+                const maxCount = Math.max(...sorted.map(s => s.count), 1);
+
+                sorted.forEach(item => {
+                    const pct = Math.round((item.count / totalTrades) * 100);
+                    const wpct = item.count > 0 ? Math.round((item.wins / item.count) * 100) : 0;
+                    const rLower = item.reason.toLowerCase();
+                    
+                    let badgeColor = 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400';
+                    let barColor = 'bg-zinc-400 dark:bg-zinc-500';
+                    let flagIcon = 'fa-solid fa-flag';
+                    
+                    if (rLower.match(/win|tp|chốt|mct/i)) {
+                        badgeColor = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 font-bold';
+                        barColor = 'bg-emerald-500 dark:bg-emerald-400';
+                        flagIcon = 'fa-solid fa-medal text-emerald-500';
+                    } else if (rLower.match(/loss|sl|sai|lỡ|lỗ/i)) {
+                        badgeColor = 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 border border-red-200 dark:border-red-800/50 font-bold';
+                        barColor = 'bg-red-500 dark:bg-red-400';
+                        flagIcon = 'fa-solid fa-skull-crossbones text-red-500';
+                    } else if (rLower.match(/be|hòa/i)) {
+                        badgeColor = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50 font-bold';
+                        barColor = 'bg-yellow-500 dark:bg-yellow-400';
+                        flagIcon = 'fa-solid fa-shield-halved text-yellow-500';
+                    }
+
+                    const pipTextStr = Number.isInteger(item.pips) ? item.pips : item.pips.toFixed(1);
+                    const isPositive = item.pips > 0;
+                    const isNegative = item.pips < 0;
+                    const pipsColor = isPositive ? 'text-emerald-600 dark:text-emerald-400 font-bold' : (isNegative ? 'text-red-500 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded' : 'text-zinc-500 dark:text-zinc-400');
+                    const prefix = isPositive ? '+' : '';
+
+                    const barWidth = Math.max((item.count / maxCount) * 100, 2);
+
+                    html += `
+                        <tr onclick="openExitListModal('${encodeURIComponent(item.reason)}')" class="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors group cursor-pointer">
+                            <td class="py-4 px-4 align-middle">
+                                <div class="flex items-center gap-2">
+                                    <i class="${flagIcon} min-w-[16px] opacity-70"></i>
+                                    <span class="inline-flex px-2.5 py-1 rounded-md text-[13px] ${badgeColor}">${item.reason}</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 align-middle">
+                                <div class="flex items-center justify-center gap-3">
+                                    <span class="text-sm font-bold w-6 text-right">${item.count}</span>
+                                    <div class="flex-1 max-w-[120px] h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden shrink-0 shadow-inner">
+                                        <div class="h-full ${barColor} rounded-full" style="width: ${barWidth}%"></div>
+                                    </div>
+                                    <span class="text-xs text-zinc-400 w-8 font-mono">${pct}%</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 align-middle text-center">
+                                <div class="font-mono text-sm inline-flex items-center justify-center px-2 py-1 rounded bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 w-14 ${wpct >= 50 ? 'text-emerald-600 dark:text-emerald-400 font-bold border-emerald-100 dark:border-emerald-800/30' : 'text-zinc-500 dark:text-zinc-400'}">
+                                    ${wpct}%
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 align-middle text-right">
+                                <span class="${pipsColor} text-base tracking-tight inline-flex items-center gap-1">
+                                    ${isPositive ? '<i class="fa-solid fa-arrow-trend-up text-[10px] opacity-70"></i>' : (isNegative ? '<i class="fa-solid fa-arrow-trend-down text-[10px] opacity-70"></i>' : '')}
+                                    ${prefix}${pipTextStr} <span class="text-[10px] font-normal opacity-50 uppercase ml-0.5">pips</span>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                if (html === '') {
+                    html = '<tr><td colspan="4" class="py-8 text-center text-zinc-500">Chưa có dữ liệu chốt lệnh hợp lệ (Các lệnh đang chạy không được tính)</td></tr>';
+                }
+                tbody.innerHTML = html;
+            }
+
+            function openExitListModal(encodedReason) {
+                const reason = decodeURIComponent(encodedReason);
+                const items = (window._currentExitData || []).filter(t => String(t['KetQua'] || t['ketqua'] || '').trim() === reason);
+                if (items.length === 0) return;
+                window._currentExitListTrades = items;
+
+                const modal = document.getElementById('exitListModal');
+                const tbody = document.getElementById('exitListBody');
+                const title = document.getElementById('exitListTitle');
+                
+                title.innerHTML = `<i class="fa-solid fa-layer-group text-blue-500"></i> Lịch sử các lệnh: ${reason}`;
+                
+                let html = '';
+                items.forEach((trade, count) => {
+                    const pipVal = parseFloat(trade.pip || trade.pips) || 0;
+                    const isWin = pipVal > 0;
+                    const badge = isWin 
+                        ? '<span class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">WIN</span>'
+                        : '<span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400">LOSS</span>';
+                    
+                    html += `
+                        <tr onclick="openTradeFromExitList(${count})" class="cursor-pointer border-b border-zinc-100 dark:border-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                            <td class="py-3 px-4 text-xs tabular-nums opacity-60 text-center">#${count + 1}</td>
+                            <td class="py-3 px-4 font-bold max-w-[150px] truncate" title="${trade.trade || trade.pair || ''} • ${trade.pattern || trade.setup || ''}">${trade.trade || trade.pair || '-'} <span class="block text-xs font-normal opacity-60 truncate">${trade.pattern || trade.setup || ''}</span></td>
+                            <td class="py-3 px-4 text-xs opacity-80">${trade.time || trade.thoigian || '-'}</td>
+                            <td class="py-3 px-4 text-xs w-1/3 truncate" title="${trade.ghi_chu || trade.cam_nhan || ''}">${trade.ghi_chu || trade.cam_nhan || '-'}</td>
+                            <td class="py-3 px-4 text-center">${badge}</td>
+                            <td class="py-3 px-4 font-black ${isWin ? 'text-emerald-500' : 'text-rose-500'} text-right">${pipVal > 0 ? '+'+pipVal : pipVal} pips</td>
+                        </tr>
+                    `;
+                });
+                
+                tbody.innerHTML = html;
+                modal.classList.remove('hidden');
+            }
+
+            function openTradeFromExitList(index) {
+                const trade = window._currentExitListTrades[index];
+                if (trade) {
+                    closeExitListModal(); // Ẩn modal danh sách lệnh
+                    openModal(trade); // Mở Modal view chi tiết hiện tại của hệ thống
+                }
+            }
+
+            function closeExitListModal() {
+                document.getElementById('exitListModal').classList.add('hidden');
+            }
+
             function renderEquityCurve(data) {
                 const canvas = document.getElementById('equityChart');
                 const statsEl = document.getElementById('equity-stats');
